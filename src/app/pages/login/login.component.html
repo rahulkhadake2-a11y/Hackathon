@@ -1,41 +1,305 @@
-<div class="container full-height align-center page-animate">
-  <div class="card app-card p-4" style="width: 350px">
+<!-- Splash Screen / Loader -->
+<div class="splash-screen" [class.fade-out]="!showSplash">
+  <div class="splash-content">
+    <div class="logo-container">
+      <div class="logo-ring"></div>
+      <div class="logo-ring delay-1"></div>
+      <div class="logo-ring delay-2"></div>
+      <div class="logo-icon">
+        <i class="bi bi-droplet-fill"></i>
+      </div>
+    </div>
+    <h1 class="splash-title">Vendor & Market Analytics</h1>
+    <p class="splash-subtitle">Enterprise Resource Planning</p>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+  </div>
+</div>
 
-    <h4 class="text-center mb-3">Vendor Analytics Login</h4>
-
-    <!-- ERROR MESSAGE -->
-    <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
-
-    <form (ngSubmit)="onLogin()">
-
-      <!-- EMAIL -->
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input class="form-control"
-               [(ngModel)]="email"
-               name="email"
-               placeholder="enter email"
-               required>
+<!-- Login Page -->
+<div class="login-container" [class.visible]="showContent">
+  <!-- Left Side - Image/Demo -->
+  <div class="login-left">
+    <div class="demo-content">
+      <div class="demo-header">
+        <h2 class="demo-title">Vendor & Market Analytics</h2>
       </div>
 
-      <!-- PASSWORD -->
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="password"
-               class="form-control"
-               [(ngModel)]="password"
-               name="password"
-               placeholder="enter password"
-               required>
+      <div class="laptop-mockup">
+        <div class="laptop-screen">
+          <div class="screen-content">
+            <div
+              class="video-container"
+              (mouseenter)="showControls = true"
+              (mouseleave)="resetControlsTimeout()"
+            >
+              <!-- Video Player -->
+              <video
+                #demoVideo
+                class="demo-video"
+                [src]="videoSource"
+                [muted]="isMuted"
+                [loop]="true"
+                (click)="togglePlayPause()"
+                (timeupdate)="onTimeUpdate($event)"
+                (loadedmetadata)="onVideoLoaded($event)"
+                (error)="onVideoError()"
+                (playing)="isPlaying = true"
+                (pause)="isPlaying = false"
+                poster="video-poster.jpg"
+              ></video>
+
+              <!-- Animated Fallback Preview (shown when video not available) -->
+              <div class="animated-preview" *ngIf="showFallback">
+                <div
+                  class="preview-scene"
+                  [class.active]="currentPreviewScene === 1"
+                >
+                  <div class="scene-content login-scene">
+                    <div class="mini-card">
+                      <div class="mini-logo">
+                        <i class="bi bi-graph-up-arrow"></i>
+                      </div>
+                      <div class="mini-title">VendorIQ Login</div>
+                      <div class="mini-input"></div>
+                      <div class="mini-input"></div>
+                      <div class="mini-button"></div>
+                    </div>
+                  </div>
+                  <div class="scene-label">Step 1: Secure Login</div>
+                </div>
+
+                <div
+                  class="preview-scene"
+                  [class.active]="currentPreviewScene === 2"
+                >
+                  <div class="scene-content dashboard-scene">
+                    <div class="mini-sidebar"></div>
+                    <div class="mini-main">
+                      <div class="mini-kpi-row">
+                        <div class="mini-kpi green"></div>
+                        <div class="mini-kpi blue"></div>
+                        <div class="mini-kpi amber"></div>
+                      </div>
+                      <div class="mini-chart"></div>
+                    </div>
+                  </div>
+                  <div class="scene-label">Step 2: Dashboard Overview</div>
+                </div>
+
+                <div
+                  class="preview-scene"
+                  [class.active]="currentPreviewScene === 3"
+                >
+                  <div class="scene-content table-scene">
+                    <div class="mini-sidebar"></div>
+                    <div class="mini-main">
+                      <div class="mini-search"></div>
+                      <div class="mini-table-row"></div>
+                      <div class="mini-table-row"></div>
+                      <div class="mini-table-row"></div>
+                    </div>
+                  </div>
+                  <div class="scene-label">Step 3: Vendor List</div>
+                </div>
+
+                <div
+                  class="preview-scene"
+                  [class.active]="currentPreviewScene === 4"
+                >
+                  <div class="scene-content profile-scene">
+                    <div class="mini-sidebar"></div>
+                    <div class="mini-main">
+                      <div class="mini-profile-header"></div>
+                      <div class="mini-charts-row">
+                        <div class="mini-line-chart"></div>
+                        <div class="mini-bar-chart"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="scene-label">Step 4: Vendor Profile</div>
+                </div>
+              </div>
+
+              <!-- Video Overlay (Play button when paused) -->
+              <div
+                class="video-overlay"
+                *ngIf="!isPlaying && !showFallback"
+                (click)="togglePlayPause()"
+              >
+                <div class="play-button-large">
+                  <i class="bi bi-play-fill"></i>
+                </div>
+              </div>
+
+              <!-- Video Controls -->
+              <div
+                class="video-controls"
+                [class.visible]="showControls"
+                *ngIf="!showFallback"
+              >
+                <button class="control-btn" (click)="togglePlayPause()">
+                  <i
+                    class="bi"
+                    [ngClass]="isPlaying ? 'bi-pause-fill' : 'bi-play-fill'"
+                  ></i>
+                </button>
+
+                <div class="progress-container" (click)="seekVideo($event)">
+                  <div class="progress-bar-video">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="videoProgress"
+                    ></div>
+                    <div
+                      class="progress-handle"
+                      [style.left.%]="videoProgress"
+                    ></div>
+                  </div>
+                </div>
+
+                <span class="time-display"
+                  >{{ formatTime(currentTime) }} /
+                  {{ formatTime(duration) }}</span
+                >
+
+                <button class="control-btn" (click)="toggleMute()">
+                  <i
+                    class="bi"
+                    [ngClass]="
+                      isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'
+                    "
+                  ></i>
+                </button>
+
+                <button class="control-btn" (click)="toggleFullscreen()">
+                  <i class="bi bi-fullscreen"></i>
+                </button>
+              </div>
+
+              <!-- Scene Indicator -->
+              <div class="scene-indicator" *ngIf="currentScene">
+                <span class="scene-badge">{{ currentScene }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="laptop-base"></div>
       </div>
 
-      <!-- LOGIN BUTTON -->
-      <button class="btn btn-primary w-100" [disabled]="loading">
-        <span *ngIf="!loading">Login</span>
-        <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
-      </button>
+      <!-- Video Description -->
+      <div class="video-info">
+        <div class="video-title">
+          <i class="bi bi-play-circle-fill"></i>
+          <span>VendorIQ Demo</span>
+        </div>
+        <p class="video-description">
+          Watch how VendorIQ helps you analyze vendor performance with real-time
+          KPIs, charts, and insights.
+        </p>
+      </div>
 
-    </form>
+      <div class="demo-footer">
+        <span class="project-label">Project:</span>
+        <span class="project-name"> Vendor & Market Analytics</span>
+      </div>
+    </div>
+  </div>
 
+  <!-- Right Side - Login Form -->
+  <div class="login-right">
+    <div class="login-form-container" [class.logging-in]="isLoggingIn">
+      <div class="form-header">
+        <h2 class="form-title">Vendor & Market Analytics</h2>
+        <p class="form-subtitle">Sign in to your account</p>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="error" [@fadeIn]>
+        <i class="bi bi-exclamation-circle"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <form (ngSubmit)="onLogin()" class="login-form">
+        <!-- Email Field -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-envelope"></i>
+            Email or Username
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="Enter your email"
+              required
+              autocomplete="username"
+            />
+            <div class="input-focus-line"></div>
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-lock"></i>
+            Password
+          </label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              class="form-input"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+              autocomplete="current-password"
+            />
+            <div class="input-focus-line"></div>
+          </div>
+        </div>
+
+        <!-- Remember & Forgot -->
+        <div class="form-options">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" />
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Remember me</span>
+          </label>
+          <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="login-btn" [disabled]="loading">
+          <span class="btn-text" *ngIf="!loading">Sign In</span>
+          <div class="btn-loader" *ngIf="loading">
+            <div class="loader-spinner"></div>
+            <span>Signing in...</span>
+          </div>
+        </button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>or continue with</span>
+        </div>
+
+        <!-- Social Login -->
+      </form>
+
+      <p class="signup-text">Don't have an account? <a href="#">Sign up</a></p>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" *ngIf="isLoggingIn && !error">
+      <div class="success-content">
+        <div class="success-icon">
+          <i class="bi bi-check-lg"></i>
+        </div>
+        <p>Welcome back!</p>
+      </div>
+    </div>
   </div>
 </div>
