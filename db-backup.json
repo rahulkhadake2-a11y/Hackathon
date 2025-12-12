@@ -1,0 +1,2270 @@
+{
+  "vendors": [
+    {
+      "id": "1",
+      "vendorName": "Acme Corporation",
+      "contactPerson": "John Smith",
+      "email": "john.smith@acme.com",
+      "phone": "+1-555-0101",
+      "category": "Electronics",
+      "status": "active",
+      "address": "123 Tech Boulevard",
+      "city": "San Francisco",
+      "country": "USA",
+      "taxId": "US-123456789",
+      "paymentTerms": "Net 30",
+      "creditLimit": 500000,
+      "totalPurchases": 1250000,
+      "rating": 4.5,
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-12-01T10:30:00.000Z"
+    },
+    {
+      "id": "2",
+      "vendorName": "Global Supplies Ltd",
+      "contactPerson": "Jane Doe",
+      "email": "jane.doe@globalsupplies.com",
+      "phone": "+1-555-0102",
+      "category": "Office Supplies",
+      "status": "active",
+      "address": "456 Commerce Street",
+      "city": "New York",
+      "country": "USA",
+      "taxId": "US-987654321",
+      "paymentTerms": "Net 45",
+      "creditLimit": 250000,
+      "totalPurchases": 890000,
+      "rating": 4.2,
+      "createdAt": "2024-02-20T09:15:00.000Z",
+      "updatedAt": "2024-11-28T14:20:00.000Z"
+    },
+    {
+      "id": "3",
+      "vendorName": "Tech Solutions Inc",
+      "contactPerson": "Bob Wilson",
+      "email": "bob.wilson@techsolutions.com",
+      "phone": "+1-555-0103",
+      "category": "IT Services",
+      "status": "active",
+      "address": "789 Innovation Drive",
+      "city": "Austin",
+      "country": "USA",
+      "taxId": "US-456789123",
+      "paymentTerms": "Net 30",
+      "creditLimit": 750000,
+      "totalPurchases": 2100000,
+      "rating": 4.8,
+      "createdAt": "2024-03-10T11:30:00.000Z",
+      "updatedAt": "2024-12-05T16:45:00.000Z"
+    },
+    {
+      "id": "4",
+      "vendorName": "Prime Materials Co",
+      "contactPerson": "Alice Brown",
+      "email": "alice.brown@primematerials.com",
+      "phone": "+1-555-0104",
+      "category": "Raw Materials",
+      "status": "active",
+      "address": "321 Industrial Park",
+      "city": "Chicago",
+      "country": "USA",
+      "taxId": "US-321654987",
+      "paymentTerms": "Net 60",
+      "creditLimit": 100000,
+      "totalPurchases": 0,
+      "rating": 0,
+      "createdAt": "2024-01-05T07:00:00.000Z",
+      "updatedAt": "2025-12-12T19:09:33.740Z"
+    },
+    {
+      "id": "5",
+      "vendorName": "Swift Logistics",
+      "contactPerson": "Charlie Davis",
+      "email": "charlie.davis@swiftlogistics.com",
+      "phone": "+1-555-0105",
+      "category": "Logistics",
+      "status": "active",
+      "address": "555 Transport Way",
+      "city": "Los Angeles",
+      "country": "USA",
+      "taxId": "US-654321789",
+      "paymentTerms": "Net 15",
+      "creditLimit": 300000,
+      "totalPurchases": 1780000,
+      "rating": 4.6,
+      "createdAt": "2024-04-01T10:00:00.000Z",
+      "updatedAt": "2024-12-08T11:15:00.000Z"
+    },
+    {
+      "id": "6",
+      "vendorName": "Quality Parts Manufacturing",
+      "contactPerson": "Diana Evans",
+      "email": "diana.evans@qualityparts.com",
+      "phone": "+1-555-0106",
+      "category": "Manufacturing",
+      "status": "active",
+      "address": "888 Factory Lane",
+      "city": "Detroit",
+      "country": "USA",
+      "taxId": "US-789123456",
+      "paymentTerms": "Net 30",
+      "creditLimit": 400000,
+      "totalPurchases": 1560000,
+      "rating": 4.3,
+      "createdAt": "2024-05-15T08:30:00.000Z",
+      "updatedAt": "2024-12-02T13:00:00.000Z"
+    },
+    {
+      "id": "17d3",
+      "vendorName": "Rahul ",
+      "contactPerson": "nithin",
+      "email": "rahul@gmail.com",
+      "phone": "9876545678",
+      "category": "Manufacturing",
+      "status": "active",
+      "address": "",
+      "city": "Hyderabad",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 454325.76,
+      "rating": 0,
+      "createdAt": "2025-12-12T09:35:40.386Z",
+      "updatedAt": "2025-12-12T09:36:36.336Z"
+    },
+    {
+      "id": "3a2f",
+      "vendorName": "Sahil Solutions ",
+      "contactPerson": "Darshan",
+      "email": "darshan@gmail.com",
+      "phone": "987654567",
+      "category": "IT Services",
+      "status": "active",
+      "address": "",
+      "city": "Gujurat",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 11232725.76,
+      "rating": 0,
+      "createdAt": "2025-12-12T09:37:42.002Z",
+      "updatedAt": "2025-12-12T09:38:47.308Z"
+    },
+    {
+      "id": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "contactPerson": "Rahul K",
+      "email": "pratham@gmail.com",
+      "phone": "987654356",
+      "category": "IT Services",
+      "status": "active",
+      "address": "",
+      "city": "Bengaluru",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 5010737.76,
+      "rating": 0,
+      "createdAt": "2025-12-12T09:40:01.177Z",
+      "updatedAt": "2025-12-12T18:32:19.959Z"
+    },
+    {
+      "id": "fc25",
+      "vendorName": "Sagar",
+      "contactPerson": "Rakesh",
+      "email": "sagar44@gmail.com",
+      "phone": "1122334455",
+      "category": "IT Services",
+      "status": "active",
+      "address": "",
+      "city": "Solapur",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 0,
+      "rating": 0,
+      "createdAt": "2025-12-12T13:08:25.007Z",
+      "updatedAt": "2025-12-12T13:08:25.007Z"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "1",
+      "vendorId": "1",
+      "vendorName": "Acme Corporation",
+      "purchaseOrderNumber": "PO-2024-001",
+      "orderDate": "2024-12-01",
+      "expectedDeliveryDate": "2024-12-15",
+      "actualDeliveryDate": "2024-12-14",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "1",
+          "itemName": "Laptop Computer",
+          "description": "Electronic Components",
+          "quantity": 100,
+          "unitPrice": 250,
+          "total": 25000
+        },
+        {
+          "itemId": "3",
+          "itemName": "Wireless Keyboard",
+          "description": "Circuit Boards",
+          "quantity": 50,
+          "unitPrice": 180,
+          "total": 9000
+        }
+      ],
+      "subtotal": 34000,
+      "tax": 2720,
+      "totalAmount": 36720,
+      "notes": "Urgent delivery required",
+      "createdAt": "2024-12-01T08:00:00.000Z",
+      "createdBy": "John Smith",
+      "urgent": true,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 13,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "id": "2",
+      "vendorId": "2",
+      "vendorName": "Global Supplies Ltd",
+      "purchaseOrderNumber": "PO-2024-002",
+      "orderDate": "2024-12-05",
+      "expectedDeliveryDate": "2024-12-20",
+      "actualDeliveryDate": "2024-12-23",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "6",
+          "itemName": "Office Chair",
+          "description": "Office Chairs",
+          "quantity": 25,
+          "unitPrice": 450,
+          "total": 11250
+        },
+        {
+          "itemId": "7",
+          "itemName": "Standing Desk",
+          "description": "Desks",
+          "quantity": 15,
+          "unitPrice": 800,
+          "total": 12000
+        }
+      ],
+      "subtotal": 23250,
+      "tax": 1860,
+      "totalAmount": 25110,
+      "notes": "New office setup",
+      "createdAt": "2024-12-05T09:30:00.000Z",
+      "createdBy": "Jane Doe",
+      "urgent": false,
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 3,
+      "qualityRating": 3,
+      "defectCount": 2,
+      "defectRate": 5,
+      "returnedItems": 2,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 5,
+      "leadTime": 18,
+      "communicationRating": 3,
+      "complianceIssues": [
+        "Minor documentation delay"
+      ]
+    },
+    {
+      "id": "3",
+      "vendorId": "3",
+      "vendorName": "Tech Solutions Inc",
+      "purchaseOrderNumber": "PO-2024-003",
+      "orderDate": "2024-12-08",
+      "expectedDeliveryDate": "2024-12-22",
+      "actualDeliveryDate": null,
+      "status": "pending",
+      "items": [
+        {
+          "itemId": "8",
+          "itemName": "Network Cable Cat6",
+          "description": "Software Licenses",
+          "quantity": 50,
+          "unitPrice": 500,
+          "total": 25000
+        },
+        {
+          "itemId": "10",
+          "itemName": "Webcam HD",
+          "description": "Support Contract",
+          "quantity": 1,
+          "unitPrice": 15000,
+          "total": 15000
+        }
+      ],
+      "subtotal": 40000,
+      "tax": 3200,
+      "totalAmount": 43200,
+      "notes": "Annual renewal",
+      "createdAt": "2024-12-08T14:00:00.000Z",
+      "createdBy": "Bob Wilson",
+      "urgent": false,
+      "onTimeDelivery": null,
+      "deliveryDelayDays": null,
+      "qualityRating": null,
+      "defectCount": null,
+      "defectRate": null,
+      "returnedItems": null,
+      "paymentStatus": "pending",
+      "paymentDelayDays": null,
+      "leadTime": null,
+      "communicationRating": 4,
+      "complianceIssues": []
+    },
+    {
+      "id": "4",
+      "vendorId": "5",
+      "vendorName": "Swift Logistics",
+      "purchaseOrderNumber": "PO-2024-004",
+      "orderDate": "2024-12-10",
+      "expectedDeliveryDate": "2024-12-25",
+      "actualDeliveryDate": null,
+      "status": "approved",
+      "items": [
+        {
+          "itemId": "7",
+          "itemName": "Standing Desk",
+          "description": "Freight Services",
+          "quantity": 1,
+          "unitPrice": 8500,
+          "total": 8500
+        },
+        {
+          "itemId": "6",
+          "itemName": "Office Chair",
+          "description": "Warehousing",
+          "quantity": 1,
+          "unitPrice": 3500,
+          "total": 3500
+        }
+      ],
+      "subtotal": 12000,
+      "tax": 960,
+      "totalAmount": 12960,
+      "notes": "Q1 logistics contract",
+      "createdAt": "2024-12-10T10:15:00.000Z",
+      "createdBy": "Charlie Davis",
+      "urgent": true,
+      "onTimeDelivery": null,
+      "deliveryDelayDays": null,
+      "qualityRating": null,
+      "defectCount": null,
+      "defectRate": null,
+      "returnedItems": null,
+      "paymentStatus": "pending",
+      "paymentDelayDays": null,
+      "leadTime": null,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "id": "5",
+      "vendorId": "6",
+      "vendorName": "Quality Parts Manufacturing",
+      "purchaseOrderNumber": "PO-2024-005",
+      "orderDate": "2024-12-11",
+      "expectedDeliveryDate": "2024-12-28",
+      "actualDeliveryDate": null,
+      "status": "pending",
+      "items": [
+        {
+          "itemId": "9",
+          "itemName": "USB-C Hub",
+          "description": "Custom Parts A",
+          "quantity": 200,
+          "unitPrice": 75,
+          "total": 15000
+        },
+        {
+          "itemId": "2",
+          "itemName": "Desktop Monitor",
+          "description": "Custom Parts B",
+          "quantity": 150,
+          "unitPrice": 90,
+          "total": 13500
+        }
+      ],
+      "subtotal": 28500,
+      "tax": 2280,
+      "totalAmount": 30780,
+      "notes": "Manufacturing order",
+      "createdAt": "2024-12-11T11:30:00.000Z",
+      "createdBy": "Diana Evans",
+      "urgent": false,
+      "onTimeDelivery": null,
+      "deliveryDelayDays": null,
+      "qualityRating": null,
+      "defectCount": null,
+      "defectRate": null,
+      "returnedItems": null,
+      "paymentStatus": "pending",
+      "paymentDelayDays": null,
+      "leadTime": null,
+      "communicationRating": 4,
+      "complianceIssues": []
+    },
+    {
+      "id": "6",
+      "vendorId": "1",
+      "vendorName": "Acme Corporation",
+      "purchaseOrderNumber": "PO-2024-006",
+      "orderDate": "2024-11-15",
+      "expectedDeliveryDate": "2024-11-30",
+      "actualDeliveryDate": "2024-11-29",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "9",
+          "itemName": "USB-C Hub",
+          "description": "Power Supplies",
+          "quantity": 75,
+          "unitPrice": 120,
+          "total": 9000
+        }
+      ],
+      "subtotal": 9000,
+      "tax": 720,
+      "totalAmount": 9720,
+      "notes": "Restock order",
+      "createdAt": "2024-11-15T10:00:00.000Z",
+      "createdBy": "John Smith",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 4,
+      "defectCount": 1,
+      "defectRate": 1.3,
+      "returnedItems": 1,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 14,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "id": "7",
+      "vendorId": "2",
+      "vendorName": "Global Supplies Ltd",
+      "purchaseOrderNumber": "PO-2024-007",
+      "orderDate": "2024-11-01",
+      "expectedDeliveryDate": "2024-11-15",
+      "actualDeliveryDate": "2024-11-20",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "6",
+          "itemName": "Office Chair",
+          "description": "Filing Cabinets",
+          "quantity": 10,
+          "unitPrice": 350,
+          "total": 3500
+        }
+      ],
+      "subtotal": 3500,
+      "tax": 280,
+      "totalAmount": 3780,
+      "notes": "Storage expansion",
+      "createdAt": "2024-11-01T08:30:00.000Z",
+      "createdBy": "Jane Doe",
+      "urgent": false,
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 5,
+      "qualityRating": 4,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 10,
+      "leadTime": 19,
+      "communicationRating": 2,
+      "complianceIssues": [
+        "Late delivery notification"
+      ]
+    },
+    {
+      "id": "8",
+      "vendorId": "3",
+      "vendorName": "Tech Solutions Inc",
+      "purchaseOrderNumber": "PO-2024-008",
+      "orderDate": "2024-10-20",
+      "expectedDeliveryDate": "2024-11-05",
+      "actualDeliveryDate": "2024-11-04",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "8",
+          "itemName": "Network Cable Cat6",
+          "description": "Cloud Hosting",
+          "quantity": 12,
+          "unitPrice": 1200,
+          "total": 14400
+        }
+      ],
+      "subtotal": 14400,
+      "tax": 1152,
+      "totalAmount": 15552,
+      "notes": "Annual hosting",
+      "createdAt": "2024-10-20T14:00:00.000Z",
+      "createdBy": "Bob Wilson",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 15,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "id": "32c0",
+      "vendorId": null,
+      "vendorName": "Gemba",
+      "purchaseOrderNumber": "PO-2025-159",
+      "orderDate": "2025-11-30",
+      "expectedDeliveryDate": "2025-12-04",
+      "actualDeliveryDate": "2025-12-04",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "506e",
+          "itemName": "RK Part",
+          "description": "Test",
+          "quantity": 6,
+          "unitPrice": 2000,
+          "total": 12000
+        }
+      ],
+      "subtotal": 12000,
+      "tax": 960,
+      "totalAmount": 12960,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "3",
+      "defectCount": 2,
+      "defectRate": 33.33333333333333,
+      "returnedItems": 1,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 2,
+      "leadTime": 4,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T08:51:40.158Z"
+    },
+    {
+      "vendorId": null,
+      "vendorName": "RK9295",
+      "purchaseOrderNumber": "PO-2025-102",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-11",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "5c23",
+          "itemName": "TV branch two",
+          "description": "Test Item",
+          "quantity": 100,
+          "unitPrice": 200,
+          "total": 20000
+        }
+      ],
+      "subtotal": 20000,
+      "tax": 1600,
+      "totalAmount": 21600,
+      "urgent": false,
+      "createdBy": "Nithin",
+      "paymentStatus": "paid",
+      "paymentDelayDays": 4,
+      "id": "05e8"
+    },
+    {
+      "id": "5494",
+      "vendorId": null,
+      "vendorName": "Nithin Chilumula",
+      "purchaseOrderNumber": "PO-2025-483",
+      "orderDate": "2025-10-06",
+      "expectedDeliveryDate": "2025-12-20",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "4",
+          "itemName": "Printer Paper A4",
+          "description": "Spare Parts",
+          "quantity": 345,
+          "unitPrice": 982,
+          "total": 338790
+        }
+      ],
+      "subtotal": 338790,
+      "tax": 27103.2,
+      "totalAmount": 365893.2,
+      "urgent": false,
+      "createdBy": "Nithin",
+      "qualityRating": "4",
+      "defectCount": 100,
+      "defectRate": 28.985507246376812,
+      "returnedItems": 90,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 10,
+      "leadTime": 10,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T09:24:23.526Z"
+    },
+    {
+      "id": "abb2",
+      "vendorId": null,
+      "vendorName": "Rahul K",
+      "purchaseOrderNumber": "PO-2025-871",
+      "orderDate": "2025-11-30",
+      "expectedDeliveryDate": "2025-12-03",
+      "actualDeliveryDate": "2025-12-05",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "5",
+          "itemName": "Ballpoint Pens",
+          "description": "Test",
+          "quantity": 123,
+          "unitPrice": 234,
+          "total": 28782
+        }
+      ],
+      "subtotal": 28782,
+      "tax": 2302.56,
+      "totalAmount": 31084.56,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 2,
+      "qualityRating": "3",
+      "defectCount": 40,
+      "defectRate": 32.52032520325203,
+      "returnedItems": 30,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 2,
+      "leadTime": 5,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T09:31:48.795Z"
+    },
+    {
+      "id": "0b6c",
+      "vendorId": "17d3",
+      "vendorName": "Rahul ",
+      "purchaseOrderNumber": "PO-2025-946",
+      "orderDate": "2025-11-23",
+      "expectedDeliveryDate": "2025-12-10",
+      "actualDeliveryDate": "2025-12-12",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "2",
+          "itemName": "Desktop Monitor",
+          "description": "Item1",
+          "quantity": 100,
+          "unitPrice": 200,
+          "total": 20000
+        }
+      ],
+      "subtotal": 20000,
+      "tax": 1600,
+      "totalAmount": 21600,
+      "urgent": false,
+      "createdBy": "Nithin",
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 2,
+      "qualityRating": "3",
+      "defectCount": 40,
+      "defectRate": 40,
+      "returnedItems": 40,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 2,
+      "leadTime": 19,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T09:36:34.835Z"
+    },
+    {
+      "id": "16c4",
+      "vendorId": "3a2f",
+      "vendorName": "Sahil Solutions ",
+      "purchaseOrderNumber": "PO-2025-798",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-11",
+      "actualDeliveryDate": "2025-12-04",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "1",
+          "itemName": "Laptop Computer",
+          "description": "Laptops",
+          "quantity": 250,
+          "unitPrice": 40000,
+          "total": 10000000
+        }
+      ],
+      "subtotal": 10000000,
+      "tax": 800000,
+      "totalAmount": 10800000,
+      "urgent": false,
+      "createdBy": "Darshan",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "2",
+      "defectCount": 70,
+      "defectRate": 28.000000000000004,
+      "returnedItems": 40,
+      "paymentStatus": "overdue",
+      "paymentDelayDays": 10,
+      "leadTime": 2,
+      "communicationRating": "5",
+      "createdAt": "2025-12-12T09:38:46.074Z"
+    },
+    {
+      "id": "2680",
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "purchaseOrderNumber": "PO-2025-651",
+      "orderDate": "2025-12-04",
+      "expectedDeliveryDate": "2025-12-11",
+      "status": "shipped",
+      "items": [
+        {
+          "itemId": "6",
+          "itemName": "Office Chair",
+          "description": "Chairs",
+          "quantity": 200,
+          "unitPrice": 1000,
+          "total": 200000
+        }
+      ],
+      "subtotal": 200000,
+      "tax": 16000,
+      "totalAmount": 216000,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "paymentStatus": "partial",
+      "paymentDelayDays": 10,
+      "createdAt": "2025-12-12T09:41:48.632Z"
+    },
+    {
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "purchaseOrderNumber": "PO-2025-668",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-04",
+      "actualDeliveryDate": "2025-12-04",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "1",
+          "itemName": "Laptop Computer",
+          "description": "Laotops",
+          "quantity": 200,
+          "unitPrice": 20000,
+          "total": 4000000
+        }
+      ],
+      "subtotal": 4000000,
+      "tax": 320000,
+      "totalAmount": 4320000,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "2",
+      "defectCount": 100,
+      "defectRate": 50,
+      "returnedItems": 100,
+      "paymentStatus": "overdue",
+      "paymentDelayDays": 2,
+      "leadTime": 2,
+      "communicationRating": "4",
+      "id": "c740"
+    },
+    {
+      "id": "multi-vendor-1",
+      "vendorId": "1",
+      "vendorName": "Acme Corporation",
+      "purchaseOrderNumber": "PO-2025-701",
+      "orderDate": "2025-11-15",
+      "expectedDeliveryDate": "2025-11-25",
+      "actualDeliveryDate": "2025-11-24",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "4",
+          "itemName": "Printer Paper A4",
+          "description": "Premium Steel Plates",
+          "quantity": 500,
+          "unitPrice": 125,
+          "total": 62500
+        },
+        {
+          "itemId": "8",
+          "itemName": "Network Cable Cat6",
+          "description": "Industrial Cables",
+          "quantity": 1000,
+          "unitPrice": 15,
+          "total": 15000
+        },
+        {
+          "itemId": "10",
+          "itemName": "Webcam HD",
+          "description": "Safety Equipment",
+          "quantity": 50,
+          "unitPrice": 280,
+          "total": 14000
+        }
+      ],
+      "subtotal": 91500,
+      "tax": 7320,
+      "totalAmount": 98820,
+      "notes": "Q4 material order",
+      "createdAt": "2025-11-15T08:00:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 9,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "id": "multi-vendor-2",
+      "vendorId": "3",
+      "vendorName": "Tech Solutions Inc",
+      "purchaseOrderNumber": "PO-2025-702",
+      "orderDate": "2025-11-18",
+      "expectedDeliveryDate": "2025-11-28",
+      "actualDeliveryDate": "2025-11-27",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "4",
+          "itemName": "Printer Paper A4",
+          "description": "Premium Steel Plates",
+          "quantity": 300,
+          "unitPrice": 135,
+          "total": 40500
+        },
+        {
+          "itemId": "8",
+          "itemName": "Network Cable Cat6",
+          "description": "Industrial Cables",
+          "quantity": 800,
+          "unitPrice": 18,
+          "total": 14400
+        }
+      ],
+      "subtotal": 54900,
+      "tax": 4392,
+      "totalAmount": 59292,
+      "notes": "Alternative supplier test",
+      "createdAt": "2025-11-18T10:00:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 9,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "id": "multi-vendor-3",
+      "vendorId": "6",
+      "vendorName": "Quality Parts Manufacturing",
+      "purchaseOrderNumber": "PO-2025-703",
+      "orderDate": "2025-11-20",
+      "expectedDeliveryDate": "2025-12-01",
+      "actualDeliveryDate": "2025-12-01",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "4",
+          "itemName": "Printer Paper A4",
+          "description": "Premium Steel Plates",
+          "quantity": 400,
+          "unitPrice": 120,
+          "total": 48000
+        },
+        {
+          "itemId": "3",
+          "itemName": "Wireless Keyboard",
+          "description": "Precision Bearings",
+          "quantity": 200,
+          "unitPrice": 45,
+          "total": 9000
+        },
+        {
+          "itemId": "10",
+          "itemName": "Webcam HD",
+          "description": "Safety Equipment",
+          "quantity": 75,
+          "unitPrice": 250,
+          "total": 18750
+        }
+      ],
+      "subtotal": 75750,
+      "tax": 6060,
+      "totalAmount": 81810,
+      "notes": "Monthly supply",
+      "createdAt": "2025-11-20T09:30:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 4,
+      "defectCount": 2,
+      "defectRate": 0.3,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 11,
+      "communicationRating": 4,
+      "complianceIssues": []
+    },
+    {
+      "id": "multi-vendor-4",
+      "vendorId": "2",
+      "vendorName": "Global Supplies Ltd",
+      "purchaseOrderNumber": "PO-2025-704",
+      "orderDate": "2025-11-22",
+      "expectedDeliveryDate": "2025-12-05",
+      "actualDeliveryDate": "2025-12-08",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "8",
+          "itemName": "Network Cable Cat6",
+          "description": "Industrial Cables",
+          "quantity": 600,
+          "unitPrice": 22,
+          "total": 13200
+        },
+        {
+          "itemId": "4",
+          "itemName": "Printer Paper A4",
+          "description": "Packaging Materials",
+          "quantity": 1000,
+          "unitPrice": 8,
+          "total": 8000
+        },
+        {
+          "itemId": "5",
+          "itemName": "Ballpoint Pens",
+          "description": "Office Supplies Bundle",
+          "quantity": 50,
+          "unitPrice": 150,
+          "total": 7500
+        }
+      ],
+      "subtotal": 28700,
+      "tax": 2296,
+      "totalAmount": 30996,
+      "notes": "General supplies",
+      "createdAt": "2025-11-22T11:00:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 3,
+      "qualityRating": 3,
+      "defectCount": 5,
+      "defectRate": 2,
+      "returnedItems": 3,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 5,
+      "leadTime": 16,
+      "communicationRating": 3,
+      "complianceIssues": [
+        "Late delivery notification"
+      ]
+    },
+    {
+      "id": "multi-vendor-5",
+      "vendorId": "5",
+      "vendorName": "Swift Logistics",
+      "purchaseOrderNumber": "PO-2025-705",
+      "orderDate": "2025-11-25",
+      "expectedDeliveryDate": "2025-12-02",
+      "actualDeliveryDate": "2025-12-01",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "4",
+          "itemName": "Printer Paper A4",
+          "description": "Packaging Materials",
+          "quantity": 2000,
+          "unitPrice": 6,
+          "total": 12000
+        },
+        {
+          "itemId": "7",
+          "itemName": "Standing Desk",
+          "description": "Shipping Containers",
+          "quantity": 20,
+          "unitPrice": 350,
+          "total": 7000
+        }
+      ],
+      "subtotal": 19000,
+      "tax": 1520,
+      "totalAmount": 20520,
+      "notes": "Logistics supplies",
+      "createdAt": "2025-11-25T14:00:00.000Z",
+      "createdBy": "Admin",
+      "urgent": true,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 6,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "vendorId": "1",
+      "vendorName": "Acme Corporation",
+      "purchaseOrderNumber": "PO-2025-706",
+      "orderDate": "2025-12-01",
+      "expectedDeliveryDate": "2025-12-10",
+      "actualDeliveryDate": "2025-12-09",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "1",
+          "itemName": "Laptop Computer",
+          "description": "Laptop Computer",
+          "quantity": 500,
+          "unitPrice": 950,
+          "total": 475000
+        },
+        {
+          "itemId": "3",
+          "itemName": "Wireless Keyboard",
+          "description": "Wireless Keyboard",
+          "quantity": 100,
+          "unitPrice": 75,
+          "total": 7500
+        },
+        {
+          "itemId": "9",
+          "itemName": "USB-C Hub",
+          "description": "USB-C Hub",
+          "quantity": 1200,
+          "unitPrice": 60,
+          "total": 72000
+        }
+      ],
+      "subtotal": 554500,
+      "tax": 44360,
+      "totalAmount": 598860,
+      "notes": "December inventory",
+      "urgent": false,
+      "createdBy": "Admin",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 8,
+      "communicationRating": 5,
+      "id": "multi-vendor-6"
+    },
+    {
+      "id": "multi-vendor-7",
+      "vendorId": "6",
+      "vendorName": "Quality Parts Manufacturing",
+      "purchaseOrderNumber": "PO-2025-707",
+      "orderDate": "2025-12-03",
+      "expectedDeliveryDate": "2025-12-12",
+      "actualDeliveryDate": "2025-12-11",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "3",
+          "itemName": "Wireless Keyboard",
+          "description": "Precision Bearings",
+          "quantity": 300,
+          "unitPrice": 48,
+          "total": 14400
+        },
+        {
+          "itemId": "2",
+          "itemName": "Desktop Monitor",
+          "description": "Electronic Sensors",
+          "quantity": 80,
+          "unitPrice": 90,
+          "total": 7200
+        },
+        {
+          "itemId": "9",
+          "itemName": "USB-C Hub",
+          "description": "Hydraulic Components",
+          "quantity": 25,
+          "unitPrice": 320,
+          "total": 8000
+        }
+      ],
+      "subtotal": 29600,
+      "tax": 2368,
+      "totalAmount": 31968,
+      "notes": "Manufacturing parts",
+      "createdAt": "2025-12-03T09:00:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 4,
+      "defectCount": 1,
+      "defectRate": 0.2,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 8,
+      "communicationRating": 4,
+      "complianceIssues": []
+    },
+    {
+      "id": "multi-vendor-8",
+      "vendorId": "3",
+      "vendorName": "Tech Solutions Inc",
+      "purchaseOrderNumber": "PO-2025-708",
+      "orderDate": "2025-12-05",
+      "expectedDeliveryDate": "2025-12-15",
+      "actualDeliveryDate": "2025-12-14",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "2",
+          "itemName": "Desktop Monitor",
+          "description": "Electronic Sensors",
+          "quantity": 150,
+          "unitPrice": 78,
+          "total": 11700
+        },
+        {
+          "itemId": "8",
+          "itemName": "Network Cable Cat6",
+          "description": "Network Equipment",
+          "quantity": 10,
+          "unitPrice": 1200,
+          "total": 12000
+        },
+        {
+          "itemId": "10",
+          "itemName": "Webcam HD",
+          "description": "Safety Equipment",
+          "quantity": 30,
+          "unitPrice": 295,
+          "total": 8850
+        }
+      ],
+      "subtotal": 32550,
+      "tax": 2604,
+      "totalAmount": 35154,
+      "notes": "Tech upgrade",
+      "createdAt": "2025-12-05T10:15:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": 5,
+      "defectCount": 0,
+      "defectRate": 0,
+      "returnedItems": 0,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 9,
+      "communicationRating": 5,
+      "complianceIssues": []
+    },
+    {
+      "vendorId": "5",
+      "vendorName": "Swift Logistics",
+      "purchaseOrderNumber": "PO-2025-709",
+      "orderDate": "2025-12-08",
+      "expectedDeliveryDate": "2025-12-15",
+      "actualDeliveryDate": "2025-12-14",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "7",
+          "itemName": "Standing Desk",
+          "description": "Standing Desk",
+          "quantity": 100,
+          "unitPrice": 550,
+          "total": 55000
+        }
+      ],
+      "subtotal": 55000,
+      "tax": 4400,
+      "totalAmount": 59400,
+      "notes": "Express delivery contract",
+      "urgent": true,
+      "createdBy": "Admin",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "2",
+      "paymentStatus": "paid",
+      "paymentDelayDays": 0,
+      "leadTime": 6,
+      "communicationRating": 5,
+      "id": "single-vendor-1"
+    },
+    {
+      "id": "high-risk-1",
+      "vendorId": "4",
+      "vendorName": "Prime Materials Co",
+      "purchaseOrderNumber": "PO-2025-710",
+      "orderDate": "2025-11-10",
+      "expectedDeliveryDate": "2025-11-20",
+      "actualDeliveryDate": "2025-11-28",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "506e",
+          "itemName": "RK Part",
+          "description": "Raw Chemicals",
+          "quantity": 50,
+          "unitPrice": 200,
+          "total": 10000
+        },
+        {
+          "itemId": "5c23",
+          "itemName": "TV branch two",
+          "description": "Specialty Compounds",
+          "quantity": 30,
+          "unitPrice": 450,
+          "total": 13500
+        }
+      ],
+      "subtotal": 23500,
+      "tax": 1880,
+      "totalAmount": 25380,
+      "notes": "Specialty order",
+      "createdAt": "2025-11-10T08:00:00.000Z",
+      "createdBy": "Admin",
+      "urgent": false,
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 8,
+      "qualityRating": 2,
+      "defectCount": 10,
+      "defectRate": 12.5,
+      "returnedItems": 8,
+      "paymentStatus": "overdue",
+      "paymentDelayDays": 15,
+      "leadTime": 18,
+      "communicationRating": 2,
+      "complianceIssues": [
+        "Documentation incomplete",
+        "Quality standards not met"
+      ]
+    },
+    {
+      "id": "e01c",
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "purchaseOrderNumber": "PO-2025-327",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-04",
+      "actualDeliveryDate": "2025-12-11",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "0ad5",
+          "itemName": "Laptop Computer",
+          "description": "Laptop Computer",
+          "quantity": 20,
+          "unitPrice": 2000,
+          "total": 40000
+        }
+      ],
+      "subtotal": 40000,
+      "tax": 3200,
+      "totalAmount": 43200,
+      "urgent": true,
+      "createdBy": "Nithin",
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 7,
+      "qualityRating": "3",
+      "paymentStatus": "paid",
+      "paymentDelayDays": 2,
+      "leadTime": 9,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T18:32:18.212Z"
+    }
+  ],
+  "riskanalysis": [
+    {
+      "id": "1",
+      "vendorId": "1",
+      "vendorName": "Acme Corporation",
+      "riskLevel": "low",
+      "overallScore": 22,
+      "financialRisk": 18,
+      "operationalRisk": 25,
+      "complianceRisk": 20,
+      "reputationRisk": 25,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 18,
+          "weight": 0.3,
+          "description": "Excellent payment track record"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 25,
+          "weight": 0.25,
+          "description": "98% on-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 20,
+          "weight": 0.25,
+          "description": "Fully compliant"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 25,
+          "weight": 0.2,
+          "description": "Industry leader"
+        }
+      ],
+      "lastAssessmentDate": "2024-12-01T00:00:00.000Z",
+      "nextReviewDate": "2025-03-01T00:00:00.000Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2024-01-15T08:00:00.000Z",
+      "updatedAt": "2024-12-01T10:30:00.000Z"
+    },
+    {
+      "id": "2",
+      "vendorId": "2",
+      "vendorName": "Global Supplies Ltd",
+      "riskLevel": "medium",
+      "overallScore": 38,
+      "financialRisk": 35,
+      "operationalRisk": 40,
+      "complianceRisk": 38,
+      "reputationRisk": 39,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 35,
+          "weight": 0.3,
+          "description": "Occasional late payments"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 40,
+          "weight": 0.25,
+          "description": "85% on-time delivery"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 38,
+          "weight": 0.25,
+          "description": "Minor issues resolved"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 39,
+          "weight": 0.2,
+          "description": "Good standing"
+        }
+      ],
+      "lastAssessmentDate": "2024-11-15T00:00:00.000Z",
+      "nextReviewDate": "2025-02-15T00:00:00.000Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2024-02-20T09:15:00.000Z",
+      "updatedAt": "2024-11-28T14:20:00.000Z"
+    },
+    {
+      "id": "3",
+      "vendorId": "3",
+      "vendorName": "Tech Solutions Inc",
+      "riskLevel": "low",
+      "overallScore": 18,
+      "financialRisk": 15,
+      "operationalRisk": 20,
+      "complianceRisk": 18,
+      "reputationRisk": 19,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 15,
+          "weight": 0.3,
+          "description": "Perfect payment history"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 20,
+          "weight": 0.25,
+          "description": "99% service uptime"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 18,
+          "weight": 0.25,
+          "description": "ISO certified"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 19,
+          "weight": 0.2,
+          "description": "Top rated provider"
+        }
+      ],
+      "lastAssessmentDate": "2024-12-05T00:00:00.000Z",
+      "nextReviewDate": "2025-03-05T00:00:00.000Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2024-03-10T11:30:00.000Z",
+      "updatedAt": "2024-12-05T16:45:00.000Z"
+    },
+    {
+      "id": "4",
+      "vendorId": "4",
+      "vendorName": "Prime Materials Co",
+      "riskLevel": "high",
+      "overallScore": 68,
+      "financialRisk": 72,
+      "operationalRisk": 65,
+      "complianceRisk": 70,
+      "reputationRisk": 65,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 72,
+          "weight": 0.3,
+          "description": "Multiple late payments"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 65,
+          "weight": 0.25,
+          "description": "70% on-time delivery"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 70,
+          "weight": 0.25,
+          "description": "Pending certifications"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 65,
+          "weight": 0.2,
+          "description": "Mixed reviews"
+        }
+      ],
+      "lastAssessmentDate": "2024-10-01T00:00:00.000Z",
+      "nextReviewDate": "2025-01-01T00:00:00.000Z",
+      "recommendations": [
+        "Increase monitoring frequency",
+        "Request performance improvement plan",
+        "Consider backup vendors"
+      ],
+      "createdAt": "2024-01-05T07:00:00.000Z",
+      "updatedAt": "2024-10-15T09:30:00.000Z"
+    },
+    {
+      "id": "5",
+      "vendorId": "5",
+      "vendorName": "Swift Logistics",
+      "riskLevel": "low",
+      "overallScore": 24,
+      "financialRisk": 22,
+      "operationalRisk": 26,
+      "complianceRisk": 24,
+      "reputationRisk": 24,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 22,
+          "weight": 0.3,
+          "description": "Consistent payments"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 26,
+          "weight": 0.25,
+          "description": "97% on-time delivery"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 24,
+          "weight": 0.25,
+          "description": "Fully licensed"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 24,
+          "weight": 0.2,
+          "description": "Reliable partner"
+        }
+      ],
+      "lastAssessmentDate": "2024-12-08T00:00:00.000Z",
+      "nextReviewDate": "2025-03-08T00:00:00.000Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2024-04-01T10:00:00.000Z",
+      "updatedAt": "2024-12-08T11:15:00.000Z"
+    },
+    {
+      "id": "6",
+      "vendorId": "6",
+      "vendorName": "Quality Parts Manufacturing",
+      "riskLevel": "medium",
+      "overallScore": 42,
+      "financialRisk": 40,
+      "operationalRisk": 45,
+      "complianceRisk": 42,
+      "reputationRisk": 41,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 40,
+          "weight": 0.3,
+          "description": "Generally reliable"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 45,
+          "weight": 0.25,
+          "description": "82% on-time delivery"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 42,
+          "weight": 0.25,
+          "description": "Some improvements needed"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 41,
+          "weight": 0.2,
+          "description": "Solid reputation"
+        }
+      ],
+      "lastAssessmentDate": "2024-12-02T00:00:00.000Z",
+      "nextReviewDate": "2025-03-02T00:00:00.000Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2024-05-15T08:30:00.000Z",
+      "updatedAt": "2024-12-02T13:00:00.000Z"
+    },
+    {
+      "id": "fb35",
+      "vendorId": null,
+      "vendorName": "Nithin Chilumula",
+      "riskLevel": "medium",
+      "overallScore": 33,
+      "financialRisk": 37,
+      "operationalRisk": 43,
+      "complianceRisk": 26,
+      "reputationRisk": 27,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 37,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 43,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 26,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 27,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:23:03.270Z",
+      "nextReviewDate": "2026-03-12T09:23:03.270Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2025-12-12T09:23:03.270Z",
+      "updatedAt": "2025-12-12T09:23:03.270Z"
+    },
+    {
+      "id": "0363",
+      "vendorId": null,
+      "vendorName": "Rahul K",
+      "riskLevel": "medium",
+      "overallScore": 26,
+      "financialRisk": 15,
+      "operationalRisk": 27,
+      "complianceRisk": 38,
+      "reputationRisk": 24,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 15,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 27,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 38,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 24,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:30:41.844Z",
+      "nextReviewDate": "2026-03-12T09:30:41.844Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2025-12-12T09:30:41.844Z",
+      "updatedAt": "2025-12-12T09:30:41.844Z"
+    },
+    {
+      "id": "23ee",
+      "vendorId": "17d3",
+      "vendorName": "Rahul ",
+      "riskLevel": "medium",
+      "overallScore": 37,
+      "financialRisk": 31,
+      "operationalRisk": 39,
+      "complianceRisk": 47,
+      "reputationRisk": 29,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 31,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 39,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 47,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 29,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:35:40.416Z",
+      "nextReviewDate": "2026-03-12T09:35:40.416Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2025-12-12T09:35:40.416Z",
+      "updatedAt": "2025-12-12T09:35:40.416Z"
+    },
+    {
+      "id": "8b82",
+      "vendorId": "3a2f",
+      "vendorName": "Sahil Solutions ",
+      "riskLevel": "low",
+      "overallScore": 19,
+      "financialRisk": 17,
+      "operationalRisk": 30,
+      "complianceRisk": 19,
+      "reputationRisk": 10,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 17,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 30,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 19,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 10,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:37:42.037Z",
+      "nextReviewDate": "2026-03-12T09:37:42.037Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2025-12-12T09:37:42.037Z",
+      "updatedAt": "2025-12-12T09:37:42.037Z"
+    },
+    {
+      "id": "c39b",
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "riskLevel": "low",
+      "overallScore": 21,
+      "financialRisk": 17,
+      "operationalRisk": 34,
+      "complianceRisk": 13,
+      "reputationRisk": 20,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 17,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 34,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 13,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 20,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:40:01.208Z",
+      "nextReviewDate": "2026-03-12T09:40:01.208Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2025-12-12T09:40:01.208Z",
+      "updatedAt": "2025-12-12T09:40:01.208Z"
+    },
+    {
+      "id": "1b17",
+      "vendorId": "fc25",
+      "vendorName": "Sagar",
+      "riskLevel": "low",
+      "overallScore": 20,
+      "financialRisk": 16,
+      "operationalRisk": 12,
+      "complianceRisk": 18,
+      "reputationRisk": 33,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 16,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 12,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 18,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 33,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T13:08:25.053Z",
+      "nextReviewDate": "2026-03-12T13:08:25.053Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2025-12-12T13:08:25.053Z",
+      "updatedAt": "2025-12-12T13:08:25.053Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "itemCode": "ITM-001",
+      "itemName": "Laptop Computer",
+      "description": "Business laptop with standard specifications",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 999,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "itemCode": "ITM-002",
+      "itemName": "Desktop Monitor",
+      "description": "27-inch LED monitor",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 350,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "itemCode": "ITM-003",
+      "itemName": "Wireless Keyboard",
+      "description": "Ergonomic wireless keyboard",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 79,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "itemCode": "ITM-004",
+      "itemName": "Printer Paper A4",
+      "description": "A4 size printer paper, 500 sheets per ream",
+      "category": "Office Supplies",
+      "unit": "ream",
+      "defaultPrice": 8,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "itemCode": "ITM-005",
+      "itemName": "Ballpoint Pens",
+      "description": "Blue ballpoint pens, pack of 12",
+      "category": "Office Supplies",
+      "unit": "pack",
+      "defaultPrice": 12,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "itemCode": "ITM-006",
+      "itemName": "Office Chair",
+      "description": "Ergonomic office chair with lumbar support",
+      "category": "Furniture",
+      "unit": "piece",
+      "defaultPrice": 299,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "itemCode": "ITM-007",
+      "itemName": "Standing Desk",
+      "description": "Height adjustable standing desk",
+      "category": "Furniture",
+      "unit": "piece",
+      "defaultPrice": 599,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "itemCode": "ITM-008",
+      "itemName": "Network Cable Cat6",
+      "description": "Cat6 Ethernet cable, 10 meters",
+      "category": "IT Services",
+      "unit": "piece",
+      "defaultPrice": 15,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "9",
+      "itemCode": "ITM-009",
+      "itemName": "USB-C Hub",
+      "description": "Multi-port USB-C hub with HDMI",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 65,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "10",
+      "itemCode": "ITM-010",
+      "itemName": "Webcam HD",
+      "description": "1080p HD webcam with microphone",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 89,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "506e",
+      "itemCode": "ITM-011",
+      "itemName": "RK Part",
+      "description": "this product is best",
+      "category": "IT Services",
+      "unit": "pack",
+      "defaultPrice": 1,
+      "status": "active",
+      "createdAt": "2025-12-12T16:05:15.253Z",
+      "updatedAt": "2025-12-12T16:05:15.253Z"
+    },
+    {
+      "id": "5c23",
+      "itemCode": "ITM-012",
+      "itemName": "TV branch two",
+      "description": "this product is too quality ",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 2,
+      "status": "active",
+      "createdAt": "2025-12-12T16:10:13.409Z",
+      "updatedAt": "2025-12-12T16:10:32.142Z"
+    },
+    {
+      "id": "0ad5",
+      "itemCode": "ITM-013",
+      "itemName": "Laptop Computer",
+      "description": "",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 2000,
+      "status": "active",
+      "createdAt": "2025-12-12T18:28:29.692Z",
+      "updatedAt": "2025-12-12T18:28:29.692Z"
+    }
+  ],
+  "vendorItems": [
+    {
+      "id": "1",
+      "vendorId": "1",
+      "itemId": "1",
+      "vendorName": "Acme Corporation",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-001",
+      "unitPrice": 950,
+      "minOrderQuantity": 5,
+      "leadTimeDays": 7,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "vendorId": "1",
+      "itemId": "2",
+      "vendorName": "Acme Corporation",
+      "itemName": "Desktop Monitor",
+      "itemCode": "ITM-002",
+      "unitPrice": 320,
+      "minOrderQuantity": 10,
+      "leadTimeDays": 5,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "vendorId": "1",
+      "itemId": "3",
+      "vendorName": "Acme Corporation",
+      "itemName": "Wireless Keyboard",
+      "itemCode": "ITM-003",
+      "unitPrice": 75,
+      "minOrderQuantity": 20,
+      "leadTimeDays": 3,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "vendorId": "1",
+      "itemId": "9",
+      "vendorName": "Acme Corporation",
+      "itemName": "USB-C Hub",
+      "itemCode": "ITM-009",
+      "unitPrice": 60,
+      "minOrderQuantity": 25,
+      "leadTimeDays": 3,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "vendorId": "2",
+      "itemId": "4",
+      "vendorName": "Global Supplies Ltd",
+      "itemName": "Printer Paper A4",
+      "itemCode": "ITM-004",
+      "unitPrice": 7.5,
+      "minOrderQuantity": 50,
+      "leadTimeDays": 2,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "vendorId": "2",
+      "itemId": "5",
+      "vendorName": "Global Supplies Ltd",
+      "itemName": "Ballpoint Pens",
+      "itemCode": "ITM-005",
+      "unitPrice": 10,
+      "minOrderQuantity": 100,
+      "leadTimeDays": 2,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "vendorId": "2",
+      "itemId": "6",
+      "vendorName": "Global Supplies Ltd",
+      "itemName": "Office Chair",
+      "itemCode": "ITM-006",
+      "unitPrice": 280,
+      "minOrderQuantity": 5,
+      "leadTimeDays": 10,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "vendorId": "3",
+      "itemId": "1",
+      "vendorName": "Tech Solutions Inc",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-001",
+      "unitPrice": 980,
+      "minOrderQuantity": 3,
+      "leadTimeDays": 5,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-03-10T00:00:00.000Z",
+      "updatedAt": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "9",
+      "vendorId": "3",
+      "itemId": "8",
+      "vendorName": "Tech Solutions Inc",
+      "itemName": "Network Cable Cat6",
+      "itemCode": "ITM-008",
+      "unitPrice": 12,
+      "minOrderQuantity": 100,
+      "leadTimeDays": 1,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-03-10T00:00:00.000Z",
+      "updatedAt": "2025-12-12T18:48:04.464Z"
+    },
+    {
+      "id": "10",
+      "vendorId": "3",
+      "itemId": "10",
+      "vendorName": "Tech Solutions Inc",
+      "itemName": "Webcam HD",
+      "itemCode": "ITM-010",
+      "unitPrice": 85,
+      "minOrderQuantity": 10,
+      "leadTimeDays": 3,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-03-10T00:00:00.000Z",
+      "updatedAt": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "11",
+      "vendorId": "5",
+      "itemId": "6",
+      "vendorName": "Quick Logistics",
+      "itemName": "Office Chair",
+      "itemCode": "ITM-006",
+      "unitPrice": 275,
+      "minOrderQuantity": 10,
+      "leadTimeDays": 5,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-04-01T00:00:00.000Z",
+      "updatedAt": "2024-04-01T00:00:00.000Z"
+    },
+    {
+      "id": "12",
+      "vendorId": "5",
+      "itemId": "7",
+      "vendorName": "Quick Logistics",
+      "itemName": "Standing Desk",
+      "itemCode": "ITM-007",
+      "unitPrice": 550,
+      "minOrderQuantity": 5,
+      "leadTimeDays": 14,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-04-01T00:00:00.000Z",
+      "updatedAt": "2024-04-01T00:00:00.000Z"
+    },
+    {
+      "id": "7cfa",
+      "vendorId": "17d3",
+      "itemId": "8",
+      "unitPrice": 80,
+      "minOrderQuantity": 50,
+      "leadTimeDays": 8,
+      "isPreferred": false,
+      "status": "active",
+      "vendorName": "Rahul ",
+      "itemName": "Network Cable Cat6",
+      "itemCode": "ITM-008",
+      "createdAt": "2025-12-12T16:11:49.643Z",
+      "updatedAt": "2025-12-12T16:11:49.643Z"
+    },
+    {
+      "id": "d7eb",
+      "vendorId": "fbbb",
+      "itemId": "0ad5",
+      "unitPrice": 2000,
+      "minOrderQuantity": 20,
+      "leadTimeDays": 1,
+      "isPreferred": false,
+      "status": "active",
+      "vendorName": "Pratham Infotech Solution",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-013",
+      "createdAt": "2025-12-12T18:28:49.594Z",
+      "updatedAt": "2025-12-12T18:28:49.595Z"
+    },
+    {
+      "id": "fd68",
+      "vendorId": "fbbb",
+      "itemId": "1",
+      "unitPrice": 2000,
+      "minOrderQuantity": 20,
+      "leadTimeDays": 1,
+      "isPreferred": false,
+      "status": "active",
+      "vendorName": "Pratham Infotech Solution",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-001",
+      "createdAt": "2025-12-12T18:29:07.177Z",
+      "updatedAt": "2025-12-12T18:29:07.177Z"
+    }
+  ]
+}

@@ -362,6 +362,24 @@ textarea.form-control {
   font-weight: 500;
 }
 
+.calculated-value.high-quality {
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.calculated-value.medium-quality {
+  background: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.calculated-value.low-quality {
+  background: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24;
+}
+
 /* Form Actions */
 .form-actions {
   display: flex;

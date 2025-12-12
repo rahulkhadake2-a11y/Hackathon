@@ -25,6 +25,41 @@ export interface AIConfig {
 
 export type AIProvider = 'local' | 'openai' | 'gemini';
 
+// Interface for item analysis input (should match the component interface)
+export interface ItemAnalysisInput {
+  itemName: string;
+  totalPurchases: number;
+  totalQuantity: number;
+  avgPrice: number;
+  vendorOptions: {
+    vendorId: string;
+    vendorName: string;
+    avgPrice: number;
+    totalQuantity: number;
+    purchaseCount: number;
+    qualityScore: number;
+    onTimeDeliveryRate: number;
+    riskScore: number;
+    isRecommended: boolean;
+    lastPurchaseDate?: Date;
+    priceVariance?: number;
+    reliabilityScore?: number;
+  }[];
+  recommendedVendor: any | null;
+  priceStability?: number;
+  demandTrend?: 'increasing' | 'stable' | 'decreasing';
+  supplyChainRisk?: number;
+  category?: string;
+}
+
+// Interface for item analysis result
+export interface ItemAnalysisResult {
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  score: number; // 0-100, higher is better
+  insights: string[];
+  recommendation: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -172,10 +207,40 @@ export class AIRiskAnalysisService {
   }
 
   /**
-   * Perform risk analysis using Google Gemini (FREE!)
+   * Analyze item risk using AI
+   * This analyzes procurement items across vendors to identify risks,
+   * optimize sourcing, and provide actionable recommendations
    */
-  private async performGeminiRiskAnalysis(vendor: Vendor): Promise<VendorRiskAssessment> {
-    const prompt = this.buildRiskAnalysisPrompt(vendor);
+  async analyzeItem(item: ItemAnalysisInput): Promise<ItemAnalysisResult> {
+    try {
+      switch (this.currentProvider) {
+        case 'gemini':
+          if (this.geminiConfig.apiKey) {
+            return await this.performGeminiItemAnalysis(item);
+          }
+          return this.calculateItemRiskLocally(item);
+
+        case 'openai':
+          if (this.config.apiKey) {
+            return await this.performOpenAIItemAnalysis(item);
+          }
+          return this.calculateItemRiskLocally(item);
+
+        case 'local':
+        default:
+          return this.calculateItemRiskLocally(item);
+      }
+    } catch (error) {
+      console.error('Item analysis failed:', error);
+      return this.calculateItemRiskLocally(item);
+    }
+  }
+
+  /**
+   * Perform item analysis using Google Gemini
+   */
+  private async performGeminiItemAnalysis(item: ItemAnalysisInput): Promise<ItemAnalysisResult> {
+    const prompt = this.buildItemAnalysisPrompt(item);
 
     try {
       const endpoint = `${this.geminiConfig.baseUrl}/${this.geminiConfig.model}:generateContent?key=${this.geminiConfig.apiKey}`;
@@ -188,11 +253,391 @@ export class AIRiskAnalysisService {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `You are an expert vendor risk analyst. ${prompt}\n\nRespond ONLY with valid JSON, no markdown or explanation.`
+              text: `You are an expert procurement analyst specializing in item risk assessment and vendor optimization. ${prompt}\n\nRespond ONLY with valid JSON, no markdown or explanation.`
             }]
           }],
           generationConfig: {
             temperature: 0.3,
+            maxOutputTokens: 1500
+          }
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Gemini API error for item analysis:', response.status);
+        return this.calculateItemRiskLocally(item);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!aiResponse) {
+        return this.calculateItemRiskLocally(item);
+      }
+
+      return this.parseItemAnalysisResponse(aiResponse, item);
+
+    } catch (error) {
+      console.error('Gemini item analysis failed:', error);
+      return this.calculateItemRiskLocally(item);
+    }
+  }
+
+  /**
+   * Perform item analysis using OpenAI
+   */
+  private async performOpenAIItemAnalysis(item: ItemAnalysisInput): Promise<ItemAnalysisResult> {
+    const prompt = this.buildItemAnalysisPrompt(item);
+
+    try {
+      const response = await fetch(this.config.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`
+        },
+        body: JSON.stringify({
+          model: this.config.model,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert procurement analyst specializing in item risk assessment and vendor optimization. Analyze item data and provide detailed risk assessments in JSON format. Focus on supply chain risks, pricing stability, vendor reliability, and sourcing optimization. Always respond with valid JSON matching the expected schema. Do not include markdown code blocks, just return raw JSON.`
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: this.config.maxTokens,
+          temperature: this.config.temperature
+        })
+      });
+
+      if (!response.ok) {
+        console.error('OpenAI API error for item analysis:', response.status);
+        return this.calculateItemRiskLocally(item);
+      }
+
+      const data = await response.json();
+
+      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        return this.calculateItemRiskLocally(item);
+      }
+
+      const aiResponse = data.choices[0].message.content;
+      return this.parseItemAnalysisResponse(aiResponse, item);
+
+    } catch (error) {
+      console.error('OpenAI item analysis failed:', error);
+      return this.calculateItemRiskLocally(item);
+    }
+  }
+
+  /**
+   * Build the prompt for item analysis
+   */
+  private buildItemAnalysisPrompt(item: ItemAnalysisInput): string {
+    const vendorDetails = item.vendorOptions.map((v, index) => `
+  Vendor ${index + 1}: ${v.vendorName}
+    - Average Price: $${v.avgPrice.toFixed(2)}
+    - Total Quantity Supplied: ${v.totalQuantity}
+    - Purchase Count: ${v.purchaseCount}
+    - Quality Score: ${v.qualityScore}/100
+    - On-Time Delivery Rate: ${v.onTimeDeliveryRate}%
+    - Risk Score: ${v.riskScore}/100
+    - Price Variance: ${v.priceVariance?.toFixed(2) || 'N/A'}%
+    - Reliability Score: ${v.reliabilityScore || 'N/A'}/100
+    - Is Recommended: ${v.isRecommended ? 'Yes' : 'No'}`).join('\n');
+
+    return `
+Analyze the following procurement item for risk assessment:
+
+ITEM PROFILE:
+- Item Name: ${item.itemName}
+- Category: ${item.category || 'General'}
+- Total Purchases: ${item.totalPurchases}
+- Total Quantity Purchased: ${item.totalQuantity}
+- Average Price Across Vendors: $${item.avgPrice.toFixed(2)}
+
+SUPPLY CHAIN METRICS:
+- Number of Available Vendors: ${item.vendorOptions.length}
+- Supply Chain Risk Score: ${item.supplyChainRisk || 'N/A'}/100
+- Price Stability Score: ${item.priceStability || 'N/A'}/100
+- Demand Trend: ${item.demandTrend || 'stable'}
+
+VENDOR OPTIONS:
+${vendorDetails}
+
+${item.recommendedVendor ? `
+CURRENT RECOMMENDED VENDOR: ${item.recommendedVendor.vendorName}
+- Avg Price: $${item.recommendedVendor.avgPrice.toFixed(2)}
+- Quality Score: ${item.recommendedVendor.qualityScore}/100
+- On-Time Delivery: ${item.recommendedVendor.onTimeDeliveryRate}%
+` : 'No recommended vendor identified yet.'}
+
+Please provide a comprehensive item risk assessment with:
+1. Risk level (low/medium/high/critical) based on supply chain, pricing, and vendor reliability
+2. Overall score (0-100, where higher = better/safer procurement option)
+3. Key insights (3-5 actionable insights about this item's procurement)
+4. Primary recommendation for optimizing this item's procurement
+
+Consider factors like:
+- Single-source dependency risk
+- Price volatility and stability
+- Vendor reliability and quality
+- Demand trends and future availability
+- Cost optimization opportunities
+- Quality consistency across vendors
+
+Respond in valid JSON format matching this structure:
+{
+  "riskLevel": "low" | "medium" | "high" | "critical",
+  "score": number,
+  "insights": ["insight1", "insight2", "insight3"],
+  "recommendation": "Primary actionable recommendation"
+}`;
+  }
+
+  /**
+   * Parse AI response for item analysis
+   */
+  private parseItemAnalysisResponse(aiResponse: string, item: ItemAnalysisInput): ItemAnalysisResult {
+    try {
+      // Extract JSON from response (handle various formats)
+      let jsonStr = aiResponse.trim();
+
+      // Remove markdown code blocks if present
+      const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[1].trim();
+      }
+
+      // Try to find JSON object in the response
+      const jsonStartIndex = jsonStr.indexOf('{');
+      const jsonEndIndex = jsonStr.lastIndexOf('}');
+      if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonStartIndex < jsonEndIndex) {
+        jsonStr = jsonStr.substring(jsonStartIndex, jsonEndIndex + 1);
+      }
+
+      const parsed = JSON.parse(jsonStr);
+
+      // Validate and normalize response
+      const validRiskLevels = ['low', 'medium', 'high', 'critical'];
+      const riskLevel = validRiskLevels.includes(parsed.riskLevel?.toLowerCase()) 
+        ? parsed.riskLevel.toLowerCase() as 'low' | 'medium' | 'high' | 'critical'
+        : this.determineItemRiskLevel(parsed.score || 50);
+
+      const score = typeof parsed.score === 'number' 
+        ? Math.max(0, Math.min(100, parsed.score))
+        : 50;
+
+      const insights = Array.isArray(parsed.insights) && parsed.insights.length > 0
+        ? parsed.insights.slice(0, 5).map((i: any) => String(i))
+        : this.generateLocalItemInsights(item);
+
+      const recommendation = typeof parsed.recommendation === 'string' && parsed.recommendation.length > 0
+        ? parsed.recommendation
+        : this.generateLocalItemRecommendation(item);
+
+      return {
+        riskLevel,
+        score,
+        insights,
+        recommendation
+      };
+    } catch (error) {
+      console.error('Failed to parse item AI response:', error);
+      return this.calculateItemRiskLocally(item);
+    }
+  }
+
+  /**
+   * Calculate item risk locally without AI API
+   */
+  private calculateItemRiskLocally(item: ItemAnalysisInput): ItemAnalysisResult {
+    // Calculate score based on multiple factors
+    let score = 50; // Base score
+
+    // Vendor diversity (more vendors = lower risk, higher score)
+    const vendorCount = item.vendorOptions.length;
+    if (vendorCount === 1) {
+      score -= 20; // Single source penalty
+    } else if (vendorCount >= 3) {
+      score += 15; // Multi-source bonus
+    } else {
+      score += 5; // Two vendors is okay
+    }
+
+    // Price stability
+    const priceStability = item.priceStability || 50;
+    score += (priceStability - 50) * 0.3;
+
+    // Supply chain risk (lower is better)
+    const supplyChainRisk = item.supplyChainRisk || 50;
+    score -= (supplyChainRisk - 50) * 0.2;
+
+    // Best vendor quality
+    if (item.recommendedVendor) {
+      const vendorQuality = item.recommendedVendor.qualityScore || 80;
+      const vendorDelivery = item.recommendedVendor.onTimeDeliveryRate || 90;
+      score += ((vendorQuality - 80) * 0.15) + ((vendorDelivery - 90) * 0.15);
+    }
+
+    // Volume consideration (higher volume = more critical)
+    if (item.totalPurchases > 20) {
+      score += 5; // Established item
+    }
+
+    // Clamp score to valid range
+    score = Math.max(0, Math.min(100, Math.round(score)));
+
+    // Determine risk level
+    const riskLevel = this.determineItemRiskLevel(score);
+
+    // Generate insights
+    const insights = this.generateLocalItemInsights(item);
+
+    // Generate recommendation
+    const recommendation = this.generateLocalItemRecommendation(item);
+
+    return {
+      riskLevel,
+      score,
+      insights,
+      recommendation
+    };
+  }
+
+  /**
+   * Determine item risk level from score
+   */
+  private determineItemRiskLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
+    // Score is "higher = better", so we invert for risk level
+    if (score >= 75) return 'low';
+    if (score >= 50) return 'medium';
+    if (score >= 25) return 'high';
+    return 'critical';
+  }
+
+  /**
+   * Generate local insights for item analysis
+   */
+  private generateLocalItemInsights(item: ItemAnalysisInput): string[] {
+    const insights: string[] = [];
+
+    // Vendor diversity insight
+    if (item.vendorOptions.length === 1) {
+      insights.push(`Single-source dependency: Only ${item.vendorOptions[0].vendorName} supplies this item. Consider qualifying additional vendors.`);
+    } else if (item.vendorOptions.length >= 3) {
+      insights.push(`Good vendor diversity with ${item.vendorOptions.length} qualified suppliers, reducing supply chain risk.`);
+    } else {
+      insights.push(`Moderate vendor base with ${item.vendorOptions.length} suppliers. Consider expanding for critical items.`);
+    }
+
+    // Price analysis insight
+    if (item.vendorOptions.length > 1) {
+      const prices = item.vendorOptions.map(v => v.avgPrice);
+      const priceDiff = Math.max(...prices) - Math.min(...prices);
+      const priceDiffPercent = (priceDiff / item.avgPrice) * 100;
+      
+      if (priceDiffPercent > 20) {
+        insights.push(`Significant price variation (${priceDiffPercent.toFixed(0)}%) across vendors - opportunity for cost optimization.`);
+      } else {
+        insights.push(`Price consistency is good across vendors (${priceDiffPercent.toFixed(0)}% variance).`);
+      }
+    }
+
+    // Quality insight
+    if (item.recommendedVendor) {
+      const avgQuality = item.vendorOptions.reduce((sum, v) => sum + v.qualityScore, 0) / item.vendorOptions.length;
+      if (avgQuality >= 90) {
+        insights.push(`Excellent quality performance across vendors (avg ${avgQuality.toFixed(0)}/100).`);
+      } else if (avgQuality < 75) {
+        insights.push(`Quality scores need attention (avg ${avgQuality.toFixed(0)}/100) - consider vendor quality improvement programs.`);
+      }
+    }
+
+    // Demand trend insight
+    if (item.demandTrend === 'increasing') {
+      insights.push('Demand is trending upward - ensure supply capacity can meet growing requirements.');
+    } else if (item.demandTrend === 'decreasing') {
+      insights.push('Demand is declining - review inventory levels and avoid overstocking.');
+    }
+
+    // Supply chain risk insight
+    if (item.supplyChainRisk && item.supplyChainRisk > 60) {
+      insights.push('High supply chain risk detected - develop contingency sourcing plans.');
+    }
+
+    return insights.slice(0, 5); // Limit to 5 insights
+  }
+
+  /**
+   * Generate local recommendation for item
+   */
+  private generateLocalItemRecommendation(item: ItemAnalysisInput): string {
+    // Priority recommendations based on risk factors
+    if (item.vendorOptions.length === 1) {
+      return `Qualify additional vendors for ${item.itemName} to mitigate single-source dependency risk. Current sole supplier: ${item.vendorOptions[0].vendorName}.`;
+    }
+
+    if (item.vendorOptions.length > 1) {
+      const prices = item.vendorOptions.map(v => v.avgPrice);
+      const maxPrice = Math.max(...prices);
+      const minPrice = Math.min(...prices);
+      const priceDiff = ((maxPrice - minPrice) / item.avgPrice) * 100;
+      
+      if (priceDiff > 25) {
+        const cheapestVendor = item.vendorOptions.find(v => v.avgPrice === minPrice);
+        return `Consider consolidating purchases with ${cheapestVendor?.vendorName} (lowest price at $${minPrice.toFixed(2)}) if quality meets requirements. Potential savings of ${priceDiff.toFixed(0)}%.`;
+      }
+    }
+
+    if (item.recommendedVendor && item.recommendedVendor.qualityScore < 80) {
+      return `Work with ${item.recommendedVendor.vendorName} on quality improvement program to increase quality score from ${item.recommendedVendor.qualityScore} to target of 90+.`;
+    }
+
+    if (item.demandTrend === 'increasing') {
+      return `Secure long-term supply agreements to ensure capacity for increasing demand of ${item.itemName}.`;
+    }
+
+    return `Continue monitoring ${item.itemName} procurement performance and maintain current vendor relationships.`;
+  }
+
+  /**
+   * Perform risk analysis using Google Gemini (FREE!)
+   */
+  private async performGeminiRiskAnalysis(vendor: Vendor): Promise<VendorRiskAssessment> {
+    const prompt = this.buildRiskAnalysisPrompt(vendor);
+
+    try {
+      const endpoint = `${this.geminiConfig.baseUrl}/${this.geminiConfig.model}:generateContent?key=${this.geminiConfig.apiKey}`;
+
+      const systemContext = `You are an expert vendor risk analyst for procurement. Your task is to calculate accurate risk scores based on vendor performance data.
+
+CRITICAL RULES FOR RISK SCORING:
+- Risk Score of 0 = NO RISK (perfect vendor with 100% quality and 100% delivery)
+- Risk Score of 100 = MAXIMUM RISK (terrible vendor to avoid)
+- A vendor with Quality Score 100/100 and 100% On-Time Delivery should have Risk Score between 0-10
+- A vendor with Quality Score 80/100 and 80% On-Time Delivery should have Risk Score around 20-30
+- A vendor with Quality Score 60/100 and 60% On-Time Delivery should have Risk Score around 40-50
+- A vendor with Quality Score below 50 or Delivery below 50% should have Risk Score 60+
+
+ALWAYS calculate the risk score mathematically based on the provided metrics. Do not randomly generate scores.`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `${systemContext}\n\n${prompt}\n\nRespond ONLY with valid JSON, no markdown or explanation.`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.1,  // Lower temperature for more consistent/accurate results
             maxOutputTokens: 2000
           }
         })
@@ -273,6 +718,18 @@ export class AIRiskAnalysisService {
     // Cast to any to access extended properties from API
     const v = vendor as any;
 
+    // Pre-calculate expected risk indicators for the AI
+    const qualityScore = vendor.qualityScore || 0;
+    const onTimeDeliveryRate = vendor.onTimeDeliveryRate || 0;
+    const rating = v.rating || 0;
+    
+    // Calculate a suggested risk score based on actual metrics
+    // Lower is better for risk score (0 = no risk, 100 = maximum risk)
+    const qualityRisk = Math.max(0, 100 - qualityScore); // 100 quality = 0 risk
+    const deliveryRisk = Math.max(0, 100 - onTimeDeliveryRate); // 100% delivery = 0 risk
+    const ratingRisk = rating > 0 ? Math.max(0, (5 - rating) * 20) : 50; // 5 rating = 0 risk
+    const suggestedRiskScore = Math.round((qualityRisk * 0.35) + (deliveryRisk * 0.35) + (ratingRisk * 0.30));
+
     return `
 Analyze the following vendor for risk assessment:
 
@@ -296,19 +753,39 @@ PURCHASE HISTORY:
 - Delivered Orders: ${v.deliveredCount || 0}
 - Vendor Rating: ${v.rating || 'Not rated'}/5
 
-PERFORMANCE METRICS:
-- On-Time Delivery Rate: ${vendor.onTimeDeliveryRate || 0}%
-- Quality Score: ${vendor.qualityScore || 0}/100
-- Defect Rate: ${vendor.defectRate || 0}%
+PERFORMANCE METRICS (CRITICAL FOR RISK CALCULATION):
+- On-Time Delivery Rate: ${onTimeDeliveryRate}% ${onTimeDeliveryRate >= 95 ? '(EXCELLENT)' : onTimeDeliveryRate >= 85 ? '(GOOD)' : onTimeDeliveryRate >= 70 ? '(NEEDS IMPROVEMENT)' : '(POOR)'}
+- Quality Score: ${qualityScore}/100 ${qualityScore >= 95 ? '(EXCELLENT)' : qualityScore >= 85 ? '(GOOD)' : qualityScore >= 70 ? '(NEEDS IMPROVEMENT)' : '(POOR)'}
 - Response Time: ${vendor.responseTime || 0} hours
 
 COMPLIANCE:
 - Certifications: ${vendor.certifications?.join(', ') || 'None'}
 - Last Audit Date: ${vendor.lastAuditDate || 'Not available'}
 
+RISK CALCULATION GUIDELINES:
+The overall risk score should be calculated as follows (IMPORTANT - follow these rules strictly):
+- Risk Score = 0 means NO RISK (best case - perfect vendor)
+- Risk Score = 100 means MAXIMUM RISK (worst case - avoid this vendor)
+
+Calculate risk based on these weighted factors:
+1. Quality Score Impact (35% weight): If quality is 100, quality risk = 0. If quality is 0, quality risk = 100.
+   Formula: qualityRisk = 100 - qualityScore
+2. Delivery Rate Impact (35% weight): If delivery is 100%, delivery risk = 0. If delivery is 0%, delivery risk = 100.
+   Formula: deliveryRisk = 100 - onTimeDeliveryRate
+3. Rating Impact (30% weight): If rating is 5/5, rating risk = 0. If rating is 1/5, rating risk = 80.
+   Formula: ratingRisk = (5 - rating) * 20
+
+Based on the data provided, the calculated risk score should be approximately: ${suggestedRiskScore}
+
+Risk Level Guidelines:
+- Risk Score 0-20: "low" risk (excellent vendor)
+- Risk Score 21-40: "medium" risk (acceptable vendor with minor concerns)
+- Risk Score 41-60: "high" risk (significant concerns, needs monitoring)
+- Risk Score 61-100: "critical" risk (serious issues, consider alternatives)
+
 Please provide a comprehensive risk assessment with:
-1. Overall risk score (0-100, where higher = more risk)
-2. Risk level (low/medium/high/critical)
+1. Overall risk score (0-100, where 0 = no risk, 100 = maximum risk) - USE THE CALCULATION GUIDELINES ABOVE
+2. Risk level (low/medium/high/critical) - MUST MATCH THE RISK SCORE
 3. Detailed risk factors by category (financial, operational, compliance, etc.)
 4. AI-powered insights with confidence levels
 5. Specific recommendations for risk mitigation
@@ -370,6 +847,29 @@ Respond in valid JSON format matching this structure:
         return this.calculateRiskLocally(vendor);
       }
 
+      // Validate and correct the AI's risk score if it's clearly wrong
+      let aiRiskScore = parsed.overallRiskScore;
+      const qualityScore = vendor.qualityScore || 0;
+      const onTimeDeliveryRate = vendor.onTimeDeliveryRate || 0;
+      
+      // Calculate expected risk score for validation
+      const qualityRisk = Math.max(0, 100 - qualityScore);
+      const deliveryRisk = Math.max(0, 100 - onTimeDeliveryRate);
+      const v = vendor as any;
+      const rating = v.rating || 3;
+      const ratingRisk = Math.max(0, (5 - rating) * 20);
+      const expectedRiskScore = Math.round((qualityRisk * 0.35) + (deliveryRisk * 0.35) + (ratingRisk * 0.30));
+      
+      // If AI score is way off from expected (more than 30 points difference), use calculated score
+      const scoreDifference = Math.abs(aiRiskScore - expectedRiskScore);
+      if (scoreDifference > 30) {
+        console.warn(`AI risk score (${aiRiskScore}) significantly differs from calculated (${expectedRiskScore}). Using calculated score.`);
+        aiRiskScore = expectedRiskScore;
+      }
+      
+      // Clamp the score to valid range
+      aiRiskScore = Math.max(0, Math.min(100, aiRiskScore));
+
       const riskFactors = (parsed.riskFactors || []).map((rf: any) => ({
         category: (rf.category || 'general').toLowerCase(),
         name: rf.name || 'Unknown Factor',
@@ -397,20 +897,23 @@ Respond in valid JSON format matching this structure:
 
       const recommendations = parsed.recommendations || ['Review vendor periodically'];
 
+      // Determine risk level based on the validated/corrected score
+      const finalRiskLevel = this.determineRiskLevel(aiRiskScore);
+
       return {
         vendorId: vendor.id,
         vendorName: vendor.name,
         assessmentDate: new Date(),
-        overallRiskScore: parsed.overallRiskScore || 50,
-        riskLevel: (parsed.riskLevel || this.determineRiskLevel(parsed.overallRiskScore || 50)).toLowerCase() as RiskLevel,
+        overallRiskScore: aiRiskScore,
+        riskLevel: finalRiskLevel,
         riskFactors,
         aiInsights,
         recommendations,
         historicalTrend: this.generateMockTrend(),
         comparisonToPeers: {
           averageRiskScore: 45,
-          percentile: this.calculatePercentile(parsed.overallRiskScore || 50),
-          betterThanPeers: (parsed.overallRiskScore || 50) < 45
+          percentile: this.calculatePercentile(aiRiskScore),
+          betterThanPeers: aiRiskScore < 45
         }
       };
     } catch (error) {
@@ -456,7 +959,6 @@ Respond in valid JSON format matching this structure:
     const paymentTerms = vendor.paymentTerms || 30;
     const onTimeDeliveryRate = vendor.onTimeDeliveryRate || 100;
     const qualityScore = vendor.qualityScore || 100;
-    const defectRate = vendor.defectRate || 0;
     const responseTime = vendor.responseTime || 12;
     const totalPurchases = vendor.totalPurchases || 0;
 
@@ -502,7 +1004,7 @@ Respond in valid JSON format matching this structure:
     factors.push({
       category: 'operational',
       name: 'Quality Performance',
-      description: `Quality score of ${qualityScore}/100 with ${defectRate}% defect rate`,
+      description: `Quality score of ${qualityScore}/100 (based on customer ratings)`,
       severity: qualityScore < 70 ? 'high' : qualityScore < 85 ? 'medium' : 'low',
       score: 100 - qualityScore,
       recommendation: qualityScore < 70
@@ -594,11 +1096,16 @@ Respond in valid JSON format matching this structure:
 
   /**
    * Determine risk level from score
+   * Risk Score Guidelines:
+   * - 0-20: low risk (excellent vendor)
+   * - 21-40: medium risk (acceptable vendor with minor concerns)
+   * - 41-60: high risk (significant concerns, needs monitoring)
+   * - 61-100: critical risk (serious issues, consider alternatives)
    */
   private determineRiskLevel(score: number): RiskLevel {
-    if (score >= 75) return 'critical';
-    if (score >= 50) return 'high';
-    if (score >= 25) return 'medium';
+    if (score >= 61) return 'critical';
+    if (score >= 41) return 'high';
+    if (score >= 21) return 'medium';
     return 'low';
   }
 

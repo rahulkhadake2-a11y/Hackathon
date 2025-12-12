@@ -11,10 +11,28 @@
       </p>
     </div>
     <div class="header-actions">
-      <!-- Provider Selection -->
-      <div class="provider-selector">
-        <button
-          class="provider-btn"
+      <!-- View Mode Toggle -->
+      <div class="view-mode-toggle">
+        <button 
+          class="view-btn" 
+          [class.active]="viewMode === 'vendor'"
+          (click)="setViewMode('vendor')"
+        >
+          <i class="bi bi-building"></i> Vendor Analysis
+        </button>
+        <button 
+          class="view-btn" 
+          [class.active]="viewMode === 'items'"
+          (click)="setViewMode('items')"
+        >
+          <i class="bi bi-box-seam"></i> Item Analysis
+        </button>
+      </div>
+
+      <!-- Provider Selection (only show for vendor analysis) -->
+      <div class="provider-selector" *ngIf="viewMode === 'vendor'">
+        <button 
+          class="provider-btn" 
           [class.active]="currentProvider === 'local'"
           (click)="setProvider('local')"
           title="Works offline, no API needed"
@@ -38,15 +56,16 @@
           <i class="bi bi-lightning"></i> OpenAI
         </button>
       </div>
-
-      <button class="btn btn-outline-primary" (click)="showApiKeyModal = true">
+      
+      <button class="btn btn-outline-primary" (click)="showApiKeyModal = true" *ngIf="viewMode === 'vendor'">
         <i class="bi bi-key"></i>
         Configure AI
       </button>
     </div>
   </div>
 
-  <div class="content-grid">
+  <!-- VENDOR ANALYSIS VIEW -->
+  <div class="content-grid" *ngIf="viewMode === 'vendor'">
     <!-- Vendor Selection Panel -->
     <div class="vendor-panel">
       <div class="panel-header">
@@ -76,7 +95,7 @@
           (click)="selectVendor(vendor)"
         >
           <div class="vendor-avatar">
-            {{ vendor.name.charAt(0) || "?" }}
+            {{ vendor.name.charAt(0) || '?' }}
           </div>
           <div class="vendor-info">
             <h4>{{ vendor.name || "Unknown Vendor" }}</h4>
@@ -119,9 +138,7 @@
         <!-- Vendor Header -->
         <div class="vendor-header">
           <div class="vendor-title">
-            <div class="vendor-logo">
-              {{ selectedVendor.name.charAt(0) || "?" }}
-            </div>
+            <div class="vendor-logo">{{ selectedVendor.name.charAt(0) || '?' }}</div>
             <div class="vendor-details">
               <h2>{{ selectedVendor.name || "Unknown Vendor" }}</h2>
               <div class="vendor-meta">
@@ -185,32 +202,14 @@
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon purple"><i class="bi bi-star"></i></div>
+            <div class="stat-icon" [ngClass]="{'green': selectedVendor.qualityScore >= 80, 'orange': selectedVendor.qualityScore >= 60 && selectedVendor.qualityScore < 80, 'red': selectedVendor.qualityScore < 60}">
+              <i class="bi bi-star"></i>
+            </div>
             <div class="stat-content">
               <span class="stat-value"
                 >{{ selectedVendor.qualityScore }}/100</span
               >
               <span class="stat-label">Quality Score</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div
-              class="stat-icon"
-              [ngClass]="{
-                green: selectedVendor.defectRate < 5,
-                orange:
-                  selectedVendor.defectRate >= 5 &&
-                  selectedVendor.defectRate < 20,
-                red: selectedVendor.defectRate >= 20
-              }"
-            >
-              <i class="bi bi-bug"></i>
-            </div>
-            <div class="stat-content">
-              <span class="stat-value"
-                >{{ selectedVendor.defectRate || 0 }}%</span
-              >
-              <span class="stat-label">Defect Rate</span>
             </div>
           </div>
           <div class="stat-card">
@@ -676,6 +675,519 @@
             <div class="step">
               <i class="bi bi-circle"></i>
               <span>Generating insights</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ITEM ANALYSIS VIEW -->
+  <div class="item-analysis-container" *ngIf="viewMode === 'items'">
+    <!-- Item Analysis Header -->
+    <div class="item-analysis-header">
+      <div class="header-info">
+        <h2><i class="bi bi-box-seam"></i> AI Item Risk Analysis</h2>
+        <p>AI-powered item analysis with best-performing items ranked at the top</p>
+      </div>
+      <div class="header-controls">
+        <!-- Provider Selector for Items -->
+        <div class="provider-selector-inline">
+          <button 
+            class="provider-btn-sm" 
+            [class.active]="currentProvider === 'local'"
+            (click)="setProvider('local')"
+            title="Works offline"
+          >
+            <i class="bi bi-cpu"></i> Local
+          </button>
+          <button
+            class="provider-btn-sm gemini"
+            [class.active]="currentProvider === 'gemini'"
+            (click)="setProvider('gemini')"
+            title="Google Gemini - FREE!"
+          >
+            <i class="bi bi-stars"></i> Gemini
+          </button>
+          <button
+            class="provider-btn-sm"
+            [class.active]="currentProvider === 'openai'"
+            (click)="setProvider('openai')"
+            title="OpenAI"
+          >
+            <i class="bi bi-lightning"></i> OpenAI
+          </button>
+        </div>
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search items or vendors..." 
+            [(ngModel)]="itemSearchQuery"
+            (input)="filterItems()"
+          />
+        </div>
+        <div class="sort-select">
+          <label>Sort by:</label>
+          <select [(ngModel)]="itemSortBy" (change)="sortItems()">
+            <option value="score">AI Score (Best First)</option>
+            <option value="risk">Risk (Lowest First)</option>
+            <option value="name">Item Name</option>
+            <option value="purchases">Most Purchased</option>
+            <option value="savings">Potential Savings</option>
+          </select>
+        </div>
+        <button class="btn btn-outline-primary btn-sm" (click)="showApiKeyModal = true">
+          <i class="bi bi-key"></i> Configure AI
+        </button>
+      </div>
+    </div>
+
+    <!-- AI Analysis Controls -->
+    <div class="ai-analysis-controls" *ngIf="!isLoadingItems && filteredItemAnalysis.length > 0">
+      <button 
+        class="btn btn-primary ai-analyze-btn"
+        (click)="runItemAIAnalysis()"
+        [disabled]="isAnalyzingItems"
+      >
+        <span *ngIf="!isAnalyzingItems">
+          <i class="bi bi-cpu"></i> Run AI Analysis on Items
+        </span>
+        <span *ngIf="isAnalyzingItems" class="analyzing">
+          <div class="spinner-sm"></div>
+          Analyzing... {{ itemAnalysisProgress }}%
+        </span>
+      </button>
+      <div class="analysis-progress" *ngIf="isAnalyzingItems">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="itemAnalysisProgress"></div>
+        </div>
+        <span class="progress-text">Analyzing items with AI ({{ itemAnalysisProgress }}%)</span>
+      </div>
+      <div class="analysis-stats">
+        <span class="stat">
+          <i class="bi bi-check-circle text-success"></i>
+          {{ filteredItemAnalysis | aiAnalyzedCount }} / {{ filteredItemAnalysis.length }} AI Analyzed
+        </span>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoadingItems">
+      <div class="spinner"></div>
+      <p>Analyzing items across all vendors...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-items" *ngIf="!isLoadingItems && filteredItemAnalysis.length === 0">
+      <i class="bi bi-inbox"></i>
+      <p *ngIf="itemSearchQuery">No items found matching "{{ itemSearchQuery }}"</p>
+      <p *ngIf="!itemSearchQuery">No purchase data available. Create purchase orders to see item analysis.</p>
+    </div>
+
+    <!-- Item Analysis Table -->
+    <div class="item-analysis-content" *ngIf="!isLoadingItems && filteredItemAnalysis.length > 0">
+      <!-- Summary Cards -->
+      <div class="analysis-summary">
+        <div class="summary-card">
+          <i class="bi bi-box-seam"></i>
+          <div class="summary-info">
+            <span class="summary-value">{{ filteredItemAnalysis.length }}</span>
+            <span class="summary-label">Unique Items</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <i class="bi bi-building"></i>
+          <div class="summary-info">
+            <span class="summary-value">{{ vendors.length }}</span>
+            <span class="summary-label">Vendors</span>
+          </div>
+        </div>
+        <div class="summary-card highlight">
+          <i class="bi bi-lightbulb"></i>
+          <div class="summary-info">
+            <span class="summary-value">{{ getMultiVendorItemCount() }}</span>
+            <span class="summary-label">Multi-Vendor Items</span>
+          </div>
+        </div>
+        <div class="summary-card ai-card">
+          <i class="bi bi-cpu"></i>
+          <div class="summary-info">
+            <span class="summary-value">{{ filteredItemAnalysis | aiAnalyzedCount }}</span>
+            <span class="summary-label">AI Analyzed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Table - Enhanced with AI columns -->
+      <div class="items-table-container">
+        <table class="items-analysis-table">
+          <thead>
+            <tr>
+              <th class="col-rank">#</th>
+              <th class="col-item">Item</th>
+              <th class="col-category">Category</th>
+              <th class="col-score">AI Score</th>
+              <th class="col-risk">Risk Level</th>
+              <th class="col-buy-from">🛒 Buy From</th>
+              <th class="col-price">Avg Price</th>
+              <th class="col-stability">Price Stability</th>
+              <th class="col-vendors">Vendors</th>
+              <th class="col-demand">Demand Trend</th>
+              <th class="col-supply">Supply Risk</th>
+              <th class="col-purchases">Purchases</th>
+              <th class="col-actions">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let item of filteredItemAnalysis; let i = index">
+              <!-- Main Item Row -->
+              <tr [class.top-performer]="i < 3 && item.aiScore && item.aiScore >= 75"
+                  [class.selected]="selectedItemForDetail?.itemName === item.itemName"
+                  [class.expanded]="isItemExpanded(item)"
+                  (click)="selectItemForDetail(item)">
+                <td class="col-rank">
+                  <span class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                    {{ i + 1 }}
+                  </span>
+                </td>
+                <td class="col-item">
+                  <div class="item-name-cell">
+                    <div class="item-name-row">
+                      <!-- Expand button - only show if more than 1 vendor -->
+                      <button class="expand-btn" 
+                              *ngIf="item.vendorOptions.length > 1"
+                              (click)="toggleItemExpand(item, $event)"
+                              [title]="isItemExpanded(item) ? 'Collapse vendors' : 'Show all ' + item.vendorOptions.length + ' vendors'">
+                        <i class="bi" [ngClass]="isItemExpanded(item) ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                      </button>
+                      <span class="no-expand-spacer" *ngIf="item.vendorOptions.length <= 1"></span>
+                      <span class="item-name">{{ item.itemName }}</span>
+                      <span class="item-code" *ngIf="item.itemCode">{{ item.itemCode }}</span>
+                      <span class="top-badge" *ngIf="i < 3 && (item.aiScore && item.aiScore >= 70 || (!item.aiScore && calculateItemScore(item) >= 70))">
+                        <i class="bi bi-trophy-fill"></i> Top Performer
+                      </span>
+                      <span class="recommended-badge" *ngIf="item.aiRiskLevel === 'low' || (!item.aiRiskLevel && item.recommendedVendor && item.recommendedVendor.riskScore <= 20)">
+                        <i class="bi bi-check-circle-fill"></i> Recommended
+                      </span>
+                    </div>
+                    <span class="item-qty">
+                      {{ item.totalQuantity }} units purchased | 
+                      {{ item.vendorOptions.length }} vendor{{ item.vendorOptions.length > 1 ? 's available' : ' available' }}
+                      <span class="no-vendor-warning" *ngIf="item.vendorOptions.length === 0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> No vendors mapped
+                      </span>
+                    </span>
+                  </div>
+                </td>
+                <td class="col-category">
+                  <span class="category-badge">{{ item.category || 'General' }}</span>
+                </td>
+                <td class="col-score">
+                  <div class="score-cell" *ngIf="item.aiAnalyzed">
+                    <span class="ai-score" [ngClass]="getScoreClass(item.aiScore || 0)">
+                      {{ item.aiScore }}
+                    </span>
+                    <i class="bi bi-stars ai-badge" title="AI Analyzed"></i>
+                  </div>
+                  <div class="score-cell" *ngIf="!item.aiAnalyzed">
+                    <span class="calculated-score">{{ calculateItemScore(item) }}</span>
+                    <span class="pending-ai" title="Run AI analysis for accurate score">
+                      <i class="bi bi-hourglass-split"></i>
+                    </span>
+                  </div>
+                </td>
+                <td class="col-risk">
+                  <span class="risk-level-badge" 
+                        [ngClass]="'risk-' + (item.aiRiskLevel || (item.recommendedVendor ? getItemRiskClass(item.recommendedVendor.riskScore).replace('risk-', '') : 'medium'))">
+                    {{ item.aiRiskLevel || (item.recommendedVendor ? getRiskLabel(item.recommendedVendor.riskScore) : 'N/A') }}
+                  </span>
+                </td>
+                <!-- Prominent Buy From Column -->
+                <td class="col-buy-from">
+                  <div class="buy-from-cell" *ngIf="item.recommendedVendor">
+                    <div class="vendor-recommendation">
+                      <span class="vendor-avatar" [style.background-color]="getVendorColor(item.recommendedVendor.vendorName)">
+                        {{ item.recommendedVendor.vendorName.charAt(0) }}
+                      </span>
+                      <div class="vendor-info">
+                        <span class="vendor-name-highlight">{{ item.recommendedVendor.vendorName }}</span>
+                        <span class="vendor-metrics-mini">
+                          <i class="bi bi-star-fill text-warning"></i> {{ item.recommendedVendor.qualityScore }}%
+                          <span class="separator">|</span>
+                          {{ formatCurrency(item.recommendedVendor.avgPrice) }}
+                        </span>
+                      </div>
+                      <span class="best-choice-badge" *ngIf="item.aiAnalyzed || item.recommendedVendor.riskScore <= 20">
+                        <i class="bi bi-check-circle-fill"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <span class="no-vendor" *ngIf="!item.recommendedVendor">-</span>
+                </td>
+                <td class="col-price">
+                  {{ formatCurrency(item.avgPrice) }}
+                </td>
+                <td class="col-stability">
+                  <div class="stability-indicator">
+                    <div class="stability-bar">
+                      <div class="stability-fill" [style.width.%]="item.priceStability || 50"></div>
+                    </div>
+                    <span>{{ item.priceStability || 50 }}%</span>
+                  </div>
+                </td>
+                <td class="col-vendors">
+                  <span class="vendor-count" [class.single-vendor]="item.vendorOptions.length === 1">
+                    {{ item.vendorOptions.length }}
+                    <i class="bi bi-exclamation-triangle-fill" *ngIf="item.vendorOptions.length === 1" title="Single source risk"></i>
+                  </span>
+                </td>
+                <td class="col-demand">
+                  <span class="trend-indicator" [ngClass]="getTrendClass(item.demandTrend)">
+                    <i [class]="getTrendIcon(item.demandTrend)"></i>
+                    {{ item.demandTrend || 'Stable' }}
+                  </span>
+                </td>
+                <td class="col-supply">
+                  <span class="supply-risk" [ngClass]="{
+                    'low': (item.supplyChainRisk || 50) < 30,
+                    'medium': (item.supplyChainRisk || 50) >= 30 && (item.supplyChainRisk || 50) < 60,
+                    'high': (item.supplyChainRisk || 50) >= 60
+                  }">
+                    {{ item.supplyChainRisk || 50 }}%
+                  </span>
+                </td>
+                <td class="col-purchases">
+                  <span class="purchase-count">{{ item.totalPurchases }}</span>
+                </td>
+                <td class="col-actions">
+                  <button class="btn-icon" title="View Details">
+                    <i class="bi" [ngClass]="selectedItemForDetail?.itemName === item.itemName ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  </button>
+                </td>
+              </tr>
+              
+              <!-- Expanded Vendors Row - shows alternate vendors with priority -->
+              <tr class="expanded-vendors-row" *ngIf="isItemExpanded(item) && item.vendorOptions.length > 1">
+                <td colspan="13">
+                  <div class="alternate-vendors-container">
+                    <div class="alternate-vendors-header">
+                      <i class="bi bi-diagram-3"></i>
+                      <span>Alternative Vendors (Priority Order)</span>
+                      <span class="vendor-count-badge">{{ item.vendorOptions.length - 1 }} alternative{{ item.vendorOptions.length > 2 ? 's' : '' }}</span>
+                    </div>
+                    <div class="alternate-vendors-grid">
+                      <div class="alternate-vendor-card" 
+                           *ngFor="let vendor of getAlternateVendors(item); let priority = index"
+                           [ngClass]="getItemRiskClass(vendor.riskScore)">
+                        <div class="priority-badge">
+                          <span class="priority-number">#{{ priority + 2 }}</span>
+                          <span class="priority-label">Priority</span>
+                        </div>
+                        <div class="vendor-card-header">
+                          <span class="vendor-avatar-small" [style.background-color]="getVendorColor(vendor.vendorName)">
+                            {{ vendor.vendorName.charAt(0) }}
+                          </span>
+                          <div class="vendor-card-name">
+                            <span class="name">{{ vendor.vendorName }}</span>
+                            <span class="preferred-tag" *ngIf="vendor.isPreferred">
+                              <i class="bi bi-star-fill"></i> Preferred
+                            </span>
+                          </div>
+                        </div>
+                        <div class="vendor-card-metrics">
+                          <div class="metric">
+                            <span class="metric-label">Price</span>
+                            <span class="metric-value">{{ formatCurrency(vendor.avgPrice) }}</span>
+                          </div>
+                          <div class="metric">
+                            <span class="metric-label">Quality</span>
+                            <span class="metric-value">{{ vendor.qualityScore }}%</span>
+                          </div>
+                          <div class="metric">
+                            <span class="metric-label">On-Time</span>
+                            <span class="metric-value">{{ vendor.onTimeDeliveryRate }}%</span>
+                          </div>
+                          <div class="metric">
+                            <span class="metric-label">Lead Time</span>
+                            <span class="metric-value">{{ vendor.leadTimeDays || '-' }} days</span>
+                          </div>
+                          <div class="metric">
+                            <span class="metric-label">Risk</span>
+                            <span class="metric-value" [ngClass]="getItemRiskClass(vendor.riskScore)">
+                              {{ vendor.riskScore }}%
+                            </span>
+                          </div>
+                          <div class="metric" *ngIf="vendor.minOrderQuantity">
+                            <span class="metric-label">Min Order</span>
+                            <span class="metric-value">{{ vendor.minOrderQuantity }}</span>
+                          </div>
+                        </div>
+                        <div class="vendor-card-footer">
+                          <span class="risk-badge" [ngClass]="getItemRiskClass(vendor.riskScore)">
+                            {{ getRiskLabel(vendor.riskScore) }}
+                          </span>
+                          <span class="price-diff" *ngIf="item.recommendedVendor">
+                            <ng-container *ngIf="vendor.avgPrice > item.recommendedVendor.avgPrice">
+                              <i class="bi bi-arrow-up text-danger"></i>
+                              +{{ formatCurrency(vendor.avgPrice - item.recommendedVendor.avgPrice) }}
+                            </ng-container>
+                            <ng-container *ngIf="vendor.avgPrice < item.recommendedVendor.avgPrice">
+                              <i class="bi bi-arrow-down text-success"></i>
+                              -{{ formatCurrency(item.recommendedVendor.avgPrice - vendor.avgPrice) }}
+                            </ng-container>
+                            <ng-container *ngIf="vendor.avgPrice === item.recommendedVendor.avgPrice">
+                              <i class="bi bi-dash"></i> Same price
+                            </ng-container>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Selected Item Detail Panel -->
+      <div class="item-detail-panel" *ngIf="selectedItemForDetail">
+        <div class="detail-header">
+          <h3>
+            <i class="bi bi-box-seam"></i>
+            {{ selectedItemForDetail.itemName }}
+          </h3>
+          <button class="close-detail" (click)="selectedItemForDetail = null">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="detail-content">
+          <!-- AI Insights Section -->
+          <div class="ai-insights-section" *ngIf="selectedItemForDetail.aiAnalyzed">
+            <h4><i class="bi bi-stars"></i> AI Analysis Results</h4>
+            <div class="ai-result-summary">
+              <div class="ai-result-card">
+                <span class="result-label">AI Score</span>
+                <span class="result-value" [ngClass]="getScoreClass(selectedItemForDetail.aiScore || 0)">
+                  {{ selectedItemForDetail.aiScore }}/100
+                </span>
+              </div>
+              <div class="ai-result-card">
+                <span class="result-label">Risk Level</span>
+                <span class="result-value risk-level-badge" [ngClass]="'risk-' + selectedItemForDetail.aiRiskLevel">
+                  {{ selectedItemForDetail.aiRiskLevel }}
+                </span>
+              </div>
+            </div>
+            <div class="ai-insights-list" *ngIf="selectedItemForDetail.aiInsights && selectedItemForDetail.aiInsights.length > 0">
+              <h5>Key Insights</h5>
+              <ul>
+                <li *ngFor="let insight of selectedItemForDetail.aiInsights">
+                  <i class="bi bi-lightbulb"></i>
+                  {{ insight }}
+                </li>
+              </ul>
+            </div>
+            <div class="ai-recommendation" *ngIf="selectedItemForDetail.aiRecommendation">
+              <h5><i class="bi bi-arrow-right-circle"></i> Recommendation</h5>
+              <p>{{ selectedItemForDetail.aiRecommendation }}</p>
+            </div>
+          </div>
+
+          <!-- Not AI Analyzed Yet -->
+          <div class="no-ai-section" *ngIf="!selectedItemForDetail.aiAnalyzed">
+            <i class="bi bi-cpu"></i>
+            <p>AI analysis not yet performed for this item.</p>
+            <button class="btn btn-primary btn-sm" (click)="analyzeSingleItem(selectedItemForDetail)" [disabled]="isAnalyzingItems">
+              <span *ngIf="!isAnalyzingItems"><i class="bi bi-stars"></i> Analyze This Item</span>
+              <span *ngIf="isAnalyzingItems"><div class="spinner-sm"></div> Analyzing...</span>
+            </button>
+          </div>
+
+          <!-- Recommended Vendor -->
+          <div class="recommended-vendor-section" *ngIf="selectedItemForDetail.recommendedVendor">
+            <h4><i class="bi bi-award"></i> Recommended Vendor</h4>
+            <div class="recommended-vendor-card">
+              <div class="vendor-name">
+                <span class="avatar">{{ selectedItemForDetail.recommendedVendor.vendorName.charAt(0) }}</span>
+                <span>{{ selectedItemForDetail.recommendedVendor.vendorName }}</span>
+              </div>
+              <div class="vendor-metrics-grid">
+                <div class="metric">
+                  <span class="metric-label">Quality</span>
+                  <span class="metric-value">{{ selectedItemForDetail.recommendedVendor.qualityScore }}%</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">On-Time Delivery</span>
+                  <span class="metric-value">{{ selectedItemForDetail.recommendedVendor.onTimeDeliveryRate }}%</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Avg Price</span>
+                  <span class="metric-value">{{ formatCurrency(selectedItemForDetail.recommendedVendor.avgPrice) }}</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Risk Score</span>
+                  <span class="metric-value" [ngClass]="getItemRiskClass(selectedItemForDetail.recommendedVendor.riskScore)">
+                    {{ selectedItemForDetail.recommendedVendor.riskScore }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- All Vendor Options Table -->
+          <div class="vendor-options-section" *ngIf="selectedItemForDetail.vendorOptions.length > 1">
+            <h4><i class="bi bi-building"></i> All Vendor Options</h4>
+            <table class="vendor-comparison-table">
+              <thead>
+                <tr>
+                  <th>Vendor</th>
+                  <th>Avg Price</th>
+                  <th>Quality</th>
+                  <th>On-Time</th>
+                  <th>Reliability</th>
+                  <th>Price Variance</th>
+                  <th>Risk Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let vendor of selectedItemForDetail.vendorOptions" [class.recommended-row]="vendor.isRecommended">
+                  <td class="vendor-cell">
+                    <span class="vendor-avatar">{{ vendor.vendorName.charAt(0) }}</span>
+                    <span>{{ vendor.vendorName }}</span>
+                    <i class="bi bi-check-circle-fill recommended-icon" *ngIf="vendor.isRecommended" title="Recommended"></i>
+                  </td>
+                  <td>{{ formatCurrency(vendor.avgPrice) }}</td>
+                  <td>
+                    <span class="quality-badge" [ngClass]="{'high': vendor.qualityScore >= 80, 'medium': vendor.qualityScore >= 60 && vendor.qualityScore < 80, 'low': vendor.qualityScore < 60}">
+                      {{ vendor.qualityScore }}%
+                    </span>
+                  </td>
+                  <td>
+                    <span class="delivery-badge" [ngClass]="{'high': vendor.onTimeDeliveryRate >= 90, 'medium': vendor.onTimeDeliveryRate >= 70 && vendor.onTimeDeliveryRate < 90, 'low': vendor.onTimeDeliveryRate < 70}">
+                      {{ vendor.onTimeDeliveryRate }}%
+                    </span>
+                  </td>
+                  <td>{{ vendor.reliabilityScore || 'N/A' }}</td>
+                  <td>{{ vendor.priceVariance?.toFixed(1) || 'N/A' }}%</td>
+                  <td>
+                    <span class="risk-score" [ngClass]="getItemRiskClass(vendor.riskScore)">
+                      {{ vendor.riskScore }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Single Vendor Warning -->
+          <div class="single-vendor-warning" *ngIf="selectedItemForDetail.vendorOptions.length === 1">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div>
+              <strong>Single Source Risk</strong>
+              <p>This item is only available from one vendor. Consider qualifying additional suppliers to reduce supply chain risk.</p>
             </div>
           </div>
         </div>

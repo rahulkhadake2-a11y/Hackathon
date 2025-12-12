@@ -52,10 +52,7 @@ export interface Purchase {
   // Risk-related fields for analysis
   onTimeDelivery?: boolean; // Was delivery on time?
   deliveryDelayDays?: number; // Days delayed (if late)
-  qualityRating?: number; // 1-5 rating for quality
-  defectCount?: number; // Number of defects found
-  defectRate?: number; // Defect percentage
-  returnedItems?: number; // Items returned
+  qualityRating?: number; // 1-5 rating for quality (used to calculate Quality Score)
   paymentStatus?: 'paid' | 'pending' | 'overdue' | 'partial';
   paymentDelayDays?: number; // Days payment was delayed
   leadTime?: number; // Days from order to delivery
@@ -613,7 +610,6 @@ export class ApiService {
   getVendorRiskMetrics(vendorId: string): Observable<{
     onTimeDeliveryRate: number;
     qualityScore: number;
-    defectRate: number;
     avgLeadTime: number;
     avgPaymentDelay: number;
     avgCommunicationRating: number;
@@ -631,7 +627,6 @@ export class ApiService {
           return {
             onTimeDeliveryRate: 100,
             qualityScore: 100,
-            defectRate: 0,
             avgLeadTime: 0,
             avgPaymentDelay: 0,
             avgCommunicationRating: 5,
@@ -656,7 +651,7 @@ export class ApiService {
         const onTimeDeliveryRate = (onTimeCount / totalDelivered) * 100;
 
         // Calculate average quality score (1-5 scale, convert to 0-100)
-        // Handle string values from form inputs
+        // Quality Score is now based solely on customer rating (simplified)
         const qualityRatings = deliveredPurchases
           .filter((p) => p.qualityRating != null)
           .map((p) => {
@@ -669,20 +664,9 @@ export class ApiService {
             ? qualityRatings.reduce((sum, r) => sum + r, 0) /
               qualityRatings.length
             : 4;
-        const qualityScore = (avgQuality / 5) * 100;
-
-        // Calculate defect rate
-        const totalItems = deliveredPurchases.reduce(
-          (sum, p) =>
-            sum + p.items.reduce((iSum, item) => iSum + item.quantity, 0),
-          0
-        );
-        const totalDefects = deliveredPurchases.reduce(
-          (sum, p) => sum + (p.defectCount || 0),
-          0
-        );
-        const defectRate =
-          totalItems > 0 ? (totalDefects / totalItems) * 100 : 0;
+        
+        // Quality Score = (Average Rating / 5) * 100
+        const qualityScore = Math.round((avgQuality / 5) * 100);
 
         // Calculate average lead time - handle string values
         const leadTimes = deliveredPurchases
@@ -727,7 +711,6 @@ export class ApiService {
         return {
           onTimeDeliveryRate: Math.round(onTimeDeliveryRate * 10) / 10,
           qualityScore: Math.round(qualityScore * 10) / 10,
-          defectRate: Math.round(defectRate * 100) / 100,
           avgLeadTime: Math.round(avgLeadTime * 10) / 10,
           avgPaymentDelay: Math.round(avgPaymentDelay * 10) / 10,
           avgCommunicationRating: Math.round(avgCommunicationRating * 10) / 10,
@@ -762,7 +745,6 @@ export class ApiService {
           // Calculate metrics
           let onTimeDeliveryRate = 100;
           let qualityScore = 100;
-          let defectRate = 0;
           let responseTime = 12; // Default hours
 
           if (totalDelivered > 0) {
@@ -784,6 +766,7 @@ export class ApiService {
             onTimeDeliveryRate = (onTimeCount / totalDelivered) * 100;
 
             // Calculate quality score - convert string to number if needed
+            // Quality Score is now based solely on customer rating (simplified)
             const qualityRatings = deliveredPurchases
               .filter((p) => p.qualityRating != null)
               .map((p) => {
@@ -798,19 +781,9 @@ export class ApiService {
                 ? qualityRatings.reduce((sum, r) => sum + r, 0) /
                   qualityRatings.length
                 : 4;
-            qualityScore = (avgQuality / 5) * 100;
-
-            // Calculate defect rate from actual defects
-            const totalItems = deliveredPurchases.reduce(
-              (sum, p) =>
-                sum + p.items.reduce((iSum, item) => iSum + item.quantity, 0),
-              0
-            );
-            const totalDefects = deliveredPurchases.reduce(
-              (sum, p) => sum + (p.defectCount || 0),
-              0
-            );
-            defectRate = totalItems > 0 ? (totalDefects / totalItems) * 100 : 0;
+            
+            // Quality Score = (Average Rating / 5) * 100
+            qualityScore = Math.round((avgQuality / 5) * 100);
 
             // Calculate response time from lead time (approximate)
             const leadTimes = deliveredPurchases
@@ -863,7 +836,6 @@ export class ApiService {
             onTimeDeliveryRate: Math.round(onTimeDeliveryRate),
             qualityScore: Math.round(qualityScore),
             responseTime: Math.round(responseTime),
-            defectRate: Math.round(defectRate * 100) / 100,
             certifications: ['ISO 9001'], // Default
             complianceStatus:
               vendor.status === 'active' ? 'compliant' : 'pending-review',
