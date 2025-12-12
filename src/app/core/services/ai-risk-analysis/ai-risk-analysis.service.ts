@@ -269,6 +269,9 @@ export class AIRiskAnalysisService {
    * Build the prompt for risk analysis
    */
   private buildRiskAnalysisPrompt(vendor: Vendor): string {
+    // Cast to any to access extended properties from API
+    const v = vendor as any;
+    
     return `
 Analyze the following vendor for risk assessment:
 
@@ -277,19 +280,26 @@ VENDOR PROFILE:
 - Category: ${vendor.category}
 - Status: ${vendor.status}
 - Compliance Status: ${vendor.complianceStatus}
+- Email: ${vendor.email || 'Not provided'}
+- Phone: ${vendor.phone || 'Not provided'}
 
 FINANCIAL METRICS:
-- Total Purchases: $${vendor.totalPurchases.toLocaleString()}
-- Average Order Value: $${vendor.averageOrderValue.toLocaleString()}
-- Credit Limit: $${vendor.creditLimit.toLocaleString()}
-- Outstanding Balance: $${vendor.outstandingBalance.toLocaleString()}
-- Payment Terms: ${vendor.paymentTerms} days
+- Total Purchases Value: $${vendor.totalPurchases?.toLocaleString() || '0'}
+- Average Order Value: $${vendor.averageOrderValue?.toLocaleString() || '0'}
+- Credit Limit: $${vendor.creditLimit?.toLocaleString() || '0'}
+- Outstanding Balance: $${vendor.outstandingBalance?.toLocaleString() || '0'}
+- Payment Terms: ${vendor.paymentTerms || 30} days
+
+PURCHASE HISTORY:
+- Number of Purchase Orders: ${v.purchaseCount || 0}
+- Delivered Orders: ${v.deliveredCount || 0}
+- Vendor Rating: ${v.rating || 'Not rated'}/5
 
 PERFORMANCE METRICS:
-- On-Time Delivery Rate: ${vendor.onTimeDeliveryRate}%
-- Quality Score: ${vendor.qualityScore}/100
-- Defect Rate: ${vendor.defectRate}%
-- Response Time: ${vendor.responseTime} hours
+- On-Time Delivery Rate: ${vendor.onTimeDeliveryRate || 0}%
+- Quality Score: ${vendor.qualityScore || 0}/100
+- Defect Rate: ${vendor.defectRate || 0}%
+- Response Time: ${vendor.responseTime || 0} hours
 
 COMPLIANCE:
 - Certifications: ${vendor.certifications?.join(', ') || 'None'}
@@ -439,8 +449,18 @@ Respond in valid JSON format matching this structure:
   private analyzeRiskFactors(vendor: Vendor): RiskFactor[] {
     const factors: RiskFactor[] = [];
 
+    // Safely get values with defaults
+    const outstandingBalance = vendor.outstandingBalance || 0;
+    const creditLimit = vendor.creditLimit || 50000;
+    const paymentTerms = vendor.paymentTerms || 30;
+    const onTimeDeliveryRate = vendor.onTimeDeliveryRate || 100;
+    const qualityScore = vendor.qualityScore || 100;
+    const defectRate = vendor.defectRate || 0;
+    const responseTime = vendor.responseTime || 12;
+    const totalPurchases = vendor.totalPurchases || 0;
+
     // Financial Risk
-    const utilizationRate = vendor.outstandingBalance / vendor.creditLimit;
+    const utilizationRate = creditLimit > 0 ? outstandingBalance / creditLimit : 0;
     factors.push({
       category: 'financial',
       name: 'Credit Utilization',
@@ -456,20 +476,20 @@ Respond in valid JSON format matching this structure:
     factors.push({
       category: 'financial',
       name: 'Payment Terms Risk',
-      description: `Payment terms of ${vendor.paymentTerms} days`,
-      severity: vendor.paymentTerms > 60 ? 'high' : vendor.paymentTerms > 30 ? 'medium' : 'low',
-      score: Math.min((vendor.paymentTerms / 90) * 100, 100),
-      recommendation: vendor.paymentTerms > 60 
+      description: `Payment terms of ${paymentTerms} days`,
+      severity: paymentTerms > 60 ? 'high' : paymentTerms > 30 ? 'medium' : 'low',
+      score: Math.min((paymentTerms / 90) * 100, 100),
+      recommendation: paymentTerms > 60 
         ? 'Extended payment terms increase financial exposure' 
         : 'Payment terms are standard'
     });
 
     // Operational Risk - Delivery Performance
-    const deliveryRisk = 100 - vendor.onTimeDeliveryRate;
+    const deliveryRisk = 100 - onTimeDeliveryRate;
     factors.push({
       category: 'operational',
       name: 'Delivery Reliability',
-      description: `On-time delivery rate of ${vendor.onTimeDeliveryRate}%`,
+      description: `On-time delivery rate of ${onTimeDeliveryRate}%`,
       severity: deliveryRisk > 20 ? 'high' : deliveryRisk > 10 ? 'medium' : 'low',
       score: deliveryRisk,
       recommendation: deliveryRisk > 20 
@@ -481,10 +501,10 @@ Respond in valid JSON format matching this structure:
     factors.push({
       category: 'operational',
       name: 'Quality Performance',
-      description: `Quality score of ${vendor.qualityScore}/100 with ${vendor.defectRate}% defect rate`,
-      severity: vendor.qualityScore < 70 ? 'high' : vendor.qualityScore < 85 ? 'medium' : 'low',
-      score: 100 - vendor.qualityScore,
-      recommendation: vendor.qualityScore < 70 
+      description: `Quality score of ${qualityScore}/100 with ${defectRate}% defect rate`,
+      severity: qualityScore < 70 ? 'high' : qualityScore < 85 ? 'medium' : 'low',
+      score: 100 - qualityScore,
+      recommendation: qualityScore < 70 
         ? 'Quality improvement plan required' 
         : 'Quality levels are acceptable'
     });
@@ -493,24 +513,25 @@ Respond in valid JSON format matching this structure:
     factors.push({
       category: 'operational',
       name: 'Responsiveness',
-      description: `Average response time of ${vendor.responseTime} hours`,
-      severity: vendor.responseTime > 48 ? 'high' : vendor.responseTime > 24 ? 'medium' : 'low',
-      score: Math.min((vendor.responseTime / 72) * 100, 100),
-      recommendation: vendor.responseTime > 48 
+      description: `Average response time of ${responseTime} hours`,
+      severity: responseTime > 48 ? 'high' : responseTime > 24 ? 'medium' : 'low',
+      score: Math.min((responseTime / 72) * 100, 100),
+      recommendation: responseTime > 48 
         ? 'Communication SLAs should be established' 
         : 'Response time is adequate'
     });
 
     // Compliance Risk
+    const complianceStatus = vendor.complianceStatus || 'pending-review';
     factors.push({
       category: 'compliance',
       name: 'Compliance Status',
-      description: `Current compliance status: ${vendor.complianceStatus}`,
-      severity: vendor.complianceStatus === 'non-compliant' ? 'critical' 
-        : vendor.complianceStatus === 'pending-review' ? 'medium' : 'low',
-      score: vendor.complianceStatus === 'non-compliant' ? 100 
-        : vendor.complianceStatus === 'pending-review' ? 50 : 10,
-      recommendation: vendor.complianceStatus === 'non-compliant' 
+      description: `Current compliance status: ${complianceStatus}`,
+      severity: complianceStatus === 'non-compliant' ? 'critical' 
+        : complianceStatus === 'pending-review' ? 'medium' : 'low',
+      score: complianceStatus === 'non-compliant' ? 100 
+        : complianceStatus === 'pending-review' ? 50 : 10,
+      recommendation: complianceStatus === 'non-compliant' 
         ? 'Immediate compliance review and remediation required' 
         : 'Continue regular compliance monitoring'
     });
@@ -529,11 +550,11 @@ Respond in valid JSON format matching this structure:
     });
 
     // Supply Chain Concentration Risk
-    const concentrationRisk = vendor.totalPurchases > 100000 ? 70 : vendor.totalPurchases > 50000 ? 40 : 20;
+    const concentrationRisk = totalPurchases > 100000 ? 70 : totalPurchases > 50000 ? 40 : 20;
     factors.push({
       category: 'supply-chain',
       name: 'Concentration Risk',
-      description: `Total purchases of $${vendor.totalPurchases.toLocaleString()} may indicate dependency`,
+      description: `Total purchases of $${totalPurchases.toLocaleString()} may indicate dependency`,
       severity: concentrationRisk > 60 ? 'high' : concentrationRisk > 30 ? 'medium' : 'low',
       score: concentrationRisk,
       recommendation: concentrationRisk > 60 
