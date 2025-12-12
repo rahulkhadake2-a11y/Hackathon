@@ -12,13 +12,10 @@
     <div class="sidebar-header">
       <div class="logo">
         <i class="bi bi-bar-chart-fill logo-icon"></i>
-        <span class="logo-text" *ngIf="!sidebarCollapsed">azia</span>
+        <span class="logo-text" *ngIf="!sidebarCollapsed">Analytics</span>
       </div>
       <button class="collapse-btn" (click)="toggleSidebar()">
-        <i
-          class="bi"
-          [ngClass]="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"
-        ></i>
+        <i class="bi" [ngClass]="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
       </button>
     </div>
 
@@ -30,14 +27,8 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a
-        *ngFor="let item of menuItems"
-        class="nav-item"
-        [class.active]="item.active"
-        [routerLink]="item.route"
-        routerLinkActive="active"
-        (click)="selectMenuItem(item)"
-      >
+      <a *ngFor="let item of menuItems" class="nav-item" [class.active]="item.active" [routerLink]="item.route"
+        routerLinkActive="active" (click)="selectMenuItem(item)">
         <i class="bi" [ngClass]="item.icon"></i>
         <span *ngIf="!sidebarCollapsed">{{ item.label }}</span>
       </a>
@@ -48,20 +39,11 @@
         <i class="bi bi-gear"></i>
         <span>Settings</span>
       </a>
-      <a
-        class="nav-item logout-item"
-        (click)="logout()"
-        *ngIf="!sidebarCollapsed"
-      >
+      <a class="nav-item logout-item" (click)="logout()" *ngIf="!sidebarCollapsed">
         <i class="bi bi-box-arrow-right"></i>
         <span>Logout</span>
       </a>
-      <div class="user-avatar">
-        <img
-          src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"
-          alt="User"
-        />
-      </div>
+
     </div>
   </aside>
 
@@ -81,14 +63,12 @@
           <i class="bi bi-bell"></i>
         </button>
         <div class="user-profile" (click)="toggleUserMenu()">
-          <img
-            src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"
-            alt="User"
-          />
+          <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=6366f1&color=fff'"
+            [alt]="userName" />
           <div class="user-dropdown" *ngIf="showUserMenu">
             <div class="dropdown-header">
-              <span class="user-name">User</span>
-              <span class="user-email">user&#64;example.com</span>
+              <span class="user-name">{{ userName }}</span>
+              <span class="user-email">{{ userEmail }}</span>
             </div>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" routerLink="/settings">

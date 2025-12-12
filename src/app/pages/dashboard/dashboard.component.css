@@ -5,6 +5,18 @@
 
 .welcome-section {
   margin-bottom: 2rem;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .welcome-section h1 {
@@ -27,12 +39,83 @@
   gap: 1.5rem;
 }
 
+/* Card entrance animations */
+.dashboard-grid .card {
+  animation: cardSlideIn 0.5s ease-out backwards;
+}
+
+.dashboard-grid .card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.dashboard-grid .card:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.dashboard-grid .card:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.dashboard-grid .card:nth-child(4) {
+  animation-delay: 0.25s;
+}
+.dashboard-grid .card:nth-child(5) {
+  animation-delay: 0.3s;
+}
+.dashboard-grid .card:nth-child(6) {
+  animation-delay: 0.35s;
+}
+.dashboard-grid .card:nth-child(7) {
+  animation-delay: 0.4s;
+}
+.dashboard-grid .card:nth-child(8) {
+  animation-delay: 0.45s;
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Cards */
 .card {
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.05),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover::before {
+  left: 100%;
 }
 
 .card-title {
@@ -42,6 +125,18 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 0.5rem;
+  animation: titleSlide 0.5s ease-out backwards;
+}
+
+@keyframes titleSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .card-subtitle {
@@ -59,6 +154,42 @@
 .profit-card {
   display: flex;
   flex-direction: column;
+}
+
+.profit-card:hover .donut-chart svg {
+  animation: rotatePulse 1s ease-in-out;
+}
+
+.profit-card:hover .chart-value {
+  animation: valuePopIn 0.4s ease-out;
+}
+
+.profit-card:hover .progress-circle {
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+}
+
+@keyframes rotatePulse {
+  0% {
+    transform: rotate(-90deg) scale(1);
+  }
+  50% {
+    transform: rotate(-90deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(-90deg) scale(1);
+  }
+}
+
+@keyframes valuePopIn {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .donut-chart {
@@ -84,11 +215,28 @@
   fill: none;
   stroke-width: 8;
   stroke-linecap: round;
-  transition: stroke-dasharray 0.5s ease;
+  animation: progressPulseDefault 2s ease-in-out infinite !important;
+}
+
+@keyframes progressPulseDefault {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.5));
+    stroke-width: 8;
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.9));
+    stroke-width: 10;
+  }
 }
 
 .progress-circle.purple {
   stroke: #8b5cf6;
+}
+
+/* Profit card specific hover glow */
+.profit-card:hover {
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .chart-value {
@@ -99,11 +247,101 @@
   font-size: 2rem;
   font-weight: 600;
   color: #8b5cf6;
+  transition: color 0.3s ease;
+  animation: valueFloat 2s ease-in-out infinite !important;
+}
+
+@keyframes valueFloat {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    text-shadow: 0 0 0 transparent;
+  }
+  50% {
+    transform: translate(-50%, -54%) scale(1.05);
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+  }
 }
 
 /* Balance Card */
 .balance-card {
   background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.1) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.balance-card:hover::after {
+  opacity: 1;
+}
+
+.balance-card:hover .balance-amount {
+  animation: amountGlow 0.6s ease-out;
+}
+
+.balance-card:hover .visa-logo {
+  animation: cardFlip 0.6s ease-out;
+}
+
+.balance-card:hover .number-display {
+  animation: numberReveal 0.5s ease-out;
+}
+
+@keyframes amountGlow {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+
+@keyframes cardFlip {
+  0% {
+    transform: perspective(400px) rotateY(0deg);
+  }
+  50% {
+    transform: perspective(400px) rotateY(15deg);
+  }
+  100% {
+    transform: perspective(400px) rotateY(0deg);
+  }
+}
+
+@keyframes numberReveal {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .balance-header {
@@ -124,6 +362,19 @@
   background: linear-gradient(135deg, #1a1f71 0%, #2563eb 100%);
   padding: 0.35rem 0.75rem;
   border-radius: 4px;
+  animation: visaShine 2.5s ease-in-out infinite !important;
+}
+
+@keyframes visaShine {
+  0%,
+  100% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+    transform: scale(1.05);
+  }
 }
 
 .visa-text {
@@ -138,6 +389,25 @@
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 1.5rem;
+  transition: text-shadow 0.3s ease;
+  animation: amountPulse 2s ease-in-out infinite !important;
+}
+
+@keyframes amountPulse {
+  0%,
+  100% {
+    text-shadow: none;
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+/* Balance card hover glow */
+.balance-card:hover {
+  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .account-details {
@@ -163,12 +433,44 @@
   color: #374151;
   font-weight: 600;
   letter-spacing: 2px;
+  animation: dotsBlink 1.5s ease-in-out infinite !important;
+}
+
+.dots:nth-child(1) {
+  animation-delay: 0s !important;
+}
+.dots:nth-child(2) {
+  animation-delay: 0.3s !important;
+}
+.dots:nth-child(3) {
+  animation-delay: 0.6s !important;
+}
+
+@keyframes dotsBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .last-digits {
   font-size: 1.25rem;
   font-weight: 700;
   color: #1f2937;
+  animation: digitGlow 2s ease-in-out infinite !important;
+}
+
+@keyframes digitGlow {
+  0%,
+  100% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+  }
 }
 
 .account-info {
@@ -201,6 +503,57 @@
   grid-row: span 2;
 }
 
+.ratio-card:hover .line-chart polyline {
+  animation: drawLine 1s ease-out forwards;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+}
+
+.ratio-card:hover .ratio-value {
+  animation: countUp 0.5s ease-out;
+}
+
+.ratio-card:hover .progress-bar {
+  animation: progressPulse 0.8s ease-out;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes countUp {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    color: #6366f1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes progressPulse {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.02);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* Ratio card hover glow */
+.ratio-card:hover {
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
 .ratio-item {
   display: flex;
   gap: 1rem;
@@ -222,6 +575,24 @@
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  animation: linePulseDefault 1.5s ease-in-out infinite !important;
+}
+
+@keyframes linePulseDefault {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px rgba(99, 102, 241, 0.5));
+    stroke-width: 2;
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(99, 102, 241, 1));
+    stroke-width: 3;
+  }
+}
+
+.ratio-card:hover .line-chart polyline {
+  stroke: #4f46e5;
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
 }
 
 .ratio-content {
@@ -233,6 +604,19 @@
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 0.5rem;
+  animation: ratioFloat 2s ease-in-out infinite !important;
+}
+
+@keyframes ratioFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+    text-shadow: 0 0 0 transparent;
+  }
+  50% {
+    transform: translateY(-4px);
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+  }
 }
 
 .ratio-progress {
@@ -246,15 +630,41 @@
 .progress-bar {
   height: 100%;
   border-radius: 2px;
-  transition: width 0.3s ease;
+  transform-origin: left;
 }
 
 .progress-bar.yellow {
   background: #f59e0b;
+  animation: progressShineYellow 1.5s ease-in-out infinite !important;
 }
 
 .progress-bar.green {
   background: #10b981;
+  animation: progressShineGreen 1.5s ease-in-out infinite !important;
+}
+
+@keyframes progressShineYellow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+    transform: scaleX(1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 1);
+    transform: scaleX(1.02);
+  }
+}
+
+@keyframes progressShineGreen {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+    transform: scaleX(1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 1);
+    transform: scaleX(1.02);
+  }
 }
 
 .ratio-goal {
@@ -287,6 +697,79 @@
   flex-direction: column;
 }
 
+.stats-card:hover .mini-chart .bar {
+  animation: barBounce 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.stats-card:hover .mini-chart .bar:nth-child(1) {
+  animation-delay: 0s;
+}
+.stats-card:hover .mini-chart .bar:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.stats-card:hover .mini-chart .bar:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.stats-card:hover .mini-chart .bar:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.stats-card:hover .mini-chart .bar:nth-child(5) {
+  animation-delay: 0.2s;
+}
+.stats-card:hover .mini-chart .bar:nth-child(6) {
+  animation-delay: 0.25s;
+}
+.stats-card:hover .mini-chart .bar:nth-child(7) {
+  animation-delay: 0.3s;
+}
+
+.stats-card:hover .stat-value {
+  animation: valueShine 0.8s ease-out;
+}
+
+.stats-card:hover .stat-change {
+  animation: changeSlide 0.4s ease-out;
+}
+
+@keyframes barBounce {
+  0% {
+    transform: scaleY(1);
+  }
+  30% {
+    transform: scaleY(1.3);
+  }
+  50% {
+    transform: scaleY(0.9);
+  }
+  70% {
+    transform: scaleY(1.1);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes valueShine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes changeSlide {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .stat-item {
   flex: 1;
 }
@@ -302,23 +785,79 @@
 .mini-chart .bar {
   width: 8px;
   border-radius: 2px;
-  transition: height 0.3s ease;
+  transform-origin: bottom;
+  animation: barWave 1.5s ease-in-out infinite !important;
+}
+
+.mini-chart .bar:nth-child(1) {
+  animation-delay: 0s !important;
+}
+.mini-chart .bar:nth-child(2) {
+  animation-delay: 0.15s !important;
+}
+.mini-chart .bar:nth-child(3) {
+  animation-delay: 0.3s !important;
+}
+.mini-chart .bar:nth-child(4) {
+  animation-delay: 0.45s !important;
+}
+.mini-chart .bar:nth-child(5) {
+  animation-delay: 0.6s !important;
+}
+.mini-chart .bar:nth-child(6) {
+  animation-delay: 0.75s !important;
+}
+.mini-chart .bar:nth-child(7) {
+  animation-delay: 0.9s !important;
+}
+
+@keyframes barWave {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scaleY(1.35);
+    opacity: 1;
+  }
 }
 
 .income-chart .bar {
   background: linear-gradient(180deg, #10b981 0%, #34d399 100%);
+  transform-origin: bottom;
 }
 
 .expense-chart .bar {
   background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+  transform-origin: bottom;
 }
 
 .receivable-chart .bar {
   background: linear-gradient(180deg, #f59e0b 0%, #fbbf24 100%);
+  transform-origin: bottom;
 }
 
 .payable-chart .bar {
   background: linear-gradient(180deg, #ec4899 0%, #f472b6 100%);
+  transform-origin: bottom;
+}
+
+/* Specific card hover glows based on type */
+.stats-card:has(.income-chart):hover {
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card:has(.expense-chart):hover {
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card:has(.receivable-chart):hover {
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card:has(.payable-chart):hover {
+  box-shadow: 0 20px 40px rgba(236, 72, 153, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .stat-value {
@@ -326,18 +865,78 @@
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 0.25rem;
+  animation: statValuePulse 2.5s ease-in-out infinite !important;
+}
+
+@keyframes statValuePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    text-shadow: none;
+  }
+  50% {
+    transform: scale(1.03);
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+  }
+}
+
+@keyframes statValueFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .stat-change {
   font-size: 0.75rem;
+  animation: changeAppear 0.8s ease-out 0.5s backwards;
+}
+
+@keyframes changeAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .stat-change.positive {
   color: #10b981;
+  animation: changeAppear 0.8s ease-out 0.5s backwards,
+    positiveGlow 2s ease-in-out 1.3s infinite;
 }
 
 .stat-change.negative {
   color: #ef4444;
+  animation: changeAppear 0.8s ease-out 0.5s backwards,
+    negativeGlow 2s ease-in-out 1.3s infinite;
+}
+
+@keyframes positiveGlow {
+  0%,
+  100% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+}
+
+@keyframes negativeGlow {
+  0%,
+  100% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  }
 }
 
 /* Accounts Cards - Positioned in third row */

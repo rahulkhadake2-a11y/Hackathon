@@ -7,7 +7,7 @@ import { RiskAnalysisComponent } from './pages/risk-analysis/risk-analysis.compo
 import { InsightsComponent } from './pages/insights/insights.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { UploadComponent } from './pages/upload/upload.component';
-import { InsightsComponent } from './pages/insights/insights.component';
+
 import { PurchaseComponent } from './pages/purchase/purchase.component';
 
 export const routes: Routes = [

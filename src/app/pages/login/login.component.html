@@ -23,187 +23,163 @@
   <div class="login-left">
     <div class="demo-content">
       <div class="demo-header">
-        <h2 class="demo-title">Vendor & Market Analytics</h2>
+        <!-- <h2 class="demo-title">Vendor & Market Analytics</h2> -->
       </div>
 
-      <div class="laptop-mockup">
-        <div class="laptop-screen">
-          <div class="screen-content">
-            <div
-              class="video-container"
-              (mouseenter)="showControls = true"
-              (mouseleave)="resetControlsTimeout()"
-            >
-              <!-- Video Player -->
-              <video
-                #demoVideo
-                class="demo-video"
-                [src]="videoSource"
-                [muted]="isMuted"
-                [loop]="true"
-                (click)="togglePlayPause()"
-                (timeupdate)="onTimeUpdate($event)"
-                (loadedmetadata)="onVideoLoaded($event)"
-                (error)="onVideoError()"
-                (playing)="isPlaying = true"
-                (pause)="isPlaying = false"
-                poster="video-poster.jpg"
-              ></video>
+      <!-- Animated Analytics Illustration -->
+      <div class="analytics-illustration">
+        <!-- Floating Background Elements -->
+        <div class="floating-elements">
+          <div class="floating-circle circle-1"></div>
+          <div class="floating-circle circle-2"></div>
+          <div class="floating-circle circle-3"></div>
+          <div class="floating-dot dot-1"></div>
+          <div class="floating-dot dot-2"></div>
+          <div class="floating-dot dot-3"></div>
+          <div class="floating-dot dot-4"></div>
+        </div>
 
-              <!-- Animated Fallback Preview (shown when video not available) -->
-              <div class="animated-preview" *ngIf="showFallback">
-                <div
-                  class="preview-scene"
-                  [class.active]="currentPreviewScene === 1"
-                >
-                  <div class="scene-content login-scene">
-                    <div class="mini-card">
-                      <div class="mini-logo">
-                        <i class="bi bi-graph-up-arrow"></i>
-                      </div>
-                      <div class="mini-title">VendorIQ Login</div>
-                      <div class="mini-input"></div>
-                      <div class="mini-input"></div>
-                      <div class="mini-button"></div>
-                    </div>
-                  </div>
-                  <div class="scene-label">Step 1: Secure Login</div>
+        <!-- Main Dashboard Card -->
+        <div class="dashboard-card main-card">
+          <div class="card-header">
+            <div class="card-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <span class="card-title-small">Vendor Analytics Dashboard</span>
+          </div>
+          <div class="card-body">
+            <!-- KPI Row -->
+            <div class="kpi-row">
+              <div class="kpi-item">
+                <div class="kpi-icon green">
+                  <i class="bi bi-people-fill"></i>
                 </div>
-
-                <div
-                  class="preview-scene"
-                  [class.active]="currentPreviewScene === 2"
-                >
-                  <div class="scene-content dashboard-scene">
-                    <div class="mini-sidebar"></div>
-                    <div class="mini-main">
-                      <div class="mini-kpi-row">
-                        <div class="mini-kpi green"></div>
-                        <div class="mini-kpi blue"></div>
-                        <div class="mini-kpi amber"></div>
-                      </div>
-                      <div class="mini-chart"></div>
-                    </div>
-                  </div>
-                  <div class="scene-label">Step 2: Dashboard Overview</div>
-                </div>
-
-                <div
-                  class="preview-scene"
-                  [class.active]="currentPreviewScene === 3"
-                >
-                  <div class="scene-content table-scene">
-                    <div class="mini-sidebar"></div>
-                    <div class="mini-main">
-                      <div class="mini-search"></div>
-                      <div class="mini-table-row"></div>
-                      <div class="mini-table-row"></div>
-                      <div class="mini-table-row"></div>
-                    </div>
-                  </div>
-                  <div class="scene-label">Step 3: Vendor List</div>
-                </div>
-
-                <div
-                  class="preview-scene"
-                  [class.active]="currentPreviewScene === 4"
-                >
-                  <div class="scene-content profile-scene">
-                    <div class="mini-sidebar"></div>
-                    <div class="mini-main">
-                      <div class="mini-profile-header"></div>
-                      <div class="mini-charts-row">
-                        <div class="mini-line-chart"></div>
-                        <div class="mini-bar-chart"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="scene-label">Step 4: Vendor Profile</div>
+                <div class="kpi-info">
+                  <span class="kpi-value">2,847</span>
+                  <span class="kpi-label">Active Vendors</span>
                 </div>
               </div>
-
-              <!-- Video Overlay (Play button when paused) -->
-              <div
-                class="video-overlay"
-                *ngIf="!isPlaying && !showFallback"
-                (click)="togglePlayPause()"
-              >
-                <div class="play-button-large">
-                  <i class="bi bi-play-fill"></i>
+              <div class="kpi-item">
+                <div class="kpi-icon blue">
+                  <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <div class="kpi-info">
+                  <span class="kpi-value">94.5%</span>
+                  <span class="kpi-label">Performance</span>
                 </div>
               </div>
-
-              <!-- Video Controls -->
-              <div
-                class="video-controls"
-                [class.visible]="showControls"
-                *ngIf="!showFallback"
-              >
-                <button class="control-btn" (click)="togglePlayPause()">
-                  <i
-                    class="bi"
-                    [ngClass]="isPlaying ? 'bi-pause-fill' : 'bi-play-fill'"
-                  ></i>
-                </button>
-
-                <div class="progress-container" (click)="seekVideo($event)">
-                  <div class="progress-bar-video">
-                    <div
-                      class="progress-fill"
-                      [style.width.%]="videoProgress"
-                    ></div>
-                    <div
-                      class="progress-handle"
-                      [style.left.%]="videoProgress"
-                    ></div>
-                  </div>
+              <div class="kpi-item">
+                <div class="kpi-icon purple">
+                  <i class="bi bi-currency-dollar"></i>
                 </div>
-
-                <span class="time-display"
-                  >{{ formatTime(currentTime) }} /
-                  {{ formatTime(duration) }}</span
-                >
-
-                <button class="control-btn" (click)="toggleMute()">
-                  <i
-                    class="bi"
-                    [ngClass]="
-                      isMuted ? 'bi-volume-mute-fill' : 'bi-volume-up-fill'
-                    "
-                  ></i>
-                </button>
-
-                <button class="control-btn" (click)="toggleFullscreen()">
-                  <i class="bi bi-fullscreen"></i>
-                </button>
+                <div class="kpi-info">
+                  <span class="kpi-value">$4.2M</span>
+                  <span class="kpi-label">Market Value</span>
+                </div>
               </div>
+            </div>
 
-              <!-- Scene Indicator -->
-              <div class="scene-indicator" *ngIf="currentScene">
-                <span class="scene-badge">{{ currentScene }}</span>
+            <!-- Chart Area -->
+            <div class="chart-area">
+              <div class="chart-bars">
+                <div class="bar bar-1"></div>
+                <div class="bar bar-2"></div>
+                <div class="bar bar-3"></div>
+                <div class="bar bar-4"></div>
+                <div class="bar bar-5"></div>
+                <div class="bar bar-6"></div>
+                <div class="bar bar-7"></div>
+              </div>
+              <div class="chart-line">
+                <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+                  <path class="line-path" d="M0,50 Q30,45 50,30 T100,25 T150,15 T200,5" fill="none"
+                    stroke="url(#lineGradient)" stroke-width="2" />
+                  <defs>
+                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#00d4ff" />
+                      <stop offset="100%" style="stop-color:#00ffcc" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               </div>
             </div>
           </div>
         </div>
-        <div class="laptop-base"></div>
+
+        <!-- Floating Stats Card -->
+        <div class="floating-card stats-card">
+          <div class="stats-icon">
+            <i class="bi bi-pie-chart-fill"></i>
+          </div>
+          <div class="stats-info">
+            <span class="stats-value">+28%</span>
+            <span class="stats-label">Growth</span>
+          </div>
+        </div>
+
+        <!-- Floating Vendor Card -->
+        <div class="floating-card vendor-card">
+          <div class="vendor-avatar">
+            <i class="bi bi-building"></i>
+          </div>
+          <div class="vendor-info">
+            <span class="vendor-name">Top Vendor</span>
+            <div class="vendor-rating">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-half"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Alert Card -->
+        <div class="floating-card alert-card">
+          <div class="alert-icon pulse">
+            <i class="bi bi-bell-fill"></i>
+          </div>
+          <span class="alert-badge">3 New</span>
+        </div>
+
+        <!-- Floating Chart Mini -->
+        <div class="floating-card mini-chart-card">
+          <div class="mini-sparkline">
+            <svg viewBox="0 0 60 30" preserveAspectRatio="none">
+              <path d="M0,25 L10,20 L20,22 L30,15 L40,18 L50,10 L60,5" fill="none" stroke="#00ffcc" stroke-width="2" />
+              <circle cx="60" cy="5" r="3" fill="#00ffcc" />
+            </svg>
+          </div>
+          <span class="mini-label">Market Trend</span>
+        </div>
+
+        <!-- Connection Lines -->
+        <svg class="connection-lines" viewBox="0 0 400 300">
+          <line class="conn-line line-1" x1="200" y1="150" x2="80" y2="60" />
+          <line class="conn-line line-2" x1="200" y1="150" x2="320" y2="80" />
+          <line class="conn-line line-3" x1="200" y1="150" x2="70" y2="240" />
+          <line class="conn-line line-4" x1="200" y1="150" x2="330" y2="230" />
+        </svg>
       </div>
 
-      <!-- Video Description -->
+      <!-- Info Section -->
       <div class="video-info">
         <div class="video-title">
-          <i class="bi bi-play-circle-fill"></i>
-          <span>VendorIQ Demo</span>
+          <i class="bi bi-bar-chart-line-fill"></i>
+          <span>Smart Analytics</span>
         </div>
         <p class="video-description">
-          Watch how VendorIQ helps you analyze vendor performance with real-time
-          KPIs, charts, and insights.
+          Unlock powerful insights with real-time vendor performance tracking,
+          market analytics, and AI-driven recommendations.
         </p>
       </div>
 
-      <div class="demo-footer">
+      <!-- <div class="demo-footer">
         <span class="project-label">Project:</span>
         <span class="project-name"> Vendor & Market Analytics</span>
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -229,15 +205,8 @@
             Email or Username
           </label>
           <div class="input-wrapper">
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="Enter your email"
-              required
-              autocomplete="username"
-            />
+            <input type="text" class="form-input" [(ngModel)]="email" name="email" placeholder="Enter your email"
+              required autocomplete="username" />
             <div class="input-focus-line"></div>
           </div>
         </div>
@@ -249,27 +218,10 @@
             Password
           </label>
           <div class="input-wrapper">
-            <input
-              type="password"
-              class="form-input"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="Enter your password"
-              required
-              autocomplete="current-password"
-            />
+            <input type="password" class="form-input" [(ngModel)]="password" name="password"
+              placeholder="Enter your password" required autocomplete="current-password" />
             <div class="input-focus-line"></div>
           </div>
-        </div>
-
-        <!-- Remember & Forgot -->
-        <div class="form-options">
-          <label class="checkbox-wrapper">
-            <input type="checkbox" />
-            <span class="checkmark"></span>
-            <span class="checkbox-label">Remember me</span>
-          </label>
-          <a href="#" class="forgot-link">Forgot Password?</a>
         </div>
 
         <!-- Login Button -->
@@ -280,16 +232,7 @@
             <span>Signing in...</span>
           </div>
         </button>
-
-        <!-- Divider -->
-        <div class="divider">
-          <span>or continue with</span>
-        </div>
-
-        <!-- Social Login -->
       </form>
-
-      <p class="signup-text">Don't have an account? <a href="#">Sign up</a></p>
     </div>
 
     <!-- Success Overlay -->
