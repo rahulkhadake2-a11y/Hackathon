@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
 import {
   ApiService,
   Purchase,
@@ -58,8 +58,6 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
   onTimeDelivery: boolean | null = null;
   deliveryDelayDays: number | null = null;
   qualityRating: number | null = null;
-  defectCount: number | null = null;
-  returnedItems: number | null = null;
   paymentStatus: 'pending' | 'paid' | 'overdue' | 'partial' = 'pending';
   paymentDelayDays: number | null = null;
   leadTime: number | null = null;
@@ -111,9 +109,6 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loadVendors();
-    this.loadItems();
-    this.loadVendorItems();
     this.generatePONumber();
 
     // Check if editing
@@ -121,7 +116,32 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     if (id) {
       this.isEditMode = true;
       this.purchaseId = id;
-      this.loadPurchase(id);
+      this.isLoading = true;
+      
+      // Load all required data first, then load the purchase
+      forkJoin({
+        vendors: this.apiService.getVendors(),
+        items: this.apiService.getItems(),
+        vendorItems: this.apiService.getVendorItems()
+      }).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (data) => {
+          this.vendors = data.vendors.filter((v) => v.status === 'active');
+          this.allItems = data.items.filter((i) => i.status === 'active');
+          this.vendorItems = data.vendorItems.filter((vi) => vi.status === 'active');
+          
+          // Now load the purchase after all reference data is ready
+          this.loadPurchase(id);
+        },
+        error: () => {
+          alert('Failed to load data');
+          this.isLoading = false;
+        }
+      });
+    } else {
+      // For new purchase, load data independently
+      this.loadVendors();
+      this.loadItems();
+      this.loadVendorItems();
     }
   }
 
@@ -223,8 +243,6 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     this.onTimeDelivery = purchase.onTimeDelivery ?? null;
     this.deliveryDelayDays = purchase.deliveryDelayDays ?? null;
     this.qualityRating = purchase.qualityRating ?? null;
-    this.defectCount = purchase.defectCount ?? null;
-    this.returnedItems = purchase.returnedItems ?? null;
     this.paymentStatus = purchase.paymentStatus || 'pending';
     this.paymentDelayDays = purchase.paymentDelayDays ?? null;
     this.leadTime = purchase.leadTime ?? null;
@@ -233,17 +251,31 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     // Filter available items for this vendor
     this.onVendorChange();
 
-    // Items - try to match with vendor items for itemId
+    // Items - map directly using itemId from the purchase items
     if (purchase.items && purchase.items.length > 0) {
-      this.items = purchase.items.map((item) => {
-        // Try to find matching vendor item by description
+      this.items = purchase.items.map((item: any) => {
+        // Use itemId directly from the purchase item if available
+        // Also verify the item exists in available items for this vendor
+        const itemId = item.itemId || '';
         const matchingVendorItem = this.availableItems.find(
-          (vi) =>
-            vi.itemName === item.description || vi.itemCode === item.description
+          (vi) => vi.itemId === itemId
         );
+        
+        // If no direct match by itemId, try matching by description or itemName
+        let finalItemId = matchingVendorItem ? itemId : '';
+        if (!finalItemId) {
+          const fallbackMatch = this.availableItems.find(
+            (vi) =>
+              vi.itemName === item.description || 
+              vi.itemName === item.itemName ||
+              vi.itemCode === item.description
+          );
+          finalItemId = fallbackMatch?.itemId || '';
+        }
+        
         return {
-          itemId: matchingVendorItem?.itemId || '',
-          description: item.description,
+          itemId: finalItemId,
+          description: item.description || item.itemName || '',
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           total: item.total,
@@ -316,11 +348,10 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Calculate defect rate
-  get defectRate(): number {
-    const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
-    if (totalItems === 0 || !this.defectCount) return 0;
-    return (this.defectCount / totalItems) * 100;
+  // Calculate quality score from rating
+  get calculatedQualityScore(): number {
+    if (!this.qualityRating) return 0;
+    return Math.round((this.qualityRating / 5) * 100);
   }
 
   getSelectedVendorName(): string {
@@ -393,9 +424,6 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
       onTimeDelivery: this.onTimeDelivery ?? undefined,
       deliveryDelayDays: this.deliveryDelayDays ?? undefined,
       qualityRating: this.qualityRating ?? undefined,
-      defectCount: this.defectCount ?? undefined,
-      defectRate: this.defectRate || undefined,
-      returnedItems: this.returnedItems ?? undefined,
       paymentStatus: this.paymentStatus,
       paymentDelayDays: this.paymentDelayDays ?? undefined,
       leadTime: this.leadTime ?? undefined,

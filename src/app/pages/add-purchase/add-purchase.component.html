@@ -233,109 +233,91 @@
         </div>
       </div>
 
-      <!-- Delivery & Quality Section (For Risk Analysis) -->
-      <div class="form-section" *ngIf="isEditMode || status === 'delivered'">
-        <h6 class="section-title">
-          <i class="bi bi-clipboard-data"></i> Delivery & Quality Assessment
-          <span class="section-subtitle">(For Risk Analysis)</span>
-        </h6>
+    <!-- Delivery & Quality Section (Only shown after delivery for feedback) -->
+    <div class="form-section" *ngIf="status === 'delivered'">
+      <h6 class="section-title">
+        <i class="bi bi-clipboard-data"></i> Delivery Feedback & Quality Assessment
+        <span class="section-subtitle">(Rate this delivery for vendor performance analysis)</span>
+      </h6>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Actual Delivery Date</label>
-            <input
-              type="date"
-              class="form-control"
-              [(ngModel)]="actualDeliveryDate"
-              (change)="onActualDeliveryDateChange()"
-            />
-          </div>
-          <div class="form-group">
-            <label>On-Time Delivery</label>
-            <div class="delivery-status">
-              <span *ngIf="onTimeDelivery === true" class="badge-success">
-                <i class="bi bi-check-circle"></i> Yes
-              </span>
-              <span *ngIf="onTimeDelivery === false" class="badge-danger">
-                <i class="bi bi-x-circle"></i> No ({{ deliveryDelayDays }} days
-                late)
-              </span>
-              <span *ngIf="onTimeDelivery === null" class="badge-neutral">
-                Not assessed
-              </span>
-            </div>
-          </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Actual Delivery Date</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="actualDeliveryDate"
+            (change)="onActualDeliveryDateChange()"
+          />
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Quality Rating</label>
-            <select class="form-control" [(ngModel)]="qualityRating">
-              <option [ngValue]="null">Not rated</option>
-              <option
-                *ngFor="let opt of qualityRatingOptions"
-                [value]="opt.value"
-              >
-                {{ opt.label }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Communication Rating</label>
-            <select class="form-control" [(ngModel)]="communicationRating">
-              <option [ngValue]="null">Not rated</option>
-              <option
-                *ngFor="let opt of communicationRatingOptions"
-                [value]="opt.value"
-              >
-                {{ opt.label }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Defect Count</label>
-            <input
-              type="number"
-              class="form-control"
-              [(ngModel)]="defectCount"
-              min="0"
-              placeholder="Number of defects found"
-            />
-          </div>
-          <div class="form-group">
-            <label>Returned Items</label>
-            <input
-              type="number"
-              class="form-control"
-              [(ngModel)]="returnedItems"
-              min="0"
-              placeholder="Number of items returned"
-            />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Lead Time (Days)</label>
-            <input
-              type="number"
-              class="form-control"
-              [(ngModel)]="leadTime"
-              min="0"
-              placeholder="Days from order to delivery"
-            />
-          </div>
-          <div class="form-group">
-            <label>Defect Rate</label>
-            <div class="calculated-value">
-              {{ defectRate | number : "1.2-2" }}%
-            </div>
+        <div class="form-group">
+          <label>On-Time Delivery</label>
+          <div class="delivery-status">
+            <span *ngIf="onTimeDelivery === true" class="badge-success">
+              <i class="bi bi-check-circle"></i> Yes
+            </span>
+            <span *ngIf="onTimeDelivery === false" class="badge-danger">
+              <i class="bi bi-x-circle"></i> No ({{ deliveryDelayDays }} days
+              late)
+            </span>
+            <span *ngIf="onTimeDelivery === null" class="badge-neutral">
+              Enter actual delivery date to calculate
+            </span>
           </div>
         </div>
       </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Quality Rating</label>
+          <select class="form-control" [(ngModel)]="qualityRating">
+            <option [ngValue]="null">Select rating...</option>
+            <option
+              *ngFor="let opt of qualityRatingOptions"
+              [value]="opt.value"
+            >
+              {{ opt.label }}
+            </option>
+          </select>
+          <small class="form-hint">Rate the quality of items received</small>
+        </div>
+        <div class="form-group">
+          <label>Communication Rating</label>
+          <select class="form-control" [(ngModel)]="communicationRating">
+            <option [ngValue]="null">Select rating...</option>
+            <option
+              *ngFor="let opt of communicationRatingOptions"
+              [value]="opt.value"
+            >
+              {{ opt.label }}
+            </option>
+          </select>
+          <small class="form-hint">Rate vendor's communication during order</small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Lead Time (Days)</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="leadTime"
+            min="0"
+            placeholder="Auto-calculated"
+            readonly
+          />
+          <small class="form-hint">Days from order to delivery (auto-calculated)</small>
+        </div>
+        <div class="form-group">
+          <label>Quality Score</label>
+          <div class="calculated-value" [ngClass]="{'high-quality': (qualityRating || 0) >= 4, 'medium-quality': (qualityRating || 0) >= 3 && (qualityRating || 0) < 4, 'low-quality': (qualityRating || 0) > 0 && (qualityRating || 0) < 3}">
+            {{ qualityRating ? (((qualityRating || 0) / 5) * 100 | number : "1.0-0") + '/100' : 'Rate quality above' }}
+          </div>
+          <small class="form-hint">Calculated from your quality rating</small>
+        </div>
+      </div>
+    </div>
 
       <!-- Payment Section -->
       <div class="form-section">
