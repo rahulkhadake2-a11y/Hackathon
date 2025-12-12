@@ -147,9 +147,26 @@
               <td class="t-col" *ngIf="col.isSelected">
                 <!-- String fields -->
                 <ng-container
-                  *ngIf="col.type === 'string' && col.field !== 'status'"
+                  *ngIf="
+                    col.type === 'string' &&
+                    col.field !== 'status' &&
+                    col.field !== 'itemNames'
+                  "
                 >
                   {{ getPurchaseValue(purchase, col.field) }}
+                </ng-container>
+                <!-- Item Names -->
+                <ng-container *ngIf="col.field === 'itemNames'">
+                  <div class="item-names-cell">
+                    <span class="item-list" [title]="getItemNames(purchase)">
+                      {{ getItemNames(purchase) }}
+                    </span>
+                    <span class="item-count">
+                      {{ purchase.items?.length || 0 }} item{{
+                        purchase.items?.length !== 1 ? "s" : ""
+                      }}
+                    </span>
+                  </div>
                 </ng-container>
                 <!-- Status badge -->
                 <ng-container *ngIf="col.field === 'status'">

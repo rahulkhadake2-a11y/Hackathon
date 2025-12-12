@@ -2,8 +2,13 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { Vendor, RiskAnalysis, ApiService } from '../../core/services/api/api.service';
+import { Subscription, forkJoin } from 'rxjs';
+import {
+  Vendor,
+  RiskAnalysis,
+  Purchase,
+  ApiService,
+} from '../../core/services/api/api.service';
 
 export interface TableColumn {
   field: string;
@@ -12,7 +17,14 @@ export interface TableColumn {
 }
 
 // Extended vendor type with risk analysis for display
-type VendorWithRisk = Vendor & { riskAnalysis?: RiskAnalysis };
+type VendorWithRisk = Vendor & {
+  riskAnalysis?: RiskAnalysis;
+  isAClass?: boolean;
+  itemNames?: string;
+  purchaseOrderCount?: number;
+  auditStatus?: string;
+  lastAuditDate?: string;
+};
 
 @Component({
   selector: 'app-vender-list',
@@ -43,17 +55,23 @@ export class VenderListComponent implements OnInit, OnDestroy {
   // Columns configuration
   availableColumns: TableColumn[] = [
     { field: 'contactPerson', columnLabel: 'Contact Person', isSelected: true },
-    { field: 'email', columnLabel: 'Email', isSelected: true },
-    { field: 'phone', columnLabel: 'Phone', isSelected: true },
+    { field: 'email', columnLabel: 'Email', isSelected: false },
+    { field: 'phone', columnLabel: 'Phone', isSelected: false },
     { field: 'category', columnLabel: 'Category', isSelected: true },
     { field: 'status', columnLabel: 'Status', isSelected: true },
+    { field: 'auditStatus', columnLabel: 'Audits', isSelected: true },
     { field: 'riskLevel', columnLabel: 'Risk Level', isSelected: true },
+    {
+      field: 'classification',
+      columnLabel: 'Classification',
+      isSelected: true,
+    },
     {
       field: 'totalPurchases',
       columnLabel: 'Total Purchases',
       isSelected: false,
     },
-    { field: 'rating', columnLabel: 'Rating', isSelected: false },
+    { field: 'rating', columnLabel: 'Rating', isSelected: true },
   ];
 
   selectedColumns: TableColumn[] = [];
@@ -78,9 +96,59 @@ export class VenderListComponent implements OnInit, OnDestroy {
 
   loadVendors() {
     this.isLoading = true;
-    this.vendorSubscription = this.apiService.getVendorsWithRisk().subscribe({
-      next: (vendors: VendorWithRisk[]) => {
-        this.allVendorList = vendors;
+
+    // Load vendors with risk and purchases
+    forkJoin({
+      vendors: this.apiService.getVendorsWithRisk(),
+      purchases: this.apiService.getPurchases(),
+    }).subscribe({
+      next: ({ vendors, purchases }) => {
+        // Calculate A-Class classification for each vendor
+        const avgPurchases =
+          vendors.reduce((sum, v) => sum + (v.totalPurchases || 0), 0) /
+          vendors.length;
+
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+        this.allVendorList = vendors.map((v) => {
+          // Get purchases for this vendor
+          const vendorPurchases = purchases.filter(
+            (p) =>
+              p.vendorId === v.id ||
+              p.vendorName?.toLowerCase() === v.vendorName?.toLowerCase()
+          );
+
+          // Get item names from purchases (unique items)
+          const itemNames = new Set<string>();
+          vendorPurchases.forEach((p) => {
+            p.items?.forEach((item) => {
+              if (item.description) itemNames.add(item.description);
+            });
+          });
+
+          // Calculate audit status
+          let auditStatus = 'Not Assessed';
+          let lastAuditDate = '';
+          if (v.riskAnalysis?.lastAssessmentDate) {
+            const assessmentDate = new Date(v.riskAnalysis.lastAssessmentDate);
+            lastAuditDate = v.riskAnalysis.lastAssessmentDate;
+            auditStatus =
+              assessmentDate >= threeMonthsAgo ? 'Completed' : 'Pending';
+          }
+
+          return {
+            ...v,
+            isAClass: v.rating >= 4 || v.totalPurchases >= avgPurchases * 1.5,
+            itemNames:
+              itemNames.size > 0
+                ? Array.from(itemNames).slice(0, 3).join(', ')
+                : 'No items',
+            purchaseOrderCount: vendorPurchases.length,
+            auditStatus,
+            lastAuditDate,
+          };
+        });
         this.updateVisibleList();
         this.isLoading = false;
       },
@@ -248,5 +316,24 @@ export class VenderListComponent implements OnInit, OnDestroy {
       default:
         return '';
     }
+  }
+
+  // Update vendor rating
+  updateRating(vendor: VendorWithRisk, newRating: number, event: Event): void {
+    event.stopPropagation();
+    const updatedVendor = { ...vendor, rating: newRating };
+    this.apiService.updateVendor(vendor.id!, updatedVendor).subscribe({
+      next: () => {
+        this.loadVendors(); // Reload to recalculate A-Class
+      },
+      error: (err: Error) => {
+        console.error('Error updating rating:', err);
+      },
+    });
+  }
+
+  // Get stars array for rating display
+  getStarsArray(): number[] {
+    return [1, 2, 3, 4, 5];
   }
 }

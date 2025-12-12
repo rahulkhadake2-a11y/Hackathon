@@ -87,6 +87,13 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       type: 'string',
     },
     {
+      field: 'itemNames',
+      columnLabel: 'Item Names',
+      isSelected: true,
+      canBeRemoved: true,
+      type: 'string',
+    },
+    {
       field: 'orderDate',
       columnLabel: 'Order Date',
       isSelected: true,
@@ -418,6 +425,19 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'USD',
     }).format(amount);
+  }
+
+  getItemNames(purchase: Purchase): string {
+    if (!purchase.items || purchase.items.length === 0) {
+      return 'No items';
+    }
+    const names = purchase.items
+      .map((item) => item.description)
+      .filter(Boolean);
+    if (names.length <= 2) {
+      return names.join(', ');
+    }
+    return names.slice(0, 2).join(', ') + ` +${names.length - 2} more`;
   }
 
   getQualityStars(rating: number | null | undefined): number[] {
