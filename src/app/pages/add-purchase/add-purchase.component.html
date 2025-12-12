@@ -1,0 +1,346 @@
+<div class="add-purchase-container">
+  <!-- Header -->
+  <div class="header-card">
+    <h5 class="card-header">
+      <i class="bi bi-cart-plus"></i>
+      {{ isEditMode ? "Edit Purchase Order" : "New Purchase Order" }}
+    </h5>
+    <nav class="breadcrumb-nav">
+      <span class="breadcrumb-link" (click)="cancel()">Purchase Orders</span>
+      <i class="bi bi-chevron-right"></i>
+      <span class="active">{{ isEditMode ? "Edit" : "New" }}</span>
+    </nav>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <span>Loading purchase order...</span>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card" *ngIf="!isLoading">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h6 class="section-title">
+        <i class="bi bi-info-circle"></i> Basic Information
+      </h6>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="required">PO Number</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="purchaseOrderNumber"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label class="required">Vendor</label>
+          <select class="form-control" [(ngModel)]="vendorId">
+            <option value="">Select Vendor</option>
+            <option *ngFor="let vendor of vendors" [value]="vendor.id">
+              {{ vendor.vendorName }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="required">Order Date</label>
+          <input type="date" class="form-control" [(ngModel)]="orderDate" />
+        </div>
+        <div class="form-group">
+          <label>Expected Delivery Date</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="expectedDeliveryDate"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" [(ngModel)]="status">
+            <option *ngFor="let opt of statusOptions" [value]="opt.value">
+              {{ opt.label }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Created By</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="createdBy"
+            placeholder="Enter name"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="urgent" />
+            <span class="checkbox-label">Mark as Urgent</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Section -->
+    <div class="form-section">
+      <h6 class="section-title"><i class="bi bi-box-seam"></i> Order Items</h6>
+
+      <div class="items-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Unit Price ($)</th>
+              <th>Total ($)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items; let i = index">
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="item.description"
+                  placeholder="Item description"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="item.quantity"
+                  min="1"
+                  (change)="updateItemTotal(i)"
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="item.unitPrice"
+                  min="0"
+                  step="0.01"
+                  (change)="updateItemTotal(i)"
+                />
+              </td>
+              <td class="total-cell">
+                {{ item.total | currency }}
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="btn-remove"
+                  (click)="removeItem(i)"
+                  [disabled]="items.length === 1"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn-add-item" (click)="addItem()">
+          <i class="bi bi-plus-lg"></i> Add Item
+        </button>
+      </div>
+
+      <!-- Totals -->
+      <div class="totals-section">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>{{ subtotal | currency }}</span>
+        </div>
+        <div class="total-row">
+          <span>Tax (8%):</span>
+          <span>{{ tax | currency }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total:</span>
+          <span>{{ totalAmount | currency }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery & Quality Section (For Risk Analysis) -->
+    <div class="form-section" *ngIf="isEditMode || status === 'delivered'">
+      <h6 class="section-title">
+        <i class="bi bi-clipboard-data"></i> Delivery & Quality Assessment
+        <span class="section-subtitle">(For Risk Analysis)</span>
+      </h6>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Actual Delivery Date</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="actualDeliveryDate"
+            (change)="onActualDeliveryDateChange()"
+          />
+        </div>
+        <div class="form-group">
+          <label>On-Time Delivery</label>
+          <div class="delivery-status">
+            <span *ngIf="onTimeDelivery === true" class="badge-success">
+              <i class="bi bi-check-circle"></i> Yes
+            </span>
+            <span *ngIf="onTimeDelivery === false" class="badge-danger">
+              <i class="bi bi-x-circle"></i> No ({{ deliveryDelayDays }} days
+              late)
+            </span>
+            <span *ngIf="onTimeDelivery === null" class="badge-neutral">
+              Not assessed
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Quality Rating</label>
+          <select class="form-control" [(ngModel)]="qualityRating">
+            <option [ngValue]="null">Not rated</option>
+            <option
+              *ngFor="let opt of qualityRatingOptions"
+              [value]="opt.value"
+            >
+              {{ opt.label }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Communication Rating</label>
+          <select class="form-control" [(ngModel)]="communicationRating">
+            <option [ngValue]="null">Not rated</option>
+            <option
+              *ngFor="let opt of communicationRatingOptions"
+              [value]="opt.value"
+            >
+              {{ opt.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Defect Count</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="defectCount"
+            min="0"
+            placeholder="Number of defects found"
+          />
+        </div>
+        <div class="form-group">
+          <label>Returned Items</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="returnedItems"
+            min="0"
+            placeholder="Number of items returned"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Lead Time (Days)</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="leadTime"
+            min="0"
+            placeholder="Days from order to delivery"
+          />
+        </div>
+        <div class="form-group">
+          <label>Defect Rate</label>
+          <div class="calculated-value">
+            {{ defectRate | number : "1.2-2" }}%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Section -->
+    <div class="form-section">
+      <h6 class="section-title">
+        <i class="bi bi-credit-card"></i> Payment Information
+      </h6>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Payment Status</label>
+          <select class="form-control" [(ngModel)]="paymentStatus">
+            <option
+              *ngFor="let opt of paymentStatusOptions"
+              [value]="opt.value"
+            >
+              {{ opt.label }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Payment Delay (Days)</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="paymentDelayDays"
+            min="0"
+            placeholder="Days payment was delayed"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="form-section">
+      <h6 class="section-title"><i class="bi bi-sticky"></i> Notes</h6>
+      <div class="form-group full-width">
+        <textarea
+          class="form-control"
+          [(ngModel)]="notes"
+          rows="3"
+          placeholder="Additional notes about this purchase order"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-cancel" (click)="cancel()">
+        <i class="bi bi-x-lg"></i> Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-save"
+        (click)="savePurchase()"
+        [disabled]="!isFormValid() || isSaving"
+      >
+        <span *ngIf="!isSaving">
+          <i class="bi bi-check-lg"></i>
+          {{ isEditMode ? "Update Purchase Order" : "Create Purchase Order" }}
+        </span>
+        <span *ngIf="isSaving">
+          <span class="btn-spinner"></span> Saving...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
