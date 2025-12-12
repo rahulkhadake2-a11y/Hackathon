@@ -19,6 +19,11 @@ import { filter } from 'rxjs/operators';
 export class LayoutComponent implements OnInit {
   // Loading state - start with true to show loader on page refresh
   isLoading = true;
+
+  // User info
+  userName = 'User';
+  userEmail = 'user@example.com';
+
   // Main menu items (shown on dashboard/home)
   mainMenuItems = [
     {
@@ -120,11 +125,43 @@ export class LayoutComponent implements OnInit {
     }
   }
 
+  // ...existing code...
+
   ngOnInit() {
+    // Load logged-in user info from localStorage
+    const storedUser = localStorage.getItem('loggedInUser');
+    const storedEmail = localStorage.getItem('loggedInEmail');
+
+    if (storedUser) {
+      this.userName = this.capitalizeFirstLetter(storedUser);
+    }
+
+    // Use stored email directly - it's already in correct format from login
+    if (storedEmail) {
+      this.userEmail = storedEmail;
+    }
+
     // Hide loader after initial page load
     setTimeout(() => {
       this.isLoading = false;
     }, 500);
+  }
+
+  // ...existing code...
+
+  logout() {
+    // Clear stored user data
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('loggedInEmail');
+    localStorage.removeItem('isLoggedIn');
+    this.showUserMenu = false;
+    this.router.navigate(['/login']);
+  }
+
+  // ...existing code...
+
+  capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   toggleSidebar() {
@@ -140,11 +177,5 @@ export class LayoutComponent implements OnInit {
 
   toggleUserMenu() {
     this.showUserMenu = !this.showUserMenu;
-  }
-
-  logout() {
-    // Clear any stored user data/tokens here if needed
-    this.showUserMenu = false;
-    this.router.navigate(['/login']);
   }
 }

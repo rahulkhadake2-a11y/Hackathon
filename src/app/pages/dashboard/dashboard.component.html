@@ -17,13 +17,8 @@
       <div class="donut-chart">
         <svg viewBox="0 0 100 100">
           <circle class="bg-circle" cx="50" cy="50" r="40" />
-          <circle
-            class="progress-circle purple"
-            cx="50"
-            cy="50"
-            r="40"
-            [attr.stroke-dasharray]="grossProfitMargin * 2.51 + ' 251'"
-          />
+          <circle class="progress-circle purple" cx="50" cy="50" r="40"
+            [attr.stroke-dasharray]="grossProfitMargin * 2.51 + ' 251'" />
         </svg>
         <div class="chart-value">{{ grossProfitMargin }}%</div>
       </div>
@@ -39,13 +34,8 @@
       <div class="donut-chart">
         <svg viewBox="0 0 100 100">
           <circle class="bg-circle" cx="50" cy="50" r="40" />
-          <circle
-            class="progress-circle purple"
-            cx="50"
-            cy="50"
-            r="40"
-            [attr.stroke-dasharray]="netProfitMargin * 2.51 + ' 251'"
-          />
+          <circle class="progress-circle purple" cx="50" cy="50" r="40"
+            [attr.stroke-dasharray]="netProfitMargin * 2.51 + ' 251'" />
         </svg>
         <div class="chart-value">{{ netProfitMargin }}%</div>
       </div>
@@ -96,10 +86,7 @@
           <h3 class="card-title">QUICK RATIO</h3>
           <div class="ratio-value">{{ quickRatio }}</div>
           <div class="ratio-progress">
-            <div
-              class="progress-bar yellow"
-              [style.width.%]="quickRatioProgress"
-            ></div>
+            <div class="progress-bar yellow" [style.width.%]="quickRatioProgress"></div>
           </div>
           <p class="ratio-goal">Quick Ratio Goal: {{ quickRatioGoal }}</p>
           <p class="ratio-desc">
@@ -121,10 +108,7 @@
           <h3 class="card-title">CURRENT RATIO</h3>
           <div class="ratio-value">{{ currentRatio }}</div>
           <div class="ratio-progress">
-            <div
-              class="progress-bar green"
-              [style.width.%]="currentRatioProgress"
-            ></div>
+            <div class="progress-bar green" [style.width.%]="currentRatioProgress"></div>
           </div>
           <p class="ratio-goal">Quick Ratio Goal: {{ currentRatioGoal }}</p>
           <p class="ratio-desc">
@@ -149,11 +133,7 @@
           <div class="bar" style="height: 85%"></div>
         </div>
         <div class="stat-value">{{ formatCurrency(totalIncome) }}</div>
-        <div
-          class="stat-change"
-          [class.positive]="incomeChangePositive"
-          [class.negative]="!incomeChangePositive"
-        >
+        <div class="stat-change" [class.positive]="incomeChangePositive" [class.negative]="!incomeChangePositive">
           {{ incomeChange }}% higher vs previous month
         </div>
       </div>
@@ -172,11 +152,7 @@
           <div class="bar" style="height: 65%"></div>
         </div>
         <div class="stat-value">{{ formatCurrency(totalExpenses) }}</div>
-        <div
-          class="stat-change"
-          [class.positive]="expenseChangePositive"
-          [class.negative]="!expenseChangePositive"
-        >
+        <div class="stat-change" [class.positive]="expenseChangePositive" [class.negative]="!expenseChangePositive">
           {{ expenseChange }}% higher vs previous month
         </div>
       </div>
@@ -200,11 +176,8 @@
         <div class="stat-value">
           {{ formatCurrency(accountsReceivable) }}
         </div>
-        <div
-          class="stat-change"
-          [class.positive]="receivableChangePositive"
-          [class.negative]="!receivableChangePositive"
-        >
+        <div class="stat-change" [class.positive]="receivableChangePositive"
+          [class.negative]="!receivableChangePositive">
           {{ receivableChange }}% higher vs previous month
         </div>
       </div>
@@ -223,11 +196,7 @@
           <div class="bar" style="height: 75%"></div>
         </div>
         <div class="stat-value">{{ formatCurrency(accountsPayable) }}</div>
-        <div
-          class="stat-change"
-          [class.positive]="payableChangePositive"
-          [class.negative]="!payableChangePositive"
-        >
+        <div class="stat-change" [class.positive]="payableChangePositive" [class.negative]="!payableChangePositive">
           {{ payableChange }}% higher vs previous month
         </div>
       </div>
