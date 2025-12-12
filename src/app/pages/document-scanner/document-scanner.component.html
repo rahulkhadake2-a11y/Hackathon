@@ -1,0 +1,449 @@
+<div class="document-scanner-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <i class="bi bi-file-earmark-text header-icon"></i>
+        <div>
+          <h2>AI Document Scanner</h2>
+          <p class="subtitle">
+            Upload invoices or GRN documents to automatically extract data using
+            OCR + AI
+          </p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn btn-outline"
+          (click)="clearDocument()"
+          *ngIf="selectedFile"
+        >
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    {{ errorMessage }}
+    <button class="close-btn" (click)="errorMessage = null">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="bi bi-check-circle-fill"></i>
+    {{ successMessage }}
+    <button class="close-btn" (click)="successMessage = null">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+
+  <div class="scanner-content">
+    <!-- Upload Section -->
+    <div class="upload-section" *ngIf="!selectedFile">
+      <div
+        class="upload-zone"
+        [class.drag-over]="isDragOver"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="triggerFileInput()"
+      >
+        <input
+          type="file"
+          #fileInput
+          (change)="onFileSelect($event)"
+          accept=".png,.jpg,.jpeg,.gif,.webp,.pdf"
+          hidden
+        />
+
+        <div class="upload-content">
+          <div class="upload-icon">
+            <i class="bi bi-cloud-arrow-up"></i>
+          </div>
+          <h3>Drop your document here</h3>
+          <p>or click to browse files</p>
+          <div class="supported-formats">
+            <span class="format-badge">PNG</span>
+            <span class="format-badge">JPG</span>
+            <span class="format-badge">JPEG</span>
+            <span class="format-badge">PDF</span>
+            <span class="format-badge">GIF</span>
+            <span class="format-badge">WEBP</span>
+          </div>
+          <p class="file-limit">Maximum file size: 10MB</p>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="bi bi-file-earmark-text"></i>
+          <h4>Invoice Scanning</h4>
+          <p>
+            Extract vendor name, amounts, tax details, and due dates from
+            invoices
+          </p>
+        </div>
+        <div class="feature-card">
+          <i class="bi bi-box-seam"></i>
+          <h4>GRN Processing</h4>
+          <p>
+            Scan goods receipt notes to capture delivery and quantity
+            information
+          </p>
+        </div>
+        <div class="feature-card">
+          <i class="bi bi-robot"></i>
+          <h4>AI-Powered OCR</h4>
+          <p>Advanced text recognition with intelligent data extraction</p>
+        </div>
+        <div class="feature-card">
+          <i class="bi bi-lightning-charge"></i>
+          <h4>Quick Import</h4>
+          <p>Create purchase orders directly from scanned documents</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview & Results Section -->
+    <div class="results-section" *ngIf="selectedFile">
+      <div class="results-grid">
+        <!-- Document Preview -->
+        <div class="preview-card">
+          <div class="card-header">
+            <h3><i class="bi bi-image"></i> Document Preview</h3>
+            <div class="header-actions">
+              <button
+                class="btn btn-sm btn-outline"
+                (click)="triggerFileInput()"
+              >
+                <i class="bi bi-arrow-repeat"></i> Replace
+              </button>
+            </div>
+          </div>
+          <div class="preview-content">
+            <div class="document-preview">
+              <img
+                [src]="previewUrl"
+                alt="Document preview"
+                *ngIf="previewUrl && !selectedFile?.type?.includes('pdf')"
+              />
+              <div
+                class="pdf-preview"
+                *ngIf="selectedFile?.type?.includes('pdf')"
+              >
+                <i class="bi bi-file-earmark-pdf"></i>
+                <p>{{ selectedFile.name }}</p>
+              </div>
+            </div>
+            <div class="file-info">
+              <span
+                ><i class="bi bi-file-earmark"></i>
+                {{ selectedFile.name }}</span
+              >
+              <span
+                ><i class="bi bi-hdd"></i>
+                {{ (selectedFile.size / 1024).toFixed(1) }} KB</span
+              >
+            </div>
+          </div>
+
+          <!-- Scan Button -->
+          <div class="scan-action">
+            <button
+              class="btn btn-primary btn-scan"
+              (click)="scanDocument()"
+              [disabled]="isProcessing"
+            >
+              <ng-container *ngIf="!isProcessing">
+                <i class="bi bi-cpu"></i> Scan Document
+              </ng-container>
+              <ng-container *ngIf="isProcessing">
+                <span class="spinner"></span> Processing...
+              </ng-container>
+            </button>
+          </div>
+
+          <!-- Progress -->
+          <div class="scan-progress" *ngIf="isProcessing && scanProgress">
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                [style.width.%]="scanProgress.progress"
+              ></div>
+            </div>
+            <p class="progress-text">{{ scanProgress.message }}</p>
+          </div>
+        </div>
+
+        <!-- Extracted Data -->
+        <div class="extracted-card" *ngIf="extractedData">
+          <div class="card-header">
+            <h3>
+              <i [class]="getDocumentTypeIcon()"></i>
+              Extracted Data
+              <span class="document-type-badge">{{
+                getDocumentTypeLabel()
+              }}</span>
+            </h3>
+            <div class="header-actions">
+              <button
+                class="btn btn-sm"
+                [class.btn-primary]="isEditing"
+                [class.btn-outline]="!isEditing"
+                (click)="toggleEditMode()"
+              >
+                <i
+                  class="bi"
+                  [class.bi-pencil]="!isEditing"
+                  [class.bi-check]="isEditing"
+                ></i>
+                {{ isEditing ? "Done" : "Edit" }}
+              </button>
+            </div>
+          </div>
+
+          <div class="extracted-content">
+            <!-- Confidence Score -->
+            <div class="confidence-indicator">
+              <span class="confidence-label">OCR Confidence:</span>
+              <span
+                class="confidence-value"
+                [class]="getConfidenceClass(extractedData.confidence)"
+              >
+                {{ (extractedData.confidence * 100).toFixed(0) }}%
+                <span class="confidence-badge">{{
+                  getConfidenceLabel(extractedData.confidence)
+                }}</span>
+              </span>
+            </div>
+
+            <!-- View Mode -->
+            <div class="data-grid" *ngIf="!isEditing">
+              <div class="data-item" *ngIf="extractedData.vendorName">
+                <label>Vendor Name</label>
+                <span class="value">{{ extractedData.vendorName }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.invoiceNumber">
+                <label>Invoice Number</label>
+                <span class="value">{{ extractedData.invoiceNumber }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.grnNumber">
+                <label>GRN Number</label>
+                <span class="value">{{ extractedData.grnNumber }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.poNumber">
+                <label>PO Number</label>
+                <span class="value">{{ extractedData.poNumber }}</span>
+              </div>
+              <div class="data-item highlight">
+                <label>Total Amount</label>
+                <span class="value amount">{{
+                  formatCurrency(
+                    extractedData.totalAmount,
+                    extractedData.currency
+                  )
+                }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.subtotal">
+                <label>Subtotal</label>
+                <span class="value">{{
+                  formatCurrency(extractedData.subtotal, extractedData.currency)
+                }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.taxAmount">
+                <label>Tax Amount</label>
+                <span class="value">{{
+                  formatCurrency(
+                    extractedData.taxAmount,
+                    extractedData.currency
+                  )
+                }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.taxRate">
+                <label>Tax Rate</label>
+                <span class="value">{{ extractedData.taxRate }}%</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.invoiceDate">
+                <label>Invoice Date</label>
+                <span class="value">{{ extractedData.invoiceDate }}</span>
+              </div>
+              <div class="data-item" *ngIf="extractedData.dueDate">
+                <label>Due Date</label>
+                <span class="value">{{ extractedData.dueDate }}</span>
+              </div>
+            </div>
+
+            <!-- Edit Mode -->
+            <form [formGroup]="editForm" class="edit-form" *ngIf="isEditing">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Vendor Name *</label>
+                  <input
+                    type="text"
+                    formControlName="vendorName"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Select Existing Vendor</label>
+                  <select formControlName="vendorId" class="form-control">
+                    <option value="">-- Select Vendor --</option>
+                    <option *ngFor="let vendor of vendors" [value]="vendor.id">
+                      {{ vendor.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Invoice Number</label>
+                  <input
+                    type="text"
+                    formControlName="invoiceNumber"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>PO Number</label>
+                  <input
+                    type="text"
+                    formControlName="poNumber"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Total Amount *</label>
+                  <input
+                    type="number"
+                    formControlName="totalAmount"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Subtotal</label>
+                  <input
+                    type="number"
+                    formControlName="subtotal"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Tax Amount</label>
+                  <input
+                    type="number"
+                    formControlName="taxAmount"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Tax Rate (%)</label>
+                  <input
+                    type="number"
+                    formControlName="taxRate"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Invoice Date</label>
+                  <input
+                    type="date"
+                    formControlName="invoiceDate"
+                    class="form-control"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Due Date</label>
+                  <input
+                    type="date"
+                    formControlName="dueDate"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group full-width">
+                <label>Notes</label>
+                <textarea
+                  formControlName="notes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Add any additional notes..."
+                ></textarea>
+              </div>
+            </form>
+
+            <!-- Line Items -->
+            <div class="line-items" *ngIf="extractedData.lineItems.length > 0">
+              <h4><i class="bi bi-list-ul"></i> Line Items</h4>
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of extractedData.lineItems">
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                      {{
+                        formatCurrency(item.unitPrice, extractedData.currency)
+                      }}
+                    </td>
+                    <td>
+                      {{ formatCurrency(item.total, extractedData.currency) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-buttons">
+              <button
+                class="btn btn-primary"
+                (click)="createPurchaseOrder()"
+                [disabled]="isEditing && !editForm.valid"
+              >
+                <i class="bi bi-plus-circle"></i> Create Purchase Order
+              </button>
+              <button class="btn btn-outline" (click)="downloadRawText()">
+                <i class="bi bi-download"></i> Download Raw Text
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raw Text Accordion -->
+      <div class="raw-text-section" *ngIf="extractedData">
+        <details class="raw-text-accordion">
+          <summary>
+            <i class="bi bi-code-slash"></i> View Raw Extracted Text
+          </summary>
+          <div class="raw-text-content">
+            <pre>{{ extractedData.rawText }}</pre>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
