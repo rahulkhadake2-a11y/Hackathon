@@ -58,6 +58,13 @@ export interface Purchase {
   leadTime?: number; // Days from order to delivery
   communicationRating?: number; // 1-5 rating for vendor communication
   complianceIssues?: string[]; // Any compliance issues found
+
+  // Quality metrics for dashboard
+  quantityReceived?: number; // Total quantity received
+  quantityAccepted?: number; // Quantity accepted after inspection
+  returnedItems?: number; // Number of items returned
+  defectCount?: number; // Number of defective items
+  defectRate?: number; // Percentage of defective items
 }
 
 export interface RiskFactor {
