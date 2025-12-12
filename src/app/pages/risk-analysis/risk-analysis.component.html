@@ -1,0 +1,545 @@
+<div class="risk-analysis-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="bi bi-shield-exclamation"></i>
+        AI Risk Analysis
+      </h1>
+      <p class="page-subtitle">Intelligent vendor risk assessment powered by AI</p>
+    </div>
+    <div class="header-actions">
+      <!-- Provider Selection -->
+      <div class="provider-selector">
+        <button 
+          class="provider-btn" 
+          [class.active]="currentProvider === 'local'"
+          (click)="setProvider('local')"
+          title="Works offline, no API needed"
+        >
+          <i class="bi bi-cpu"></i> Local
+        </button>
+        <button 
+          class="provider-btn gemini" 
+          [class.active]="currentProvider === 'gemini'"
+          (click)="setProvider('gemini')"
+          title="Google Gemini - FREE!"
+        >
+          <i class="bi bi-stars"></i> Gemini (Free)
+        </button>
+        <button 
+          class="provider-btn" 
+          [class.active]="currentProvider === 'openai'"
+          (click)="setProvider('openai')"
+          title="OpenAI - Requires credits"
+        >
+          <i class="bi bi-lightning"></i> OpenAI
+        </button>
+      </div>
+      
+      <button class="btn btn-outline-primary" (click)="showApiKeyModal = true">
+        <i class="bi bi-key"></i>
+        Configure AI
+      </button>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- Vendor Selection Panel -->
+    <div class="vendor-panel">
+      <div class="panel-header">
+        <h3><i class="bi bi-building"></i> Select Vendor</h3>
+      </div>
+      <div class="vendor-list">
+        <div 
+          *ngFor="let vendor of vendors" 
+          class="vendor-card"
+          [class.selected]="selectedVendor?.id === vendor.id"
+          (click)="selectVendor(vendor)"
+        >
+          <div class="vendor-avatar">
+            {{ vendor.name.charAt(0) }}
+          </div>
+          <div class="vendor-info">
+            <h4>{{ vendor.name }}</h4>
+            <span class="vendor-category">{{ vendor.category }}</span>
+          </div>
+          <div class="vendor-status" [ngClass]="vendor.complianceStatus">
+            <span class="status-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Analysis Panel -->
+    <div class="analysis-panel">
+      <!-- No Vendor Selected State -->
+      <div class="empty-state" *ngIf="!selectedVendor">
+        <div class="empty-icon">
+          <i class="bi bi-arrow-left-circle"></i>
+        </div>
+        <h3>Select a Vendor</h3>
+        <p>Choose a vendor from the list to begin risk analysis</p>
+      </div>
+
+      <!-- Vendor Selected -->
+      <div class="analysis-content" *ngIf="selectedVendor">
+        <!-- Error Message -->
+        <div class="error-alert" *ngIf="errorMessage">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span>{{ errorMessage }}</span>
+          <button class="close-error" (click)="errorMessage = ''">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+
+        <!-- Vendor Header -->
+        <div class="vendor-header">
+          <div class="vendor-title">
+            <div class="vendor-logo">{{ selectedVendor.name.charAt(0) }}</div>
+            <div class="vendor-details">
+              <h2>{{ selectedVendor.name }}</h2>
+              <div class="vendor-meta">
+                <span><i class="bi bi-tag"></i> {{ selectedVendor.category }}</span>
+                <span><i class="bi bi-calendar"></i> Since {{ formatDate(selectedVendor.createdAt) }}</span>
+              </div>
+            </div>
+          </div>
+          <button 
+            class="btn btn-primary analyze-btn" 
+            (click)="runRiskAnalysis()"
+            [disabled]="isAnalyzing"
+          >
+            <span *ngIf="!isAnalyzing">
+              <i class="bi bi-cpu"></i> Run AI Analysis
+            </span>
+            <span *ngIf="isAnalyzing" class="analyzing">
+              <div class="spinner"></div>
+              Analyzing...
+            </span>
+          </button>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-currency-dollar"></i></div>
+            <div class="stat-content">
+              <span class="stat-value">{{ formatCurrency(selectedVendor.totalPurchases) }}</span>
+              <span class="stat-label">Total Purchases</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-truck"></i></div>
+            <div class="stat-content">
+              <span class="stat-value">{{ selectedVendor.onTimeDeliveryRate }}%</span>
+              <span class="stat-label">On-Time Delivery</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-star"></i></div>
+            <div class="stat-content">
+              <span class="stat-value">{{ selectedVendor.qualityScore }}/100</span>
+              <span class="stat-label">Quality Score</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" [ngClass]="selectedVendor.complianceStatus">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value capitalize">{{ selectedVendor.complianceStatus }}</span>
+              <span class="stat-label">Compliance</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div class="analysis-results" *ngIf="currentAssessment">
+          <!-- Risk Score Overview -->
+          <div class="risk-overview">
+            <div class="risk-score-card" [ngClass]="getRiskLevelClass(currentAssessment.riskLevel)">
+              <div class="score-circle">
+                <svg viewBox="0 0 100 100">
+                  <circle class="score-bg" cx="50" cy="50" r="45"></circle>
+                  <circle 
+                    class="score-progress" 
+                    cx="50" cy="50" r="45"
+                    [style.stroke]="getRiskScoreColor(currentAssessment.overallRiskScore)"
+                    [style.stroke-dasharray]="(currentAssessment.overallRiskScore * 2.83) + ' 283'"
+                  ></circle>
+                </svg>
+                <div class="score-value">
+                  <span class="score-number">{{ currentAssessment.overallRiskScore }}</span>
+                  <span class="score-max">/100</span>
+                </div>
+              </div>
+              <div class="score-info">
+                <h3>Overall Risk Score</h3>
+                <span class="risk-badge" [ngClass]="getRiskLevelClass(currentAssessment.riskLevel)">
+                  {{ currentAssessment.riskLevel | uppercase }} RISK
+                </span>
+                <p class="score-date">Assessed on {{ formatDate(currentAssessment.assessmentDate) }}</p>
+              </div>
+            </div>
+
+            <!-- Peer Comparison -->
+            <div class="peer-comparison" *ngIf="currentAssessment.comparisonToPeers">
+              <h4><i class="bi bi-people"></i> Peer Comparison</h4>
+              <div class="comparison-stat">
+                <span class="label">Industry Average</span>
+                <span class="value">{{ currentAssessment.comparisonToPeers.averageRiskScore }}/100</span>
+              </div>
+              <div class="comparison-stat">
+                <span class="label">Percentile</span>
+                <span class="value" [class.good]="currentAssessment.comparisonToPeers.betterThanPeers">
+                  {{ currentAssessment.comparisonToPeers.percentile }}%
+                </span>
+              </div>
+              <div class="comparison-badge" [class.positive]="currentAssessment.comparisonToPeers.betterThanPeers">
+                <i class="bi" [ngClass]="currentAssessment.comparisonToPeers.betterThanPeers ? 'bi-arrow-up' : 'bi-arrow-down'"></i>
+                {{ currentAssessment.comparisonToPeers.betterThanPeers ? 'Better' : 'Worse' }} than peers
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="analysis-tabs">
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab === 'overview'"
+              (click)="activeTab = 'overview'"
+            >
+              <i class="bi bi-grid"></i> Overview
+            </button>
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab === 'factors'"
+              (click)="activeTab = 'factors'"
+            >
+              <i class="bi bi-list-check"></i> Risk Factors
+            </button>
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab === 'insights'"
+              (click)="activeTab = 'insights'"
+            >
+              <i class="bi bi-lightbulb"></i> AI Insights
+            </button>
+            <button 
+              class="tab-btn" 
+              [class.active]="activeTab === 'chat'"
+              (click)="activeTab = 'chat'"
+            >
+              <i class="bi bi-chat-dots"></i> Ask AI
+            </button>
+          </div>
+
+          <!-- Tab Content -->
+          <div class="tab-content">
+            <!-- Overview Tab -->
+            <div class="tab-pane" *ngIf="activeTab === 'overview'">
+              <div class="recommendations-section">
+                <h4><i class="bi bi-clipboard-check"></i> Recommendations</h4>
+                <ul class="recommendations-list" *ngIf="currentAssessment.recommendations && currentAssessment.recommendations.length > 0">
+                  <li *ngFor="let rec of currentAssessment.recommendations; let i = index">
+                    <span class="rec-number">{{ i + 1 }}</span>
+                    <span class="rec-text">{{ rec }}</span>
+                  </li>
+                </ul>
+                <div class="empty-tab" *ngIf="!currentAssessment.recommendations || currentAssessment.recommendations.length === 0">
+                  <i class="bi bi-clipboard"></i>
+                  <p>No recommendations available.</p>
+                </div>
+              </div>
+
+              <!-- Risk Trend -->
+              <div class="trend-section" *ngIf="currentAssessment.historicalTrend.length > 0">
+                <h4><i class="bi bi-graph-up"></i> Risk Trend</h4>
+                <div class="trend-chart">
+                  <div 
+                    class="trend-bar" 
+                    *ngFor="let point of currentAssessment.historicalTrend"
+                    [style.height.%]="point.riskScore"
+                    [ngClass]="getRiskLevelClass(point.riskLevel)"
+                    [title]="formatDate(point.date) + ': ' + point.riskScore"
+                  >
+                    <span class="trend-value">{{ point.riskScore }}</span>
+                  </div>
+                </div>
+                <div class="trend-labels">
+                  <span *ngFor="let point of currentAssessment.historicalTrend">
+                    {{ formatDate(point.date).split(' ')[0] }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Risk Factors Tab -->
+            <div class="tab-pane" *ngIf="activeTab === 'factors'">
+              <div class="factors-grid" *ngIf="currentAssessment.riskFactors && currentAssessment.riskFactors.length > 0">
+                <div 
+                  class="factor-card" 
+                  *ngFor="let factor of currentAssessment.riskFactors"
+                  [ngClass]="getRiskLevelClass(factor.severity)"
+                >
+                  <div class="factor-header">
+                    <div class="factor-icon">
+                      <i class="bi" [ngClass]="getCategoryIcon(factor.category)"></i>
+                    </div>
+                    <div class="factor-title">
+                      <h5>{{ factor.name }}</h5>
+                      <span class="factor-category">{{ factor.category | titlecase }}</span>
+                    </div>
+                    <div class="factor-score">
+                      <span class="score">{{ factor.score | number:'1.0-0' }}</span>
+                      <span class="severity-badge" [ngClass]="getRiskLevelClass(factor.severity)">
+                        {{ factor.severity }}
+                      </span>
+                    </div>
+                  </div>
+                  <p class="factor-description">{{ factor.description }}</p>
+                  <div class="factor-recommendation" *ngIf="factor.recommendation">
+                    <i class="bi bi-lightbulb"></i>
+                    <span>{{ factor.recommendation }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="empty-tab" *ngIf="!currentAssessment.riskFactors || currentAssessment.riskFactors.length === 0">
+                <i class="bi bi-exclamation-circle"></i>
+                <p>No risk factors found. Try running the analysis again.</p>
+              </div>
+            </div>
+
+            <!-- AI Insights Tab -->
+            <div class="tab-pane" *ngIf="activeTab === 'insights'">
+              <div class="insights-list" *ngIf="currentAssessment.aiInsights && currentAssessment.aiInsights.length > 0">
+                <div 
+                  class="insight-card" 
+                  *ngFor="let insight of currentAssessment.aiInsights"
+                  [ngClass]="getImpactClass(insight.impact)"
+                >
+                  <div class="insight-header">
+                    <div class="insight-icon" [ngClass]="getImpactClass(insight.impact)">
+                      <i class="bi" [ngClass]="{
+                        'bi-check-circle': insight.impact === 'positive',
+                        'bi-exclamation-triangle': insight.impact === 'negative',
+                        'bi-info-circle': insight.impact === 'neutral'
+                      }"></i>
+                    </div>
+                    <div class="insight-title">
+                      <h5>{{ insight.title }}</h5>
+                      <div class="insight-meta">
+                        <span class="confidence">
+                          <i class="bi bi-cpu"></i>
+                          {{ (insight.confidence * 100).toFixed(0) }}% confidence
+                        </span>
+                        <span class="action-badge" *ngIf="insight.actionRequired">
+                          <i class="bi bi-flag"></i> Action Required
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="insight-description">{{ insight.description }}</p>
+                  <div class="insight-actions" *ngIf="insight.suggestedActions && insight.suggestedActions.length > 0">
+                    <h6>Suggested Actions:</h6>
+                    <ul>
+                      <li *ngFor="let action of insight.suggestedActions">{{ action }}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="empty-tab" *ngIf="!currentAssessment.aiInsights || currentAssessment.aiInsights.length === 0">
+                <i class="bi bi-lightbulb"></i>
+                <p>No AI insights available. Try running the analysis again.</p>
+              </div>
+            </div>
+
+            <!-- Chat Tab -->
+            <div class="tab-pane chat-pane" *ngIf="activeTab === 'chat'">
+              <div class="chat-container">
+                <div class="chat-messages">
+                  <div class="chat-welcome" *ngIf="chatMessages.length === 0">
+                    <div class="welcome-icon">
+                      <i class="bi bi-robot"></i>
+                    </div>
+                    <h4>AI Risk Assistant</h4>
+                    <p>Ask me anything about this vendor's risk assessment, recommendations, or how to mitigate specific risks.</p>
+                    <div class="suggested-questions">
+                      <button (click)="chatInput = 'What is the overall risk score?'; sendChatMessage()">
+                        What is the risk score?
+                      </button>
+                      <button (click)="chatInput = 'What are the main recommendations?'; sendChatMessage()">
+                        Main recommendations?
+                      </button>
+                      <button (click)="chatInput = 'Tell me about compliance status'; sendChatMessage()">
+                        Compliance status
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div 
+                    class="chat-message" 
+                    *ngFor="let message of chatMessages"
+                    [ngClass]="message.role"
+                  >
+                    <div class="message-avatar">
+                      <i class="bi" [ngClass]="message.role === 'user' ? 'bi-person' : 'bi-robot'"></i>
+                    </div>
+                    <div class="message-content">
+                      <div class="message-text">{{ message.content }}</div>
+                      <div class="message-time">{{ formatDate(message.timestamp) }}</div>
+                    </div>
+                  </div>
+
+                  <div class="typing-indicator" *ngIf="isChatting">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+
+                <div class="chat-input-container">
+                  <input 
+                    type="text" 
+                    class="chat-input"
+                    [(ngModel)]="chatInput"
+                    placeholder="Ask about vendor risks..."
+                    (keyup.enter)="sendChatMessage()"
+                    [disabled]="isChatting"
+                  />
+                  <button 
+                    class="send-btn" 
+                    (click)="sendChatMessage()"
+                    [disabled]="!chatInput.trim() || isChatting"
+                  >
+                    <i class="bi bi-send"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Assessment State -->
+        <div class="no-assessment" *ngIf="!currentAssessment && !isAnalyzing">
+          <div class="no-assessment-icon">
+            <i class="bi bi-cpu"></i>
+          </div>
+          <h3>Ready for Analysis</h3>
+          <p>Click "Run AI Analysis" to generate a comprehensive risk assessment for this vendor.</p>
+        </div>
+
+        <!-- Analyzing State -->
+        <div class="analyzing-state" *ngIf="isAnalyzing">
+          <div class="analyzing-animation">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring delay-1"></div>
+            <div class="pulse-ring delay-2"></div>
+            <i class="bi bi-cpu"></i>
+          </div>
+          <h3>Analyzing Vendor Risk</h3>
+          <p>Our AI is evaluating financial, operational, compliance, and supply chain factors...</p>
+          <div class="analysis-steps">
+            <div class="step active">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Collecting data</span>
+            </div>
+            <div class="step active">
+              <i class="bi bi-arrow-repeat spin"></i>
+              <span>Processing metrics</span>
+            </div>
+            <div class="step">
+              <i class="bi bi-circle"></i>
+              <span>Generating insights</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key Modal -->
+  <div class="modal-overlay" *ngIf="showApiKeyModal" (click)="showApiKeyModal = false">
+    <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3><i class="bi bi-key"></i> Configure AI Provider</h3>
+        <button class="close-btn" (click)="showApiKeyModal = false">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Gemini Section (FREE) -->
+        <div class="provider-section recommended">
+          <div class="provider-header">
+            <div class="provider-title">
+              <i class="bi bi-stars"></i>
+              <h4>Google Gemini</h4>
+              <span class="free-badge">FREE</span>
+            </div>
+            <span class="provider-status" [class.configured]="hasGeminiKey">
+              {{ hasGeminiKey ? '✓ Configured' : 'Not configured' }}
+            </span>
+          </div>
+          <p class="provider-description">
+            Get a FREE API key from Google AI Studio. Generous free tier with 60 requests/minute.
+          </p>
+          <a href="https://makersuite.google.com/app/apikey" target="_blank" class="get-key-link">
+            <i class="bi bi-box-arrow-up-right"></i> Get FREE Gemini API Key
+          </a>
+          <div class="form-group">
+            <input 
+              type="password" 
+              class="form-input"
+              [(ngModel)]="geminiKeyInput"
+              placeholder="AIza..."
+            />
+            <button class="btn btn-success btn-sm" (click)="setGeminiKey()" [disabled]="!geminiKeyInput.trim()">
+              Save Gemini Key
+            </button>
+          </div>
+        </div>
+
+        <div class="divider-or">
+          <span>OR</span>
+        </div>
+
+        <!-- OpenAI Section (Paid) -->
+        <div class="provider-section">
+          <div class="provider-header">
+            <div class="provider-title">
+              <i class="bi bi-lightning"></i>
+              <h4>OpenAI</h4>
+              <span class="paid-badge">Paid</span>
+            </div>
+            <span class="provider-status" [class.configured]="hasApiKey">
+              {{ hasApiKey ? '✓ Configured' : 'Not configured' }}
+            </span>
+          </div>
+          <p class="provider-description">
+            Requires credits. Better for production use with higher rate limits.
+          </p>
+          <div class="form-group">
+            <input 
+              type="password" 
+              class="form-input"
+              [(ngModel)]="apiKeyInput"
+              placeholder="sk-..."
+            />
+            <button class="btn btn-primary btn-sm" (click)="setApiKey()" [disabled]="!apiKeyInput.trim()">
+              Save OpenAI Key
+            </button>
+          </div>
+        </div>
+
+        <div class="api-info">
+          <i class="bi bi-shield-check"></i>
+          <span>Your API keys are stored locally in your browser and never sent to our servers.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="showApiKeyModal = false">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
