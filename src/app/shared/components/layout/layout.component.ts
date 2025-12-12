@@ -10,10 +10,11 @@ import {
 } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { ThemeService } from '../../../core/services/theme/theme.service';
+import { AiChatComponent } from '../ai-chat/ai-chat.component';
 
 @Component({
   selector: 'app-layout',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AiChatComponent],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css',
 })
@@ -67,6 +68,12 @@ export class LayoutComponent implements OnInit {
       icon: 'bi-bar-chart',
       label: 'Analytics',
       route: '/aianalysis',
+      active: false,
+    },
+    {
+      icon: 'bi-database',
+      label: 'Master Data',
+      route: '/master-data',
       active: false,
     },
   ];

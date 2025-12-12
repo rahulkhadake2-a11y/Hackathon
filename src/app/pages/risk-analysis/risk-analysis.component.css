@@ -1,7 +1,7 @@
 /* Risk Analysis Component Styles */
 .risk-analysis-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
+background: linear-gradient(180deg, #1e2a4a 0%, #2d3a5c 100%);
   padding: 2rem;
   color: #e4e6eb;
 }
@@ -1691,15 +1691,15 @@
   .content-grid {
     grid-template-columns: 280px 1fr;
   }
-  
+
   .quick-stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .risk-overview {
     grid-template-columns: 1fr;
   }
-  
+
   .factors-grid {
     grid-template-columns: 1fr;
   }
@@ -1709,17 +1709,17 @@
   .content-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .vendor-panel {
     max-height: 300px;
   }
-  
+
   .vendor-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .analyze-btn {
     width: 100%;
     justify-content: center;
@@ -3485,46 +3485,46 @@
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .header-controls {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
   }
-  
+
   .provider-selector-inline {
     justify-content: center;
   }
-  
+
   .search-box input {
     width: 100%;
   }
-  
+
   .analysis-summary {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .ai-analysis-controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .items-table-container {
     overflow-x: auto;
   }
-  
+
   .items-analysis-table {
     min-width: 900px;
   }
-  
+
   .ai-result-summary {
     grid-template-columns: 1fr;
   }
-  
+
   .vendor-metrics-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .recommended-vendor-card {
     flex-direction: column;
     align-items: flex-start;

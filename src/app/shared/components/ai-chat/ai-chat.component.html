@@ -1,0 +1,119 @@
+<!-- AI Chat Button -->
+<button class="chat-toggle-btn" (click)="toggleChat()" [class.open]="isOpen">
+  <i class="bi" [class.bi-chat-dots-fill]="!isOpen" [class.bi-x-lg]="isOpen"></i>
+  <span class="chat-badge" *ngIf="!isOpen">AI</span>
+</button>
+
+<!-- Chat Window -->
+<div class="chat-window" [class.open]="isOpen" [class.minimized]="isMinimized">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="header-left">
+      <div class="ai-avatar">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div class="header-info">
+        <h4>ERP Assistant</h4>
+        <span class="status-indicator">
+          <span class="status-dot"></span>
+          Online
+        </span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" (click)="clearChat()" title="Clear chat">
+        <i class="bi bi-trash3"></i>
+      </button>
+      <button class="header-btn" (click)="minimizeChat()" title="Minimize">
+        <i class="bi" [class.bi-dash-lg]="!isMinimized" [class.bi-plus-lg]="isMinimized"></i>
+      </button>
+      <button class="header-btn close-btn" (click)="closeChat()" title="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body" *ngIf="!isMinimized">
+    <!-- Messages Container -->
+    <div class="messages-container" #messagesContainer>
+      <div *ngFor="let message of messages" 
+           class="message" 
+           [class.user]="message.type === 'user'"
+           [class.assistant]="message.type === 'assistant'">
+        
+        <!-- Assistant Avatar -->
+        <div class="message-avatar" *ngIf="message.type === 'assistant'">
+          <i class="bi bi-robot"></i>
+        </div>
+        
+        <!-- Message Content -->
+        <div class="message-content">
+          <div class="message-bubble" [innerHTML]="formatMessage(message.content)"></div>
+          <span class="message-time">
+            {{ message.timestamp | date:'shortTime' }}
+          </span>
+          
+          <!-- Suggestions -->
+          <div class="suggestions" *ngIf="message.suggestions && message.suggestions.length > 0">
+            <button class="suggestion-btn" 
+                    *ngFor="let suggestion of message.suggestions"
+                    (click)="useSuggestion(suggestion)">
+              {{ suggestion }}
+            </button>
+          </div>
+        </div>
+        
+        <!-- User Avatar -->
+        <div class="message-avatar user-avatar" *ngIf="message.type === 'user'">
+          <i class="bi bi-person-fill"></i>
+        </div>
+      </div>
+      
+      <!-- Typing Indicator -->
+      <div class="message assistant" *ngIf="isTyping">
+        <div class="message-avatar">
+          <i class="bi bi-robot"></i>
+        </div>
+        <div class="message-content">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Suggestions -->
+    <div class="quick-suggestions">
+      <button class="quick-btn" 
+              *ngFor="let suggestion of quickSuggestions"
+              (click)="useQuickSuggestion(suggestion)">
+        <i class="bi bi-lightning-charge"></i>
+        {{ suggestion }}
+      </button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <div class="input-wrapper">
+        <input type="text" 
+               #messageInput
+               [(ngModel)]="userMessage" 
+               (keypress)="onKeyPress($event)"
+               placeholder="Ask me anything..."
+               class="chat-input">
+        <button class="send-btn" 
+                (click)="sendMessage()" 
+                [disabled]="!userMessage.trim()">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </div>
+      <p class="input-hint">
+        <i class="bi bi-info-circle"></i>
+        Try: "Show top vendors" or "Pending orders"
+      </p>
+    </div>
+  </div>
+</div>
