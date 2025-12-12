@@ -116,7 +116,7 @@
                     class="status-badge"
                     [ngClass]="getStatusClass(vendor.status)"
                   >
-                    {{ vendor.status || 'pending' }}
+                    {{ vendor.status || "pending" }}
                   </span>
                 </ng-container>
                 <ng-container *ngIf="col.field === 'riskLevel'">
@@ -131,9 +131,59 @@
                   {{ vendor.totalPurchases | currency }}
                 </ng-container>
                 <ng-container *ngIf="col.field === 'rating'">
-                  <div class="rating">
-                    <i class="bi bi-star-fill"></i>
-                    {{ vendor.rating }}
+                  <div class="rating-stars">
+                    <i
+                      *ngFor="let star of getStarsArray()"
+                      class="bi"
+                      [ngClass]="
+                        star <= vendor.rating
+                          ? 'bi-star-fill star-filled'
+                          : 'bi-star star-empty'
+                      "
+                      (click)="updateRating(vendor, star, $event)"
+                      [title]="'Rate ' + star + ' stars'"
+                    >
+                    </i>
+                    <span class="rating-value">{{
+                      vendor.rating | number : "1.1-1"
+                    }}</span>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="col.field === 'classification'">
+                  <span
+                    class="classification-badge"
+                    [ngClass]="vendor.isAClass ? 'a-class' : 'standard'"
+                  >
+                    <i
+                      class="bi"
+                      [ngClass]="vendor.isAClass ? 'bi-award-fill' : 'bi-dash'"
+                    ></i>
+                    {{ vendor.isAClass ? "A-Class" : "Standard" }}
+                  </span>
+                </ng-container>
+                <ng-container *ngIf="col.field === 'auditStatus'">
+                  <div class="audit-status-cell">
+                    <span
+                      class="audit-badge"
+                      [ngClass]="{
+                        'audit-completed': vendor.auditStatus === 'Completed',
+                        'audit-pending': vendor.auditStatus === 'Pending',
+                        'audit-none': vendor.auditStatus === 'Not Assessed'
+                      }"
+                    >
+                      <i
+                        class="bi"
+                        [ngClass]="{
+                          'bi-check-circle-fill':
+                            vendor.auditStatus === 'Completed',
+                          'bi-exclamation-circle-fill':
+                            vendor.auditStatus === 'Pending',
+                          'bi-dash-circle':
+                            vendor.auditStatus === 'Not Assessed'
+                        }"
+                      ></i>
+                      {{ vendor.auditStatus }}
+                    </span>
                   </div>
                 </ng-container>
                 <ng-container
@@ -141,7 +191,9 @@
                     col.field !== 'status' &&
                     col.field !== 'riskLevel' &&
                     col.field !== 'totalPurchases' &&
-                    col.field !== 'rating'
+                    col.field !== 'rating' &&
+                    col.field !== 'classification' &&
+                    col.field !== 'auditStatus'
                   "
                 >
                   {{ $any(vendor)[col.field] }}

@@ -790,3 +790,40 @@ tbody tr:hover {
     text-align: center;
   }
 }
+
+/* Item Names Column */
+.item-names-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item-list {
+  font-size: 0.8125rem;
+  color: #374151;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-count {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.6875rem;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  width: fit-content;
+}
+
+/* Dark theme for item names */
+:host-context(.dark-theme) .item-list {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .item-count {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}

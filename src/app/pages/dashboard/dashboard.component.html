@@ -4,186 +4,16 @@
     <p>Vendor & Supply Chain Analytics Dashboard</p>
   </div>
 
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading dashboard data...</p>
+    </div>
+  </div>
+
   <!-- Dashboard Grid -->
-  <div class="dashboard-grid">
-
-    <!-- Row 1 -->
-    <!-- Total Expenses Card -->
-    <div class="card stats-card expense-card">
-      <div class="card-header">
-        <div class="card-icon expense-icon">
-          <i class="bi bi-cash-stack"></i>
-        </div>
-        <span class="card-badge negative">-{{ expenseChange }}%</span>
-      </div>
-      <h3 class="card-title">TOTAL EXPENSES</h3>
-      <div class="stat-value expense-value">{{ formatCurrency(totalExpenses) }}</div>
-      <div class="mini-chart expense-chart">
-        <div class="bar" style="height: 50%"></div>
-        <div class="bar" style="height: 70%"></div>
-        <div class="bar" style="height: 45%"></div>
-        <div class="bar" style="height: 60%"></div>
-        <div class="bar" style="height: 55%"></div>
-        <div class="bar" style="height: 40%"></div>
-        <div class="bar" style="height: 65%"></div>
-      </div>
-      <div class="stat-change" [class.positive]="expenseChangePositive" [class.negative]="!expenseChangePositive">
-        <i class="bi" [class.bi-arrow-up]="expenseChangePositive" [class.bi-arrow-down]="!expenseChangePositive"></i>
-        {{ expenseChange }}% vs previous month
-      </div>
-    </div>
-
-    <!-- Performance Card -->
-    <div class="card performance-card">
-      <div class="card-header">
-        <div class="card-icon performance-icon">
-          <i class="bi bi-speedometer2"></i>
-        </div>
-        <span class="card-badge positive">+{{ performanceChange }}%</span>
-      </div>
-      <h3 class="card-title">PERFORMANCE SCORE</h3>
-      <div class="performance-gauge">
-        <svg viewBox="0 0 100 50" class="gauge-svg">
-          <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" />
-          <path class="gauge-fill" d="M 10 50 A 40 40 0 0 1 90 50"
-            [style.stroke-dasharray]="(performanceScore / 100) * 126 + ' 126'" />
-        </svg>
-        <div class="gauge-value">{{ performanceScore | number:'1.0-0' }}%</div>
-        <div class="gauge-label">Overall Score</div>
-      </div>
-      <div class="stat-change positive">
-        <i class="bi bi-arrow-up"></i>
-        {{ performanceChange }}% improvement this month
-      </div>
-    </div>
-
-    <!-- Products Received Card -->
-    <div class="card stats-card products-card">
-      <div class="card-header">
-        <div class="card-icon products-icon">
-          <i class="bi bi-box-seam"></i>
-        </div>
-        <span class="card-badge positive">+{{ productsReceivedChange }}%</span>
-      </div>
-      <h3 class="card-title">PRODUCTS RECEIVED</h3>
-      <div class="stat-value products-value">{{ formatNumber(totalProductsReceived) }}</div>
-      <div class="progress-container">
-        <div class="progress-bar-track">
-          <div class="progress-bar-fill products-fill" style="width: 78%"></div>
-        </div>
-        <span class="progress-label">Till Date</span>
-      </div>
-      <div class="stat-change positive">
-        <i class="bi bi-arrow-up"></i>
-        {{ productsReceivedChange }}% vs last month
-      </div>
-    </div>
-
-    <!-- Row 2 -->
-    <!-- Products Accepted Card -->
-    <div class="card stats-card accepted-card">
-      <div class="card-header">
-        <div class="card-icon accepted-icon">
-          <i class="bi bi-check2-circle"></i>
-        </div>
-        <span class="card-badge positive">{{ acceptanceRate }}%</span>
-      </div>
-      <h3 class="card-title">PRODUCTS ACCEPTED</h3>
-      <div class="stat-value accepted-value">{{ formatNumber(totalProductsAccepted) }}</div>
-      <div class="acceptance-stats">
-        <div class="acceptance-ring">
-          <svg viewBox="0 0 36 36" class="circular-chart">
-            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <path class="circle-fill green" [attr.stroke-dasharray]="acceptanceRate + ', 100'"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-          </svg>
-          <span class="ring-value">{{ acceptanceRate }}%</span>
-        </div>
-        <span class="acceptance-label">Acceptance Rate</span>
-      </div>
-    </div>
-
-    <!-- A-Class Suppliers Card -->
-    <div class="card stats-card suppliers-card">
-      <div class="card-header">
-        <div class="card-icon suppliers-icon">
-          <i class="bi bi-award"></i>
-        </div>
-        <span class="card-badge gold">Class A</span>
-      </div>
-      <h3 class="card-title">A-CLASS SUPPLIERS</h3>
-      <div class="stat-value suppliers-value">{{ aClassSuppliers }}</div>
-      <div class="suppliers-breakdown">
-        <div class="supplier-bar">
-          <div class="supplier-segment a-class" [style.width.%]="aClassPercentage"></div>
-          <div class="supplier-segment other-class" [style.width.%]="100 - aClassPercentage"></div>
-        </div>
-        <div class="supplier-labels">
-          <span class="supplier-label"><span class="dot gold"></span>A-Class: {{ aClassSuppliers }}</span>
-          <span class="supplier-label"><span class="dot gray"></span>Others: {{ totalSuppliers - aClassSuppliers
-            }}</span>
-        </div>
-      </div>
-      <div class="stat-info">
-        Out of {{ totalSuppliers }} total suppliers
-      </div>
-    </div>
-
-    <!-- Accounts Payable Card -->
-    <div class="card stats-card payable-card">
-      <div class="card-header">
-        <div class="card-icon payable-icon">
-          <i class="bi bi-credit-card"></i>
-        </div>
-        <span class="card-badge warning">{{ pendingInvoices }} pending</span>
-      </div>
-      <h3 class="card-title">ACCOUNTS PAYABLE</h3>
-      <div class="stat-value payable-value">{{ formatCurrency(accountsPayable) }}</div>
-      <div class="payable-info">
-        <div class="info-row">
-          <span class="info-icon"><i class="bi bi-file-text"></i></span>
-          <span class="info-text">{{ pendingInvoices }} Pending Invoices</span>
-        </div>
-        <div class="info-row urgent">
-          <span class="info-icon"><i class="bi bi-exclamation-triangle"></i></span>
-          <span class="info-text">5 Due This Week</span>
-        </div>
-      </div>
-      <div class="stat-change negative">
-        <i class="bi bi-arrow-up"></i>
-        {{ payableChange }}% increase in pending
-      </div>
-    </div>
-
-    <!-- Row 3 -->
-    <!-- Pending Audits Card -->
-    <div class="card stats-card audits-card">
-      <div class="card-header">
-        <div class="card-icon audits-icon">
-          <i class="bi bi-clipboard-check"></i>
-        </div>
-        <span class="card-badge warning">{{ pendingAudits }} pending</span>
-      </div>
-      <h3 class="card-title">SUPPLIER AUDITS</h3>
-      <div class="audit-stats">
-        <div class="audit-number pending-number">{{ pendingAudits }}</div>
-        <div class="audit-label">Pending Audits</div>
-      </div>
-      <div class="audit-progress">
-        <div class="audit-bar">
-          <div class="audit-completed" [style.width.%]="auditCompletionRate"></div>
-        </div>
-        <div class="audit-info">
-          <span>{{ completedAudits }}/{{ totalAudits }} Completed</span>
-          <span class="completion-rate">{{ auditCompletionRate }}%</span>
-        </div>
-      </div>
-      <div class="audit-schedule">
-        <i class="bi bi-calendar-event"></i>
-        <span>Next audit: Dec 15, 2024</span>
-      </div>
-    </div>
-
+  <div class="dashboard-grid" *ngIf="!isLoading">
     <!-- New Vendors Card -->
     <div class="card stats-card vendors-card">
       <div class="card-header">
@@ -220,6 +50,278 @@
         {{ vendorGrowthChange }}% growth vs last month
       </div>
     </div>
+    <!-- Row 1 -->
+    <!-- Total Expenses Card -->
+    <div class="card stats-card expense-card">
+      <div class="card-header">
+        <div class="card-icon expense-icon">
+          <i class="bi bi-cash-stack"></i>
+        </div>
+        <span
+          class="card-badge"
+          [class.negative]="!expenseChangePositive"
+          [class.positive]="expenseChangePositive"
+        >
+          {{ expenseChangePositive ? "+" : "-"
+          }}{{ expenseChange | number : "1.1-1" }}%
+        </span>
+      </div>
+      <h3 class="card-title">TOTAL EXPENSES</h3>
+      <div class="stat-value expense-value">
+        {{ formatCurrency(totalExpenses) }}
+      </div>
+      <div class="mini-chart expense-chart">
+        <div class="bar" style="height: 50%"></div>
+        <div class="bar" style="height: 70%"></div>
+        <div class="bar" style="height: 45%"></div>
+        <div class="bar" style="height: 60%"></div>
+        <div class="bar" style="height: 55%"></div>
+        <div class="bar" style="height: 40%"></div>
+        <div class="bar" style="height: 65%"></div>
+      </div>
+      <div
+        class="stat-change"
+        [class.positive]="expenseChangePositive"
+        [class.negative]="!expenseChangePositive"
+      >
+        <i
+          class="bi"
+          [class.bi-arrow-up]="expenseChangePositive"
+          [class.bi-arrow-down]="!expenseChangePositive"
+        ></i>
+        {{ expenseChange }}% vs previous month
+      </div>
+    </div>
+
+    <!-- Accounts Payable Card -->
+    <div class="card stats-card payable-card">
+      <div class="card-header">
+        <div class="card-icon payable-icon">
+          <i class="bi bi-credit-card"></i>
+        </div>
+        <span class="card-badge warning">{{ pendingInvoices }} pending</span>
+      </div>
+      <h3 class="card-title">ACCOUNTS PAYABLE</h3>
+      <div class="stat-value payable-value">
+        {{ formatCurrency(accountsPayable) }}
+      </div>
+      <div class="payable-info">
+        <div class="info-row">
+          <span class="info-icon"><i class="bi bi-file-text"></i></span>
+          <span class="info-text">{{ pendingInvoices }} Pending Invoices</span>
+        </div>
+        <div class="info-row urgent">
+          <span class="info-icon"
+            ><i class="bi bi-exclamation-triangle"></i
+          ></span>
+          <span class="info-text">5 Due This Week</span>
+        </div>
+      </div>
+      <div class="stat-change negative">
+        <i class="bi bi-arrow-up"></i>
+        {{ payableChange }}% increase in pending
+      </div>
+    </div>
+
+    <div class="card performance-card">
+      <div class="card-header">
+        <div class="card-icon performance-icon">
+          <i class="bi bi-speedometer2"></i>
+        </div>
+        <span class="card-badge positive">+{{ performanceChange }}%</span>
+      </div>
+      <h3 class="card-title">PERFORMANCE SCORE</h3>
+      <div class="performance-gauge">
+        <svg viewBox="0 0 100 50" class="gauge-svg">
+          <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" />
+          <path
+            class="gauge-fill"
+            d="M 10 50 A 40 40 0 0 1 90 50"
+            [style.stroke-dasharray]="(performanceScore / 100) * 126 + ' 126'"
+          />
+        </svg>
+        <div class="gauge-value">
+          {{ performanceScore | number : "1.0-0" }}%
+        </div>
+        <div class="gauge-label">Overall Score</div>
+      </div>
+      <div class="stat-change positive">
+        <i class="bi bi-arrow-up"></i>
+        {{ performanceChange }}% improvement this month
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <!-- Products Accepted & Received Card -->
+    <div class="card stats-card accepted-card">
+      <div class="card-header">
+        <div class="card-icon accepted-icon">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+        <span class="card-badge positive">{{ acceptanceRate }}%</span>
+      </div>
+      <h3 class="card-title">PRODUCTS STATUS</h3>
+      <div class="products-status-container">
+        <div class="status-item">
+          <div class="status-label">Accepted</div>
+          <div class="stat-value accepted-value">
+            {{ formatNumber(totalProductsAccepted) }}
+          </div>
+        </div>
+        <div class="status-divider"></div>
+        <div class="status-item">
+          <div class="status-label">Received</div>
+          <div class="stat-value received-value">
+            {{ formatNumber(totalProductsReceived) }}
+          </div>
+        </div>
+      </div>
+      <div class="acceptance-stats">
+        <div class="acceptance-ring">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <path
+              class="circle-bg"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path
+              class="circle-fill green"
+              [attr.stroke-dasharray]="acceptanceRate + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+          </svg>
+          <span class="ring-value">{{ acceptanceRate }}%</span>
+        </div>
+        <span class="acceptance-label">Acceptance Rate</span>
+      </div>
+    </div>
+
+    <!-- A-Class Suppliers Card -->
+    <div class="card stats-card suppliers-card">
+      <div class="card-header">
+        <div class="card-icon suppliers-icon">
+          <i class="bi bi-award"></i>
+        </div>
+        <span class="card-badge gold">Class A</span>
+      </div>
+      <h3 class="card-title">A-CLASS SUPPLIERS</h3>
+      <div class="stat-value suppliers-value">{{ aClassSuppliers }}</div>
+      <div class="suppliers-breakdown">
+        <div class="supplier-bar">
+          <div
+            class="supplier-segment a-class"
+            [style.width.%]="aClassPercentage"
+          ></div>
+          <div
+            class="supplier-segment other-class"
+            [style.width.%]="100 - aClassPercentage"
+          ></div>
+        </div>
+        <div class="supplier-labels">
+          <span class="supplier-label"
+            ><span class="dot gold"></span>A-Class: {{ aClassSuppliers }}</span
+          >
+          <span class="supplier-label"
+            ><span class="dot gray"></span>Others:
+            {{ totalSuppliers - aClassSuppliers }}</span
+          >
+        </div>
+      </div>
+      <div class="stat-info">Out of {{ totalSuppliers }} total suppliers</div>
+    </div>
+
+    <!-- Row 3 -->
+    <!-- Pending Audits Card -->
+    <div class="card stats-card audits-card">
+      <div class="card-header">
+        <div class="card-icon audits-icon">
+          <i class="bi bi-clipboard-check"></i>
+        </div>
+        <div class="header-actions">
+          <span class="info-tooltip">
+            <i class="bi bi-info-circle" (click)="toggleAuditHelp()"></i>
+            <div class="tooltip-content" *ngIf="showAuditHelp">
+              <div class="tooltip-header">
+                <h4>How Supplier Audits Work</h4>
+                <button class="tooltip-close" (click)="toggleAuditHelp()">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+              <div class="tooltip-body">
+                <p><strong>What is a Supplier Audit?</strong></p>
+                <p>
+                  A periodic risk assessment review of vendors to ensure they
+                  meet reliability, compliance, and performance standards.
+                </p>
+
+                <p><strong>Audit Status:</strong></p>
+                <ul>
+                  <li>
+                    <span class="status-dot completed"></span>
+                    <strong>Completed:</strong> Assessed within last 3 months
+                  </li>
+                  <li>
+                    <span class="status-dot pending"></span>
+                    <strong>Pending:</strong> Assessment overdue (>3 months)
+                  </li>
+                </ul>
+
+                <p><strong>Risk Categories:</strong></p>
+                <ul>
+                  <li>📊 Financial Risk - Payment history, stability</li>
+                  <li>⚙️ Operational Risk - Delivery, reliability</li>
+                  <li>📋 Compliance Risk - Regulations, certifications</li>
+                  <li>⭐ Reputation Risk - Market standing</li>
+                </ul>
+
+                <p><strong>Risk Levels:</strong></p>
+                <div class="risk-legend">
+                  <span class="risk-tag low">Low (0-30)</span>
+                  <span class="risk-tag medium">Medium (31-50)</span>
+                  <span class="risk-tag high">High (51-70)</span>
+                  <span class="risk-tag critical">Critical (71+)</span>
+                </div>
+              </div>
+            </div>
+          </span>
+          <span
+            class="card-badge warning clickable"
+            (click)="openAuditModal()"
+            title="Click to view pending audits"
+          >
+            {{ pendingAudits }} pending
+          </span>
+        </div>
+      </div>
+      <h3 class="card-title">SUPPLIER AUDITS</h3>
+      <div
+        class="audit-stats clickable"
+        (click)="openAuditModal()"
+        title="Click to view pending audits"
+      >
+        <div class="audit-number pending-number">{{ pendingAudits }}</div>
+        <div class="audit-label">
+          Pending Audits <i class="bi bi-box-arrow-up-right"></i>
+        </div>
+      </div>
+      <div class="audit-progress">
+        <div class="audit-bar">
+          <div
+            class="audit-completed"
+            [style.width.%]="auditCompletionRate"
+          ></div>
+        </div>
+        <div class="audit-info">
+          <span>{{ completedAudits }}/{{ totalAudits }} Completed</span>
+          <span class="completion-rate"
+            >{{ auditCompletionRate | number : "1.0-0" }}%</span
+          >
+        </div>
+      </div>
+      <div class="audit-schedule">
+        <i class="bi bi-calendar-event"></i>
+        <span>Next audit: {{ nextAuditDate }}</span>
+      </div>
+    </div>
 
     <!-- Green Channel Products Card -->
     <div class="card stats-card green-card">
@@ -230,18 +332,28 @@
         <span class="card-badge success">Fast Track</span>
       </div>
       <h3 class="card-title">GREEN CHANNEL PRODUCTS</h3>
-      <div class="stat-value green-value">{{ formatNumber(greenChannelProducts) }}</div>
+      <div class="stat-value green-value">
+        {{ formatNumber(greenChannelProducts) }}
+      </div>
       <div class="green-stats">
         <div class="green-ring">
           <svg viewBox="0 0 36 36" class="circular-chart">
-            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <path class="circle-fill emerald" [attr.stroke-dasharray]="greenChannelPercentage + ', 100'"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path
+              class="circle-bg"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path
+              class="circle-fill emerald"
+              [attr.stroke-dasharray]="greenChannelPercentage + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
           </svg>
           <span class="ring-value">{{ greenChannelPercentage }}%</span>
         </div>
         <div class="green-info">
-          <span class="green-ratio">{{ greenChannelProducts }}/{{ totalChannelProducts }}</span>
+          <span class="green-ratio"
+            >{{ greenChannelProducts }}/{{ totalChannelProducts }}</span
+          >
           <span class="green-label">of total products</span>
         </div>
       </div>
@@ -250,6 +362,198 @@
         {{ greenChannelChange }}% increase this month
       </div>
     </div>
+  </div>
+</div>
 
+<!-- Pending Audits Modal -->
+<div class="modal-overlay" *ngIf="showAuditModal" (click)="closeAuditModal()">
+  <div class="audit-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="bi bi-clipboard-check"></i> Pending Supplier Audits</h2>
+      <button class="close-btn" (click)="closeAuditModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- No pending audits -->
+      <div class="no-audits" *ngIf="pendingAuditsList.length === 0">
+        <i class="bi bi-check-circle"></i>
+        <h3>All audits are up to date!</h3>
+        <p>No vendors require assessment at this time.</p>
+      </div>
+
+      <!-- Audit list and details -->
+      <div class="audit-content" *ngIf="pendingAuditsList.length > 0">
+        <!-- Audit List -->
+        <div class="audit-list">
+          <h4>Vendors Requiring Audit ({{ pendingAuditsList.length }})</h4>
+          <div class="audit-items">
+            <div
+              *ngFor="let audit of pendingAuditsList"
+              class="audit-item"
+              [class.selected]="selectedAudit?.id === audit.id"
+              (click)="selectAudit(audit)"
+            >
+              <div class="audit-item-header">
+                <span class="vendor-name">{{ audit.vendorName }}</span>
+                <span
+                  class="risk-badge"
+                  [ngClass]="getRiskLevelClass(audit.riskLevel)"
+                >
+                  {{ audit.riskLevel }}
+                </span>
+              </div>
+              <div class="audit-item-info">
+                <span class="days-overdue">
+                  <i class="bi bi-exclamation-triangle"></i>
+                  {{ getDaysSinceAssessment(audit.lastAssessmentDate) }} days
+                  since last audit
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audit Details -->
+        <div class="audit-details" *ngIf="selectedAudit">
+          <h4>Audit Details</h4>
+          <div class="detail-card">
+            <div class="detail-header">
+              <div class="vendor-avatar">
+                {{ selectedAudit.vendorName?.charAt(0) }}
+              </div>
+              <div class="vendor-info">
+                <h3>{{ selectedAudit.vendorName }}</h3>
+                <span
+                  class="risk-badge large"
+                  [ngClass]="getRiskLevelClass(selectedAudit.riskLevel)"
+                >
+                  {{ selectedAudit.riskLevel }} Risk
+                </span>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Overall Risk Score</span>
+                <span class="detail-value score"
+                  >{{ selectedAudit.overallScore }}/100</span
+                >
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Last Assessment</span>
+                <span class="detail-value">{{
+                  formatDate(selectedAudit.lastAssessmentDate)
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Next Review Due</span>
+                <span class="detail-value overdue">{{
+                  formatDate(selectedAudit.nextReviewDate)
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Days Overdue</span>
+                <span class="detail-value warning"
+                  >{{
+                    getDaysSinceAssessment(selectedAudit.lastAssessmentDate) -
+                      90
+                  }}
+                  days</span
+                >
+              </div>
+            </div>
+
+            <div class="risk-breakdown">
+              <h5>Risk Breakdown</h5>
+              <div class="risk-bars">
+                <div class="risk-bar-item">
+                  <span class="risk-label">Financial Risk</span>
+                  <div class="risk-bar-container">
+                    <div
+                      class="risk-bar-fill"
+                      [style.width.%]="selectedAudit.financialRisk"
+                    ></div>
+                  </div>
+                  <span class="risk-value"
+                    >{{ selectedAudit.financialRisk }}%</span
+                  >
+                </div>
+                <div class="risk-bar-item">
+                  <span class="risk-label">Operational Risk</span>
+                  <div class="risk-bar-container">
+                    <div
+                      class="risk-bar-fill"
+                      [style.width.%]="selectedAudit.operationalRisk"
+                    ></div>
+                  </div>
+                  <span class="risk-value"
+                    >{{ selectedAudit.operationalRisk }}%</span
+                  >
+                </div>
+                <div class="risk-bar-item">
+                  <span class="risk-label">Compliance Risk</span>
+                  <div class="risk-bar-container">
+                    <div
+                      class="risk-bar-fill"
+                      [style.width.%]="selectedAudit.complianceRisk"
+                    ></div>
+                  </div>
+                  <span class="risk-value"
+                    >{{ selectedAudit.complianceRisk }}%</span
+                  >
+                </div>
+                <div class="risk-bar-item">
+                  <span class="risk-label">Reputation Risk</span>
+                  <div class="risk-bar-container">
+                    <div
+                      class="risk-bar-fill"
+                      [style.width.%]="selectedAudit.reputationRisk"
+                    ></div>
+                  </div>
+                  <span class="risk-value"
+                    >{{ selectedAudit.reputationRisk }}%</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="recommendations"
+              *ngIf="selectedAudit.recommendations?.length"
+            >
+              <h5>Recommendations</h5>
+              <ul>
+                <li *ngFor="let rec of selectedAudit.recommendations">
+                  {{ rec }}
+                </li>
+              </ul>
+            </div>
+
+            <div class="detail-actions">
+              <button class="btn-secondary" (click)="closeAuditModal()">
+                Close
+              </button>
+              <button
+                class="btn-primary"
+                (click)="navigateToVendorRisk(selectedAudit.vendorId)"
+              >
+                <i class="bi bi-box-arrow-up-right"></i>
+                View Vendor Profile
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No selection placeholder -->
+        <div class="audit-details placeholder" *ngIf="!selectedAudit">
+          <div class="placeholder-content">
+            <i class="bi bi-hand-index"></i>
+            <p>Select a vendor from the list to view audit details</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

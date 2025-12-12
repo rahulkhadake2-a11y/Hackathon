@@ -114,7 +114,40 @@
       </div>
       <div class="stat-content">
         <span class="stat-label">Rating</span>
-        <span class="stat-value">{{ vendor.rating }}/5</span>
+        <div class="rating-interactive">
+          <div class="rating-stars-profile">
+            <i
+              *ngFor="let star of [1, 2, 3, 4, 5]"
+              class="bi"
+              [ngClass]="
+                star <= vendor.rating
+                  ? 'bi-star-fill star-filled'
+                  : 'bi-star star-empty'
+              "
+              (click)="updateVendorRating(star)"
+              [title]="'Rate ' + star + ' stars'"
+            >
+            </i>
+          </div>
+          <span class="stat-value">{{ vendor.rating }}/5</span>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card" [ngClass]="isAClassSupplier ? 'a-class-card' : ''">
+      <div class="stat-icon" [ngClass]="isAClassSupplier ? 'gold' : 'gray'">
+        <i
+          class="bi"
+          [ngClass]="isAClassSupplier ? 'bi-award-fill' : 'bi-award'"
+        ></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Classification</span>
+        <span
+          class="stat-value classification-text"
+          [ngClass]="isAClassSupplier ? 'a-class-text' : ''"
+        >
+          {{ isAClassSupplier ? "A-Class" : "Standard" }}
+        </span>
       </div>
     </div>
   </div>

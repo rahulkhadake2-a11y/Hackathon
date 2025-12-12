@@ -64,17 +64,17 @@
       "email": "alice.brown@primematerials.com",
       "phone": "+1-555-0104",
       "category": "Raw Materials",
-      "status": "inactive",
+      "status": "active",
       "address": "321 Industrial Park",
       "city": "Chicago",
       "country": "USA",
       "taxId": "US-321654987",
       "paymentTerms": "Net 60",
       "creditLimit": 100000,
-      "totalPurchases": 450000,
-      "rating": 3.9,
+      "totalPurchases": 0,
+      "rating": 0,
       "createdAt": "2024-01-05T07:00:00.000Z",
-      "updatedAt": "2024-10-15T09:30:00.000Z"
+      "updatedAt": "2025-12-12T19:12:00.288Z"
     },
     {
       "id": "5",
@@ -189,6 +189,25 @@
       "rating": 0,
       "createdAt": "2025-12-12T13:08:25.007Z",
       "updatedAt": "2025-12-12T13:08:25.007Z"
+    },
+    {
+      "id": "9938",
+      "vendorName": "Rohan",
+      "contactPerson": "Sahil",
+      "email": "sahil77@gmail.com",
+      "phone": "08600429295",
+      "category": "Logistics",
+      "status": "active",
+      "address": "",
+      "city": "BENGALURU",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 0,
+      "rating": 0,
+      "createdAt": "2025-12-12T17:23:35.439Z",
+      "updatedAt": "2025-12-12T17:23:35.439Z"
     }
   ],
   "purchases": [
@@ -274,7 +293,9 @@
       "paymentDelayDays": 5,
       "leadTime": 18,
       "communicationRating": 3,
-      "complianceIssues": ["Minor documentation delay"]
+      "complianceIssues": [
+        "Minor documentation delay"
+      ]
     },
     {
       "id": "3",
@@ -319,46 +340,45 @@
       "complianceIssues": []
     },
     {
-      "id": "4",
       "vendorId": "5",
       "vendorName": "Swift Logistics",
       "purchaseOrderNumber": "PO-2024-004",
       "orderDate": "2024-12-10",
       "expectedDeliveryDate": "2024-12-25",
-      "actualDeliveryDate": null,
-      "status": "approved",
+      "actualDeliveryDate": "2024-01-10",
+      "status": "delivered",
       "items": [
         {
-          "description": "Freight Services",
-          "quantity": 1,
-          "unitPrice": 8500,
-          "total": 8500
+          "itemId": "6",
+          "description": "Office Chair",
+          "quantity": 10,
+          "unitPrice": 275,
+          "total": 2750
         },
         {
-          "description": "Warehousing",
-          "quantity": 1,
-          "unitPrice": 3500,
-          "total": 3500
+          "itemId": "7",
+          "description": "Standing Desk",
+          "quantity": 5,
+          "unitPrice": 550,
+          "total": 2750
         }
       ],
-      "subtotal": 12000,
-      "tax": 960,
-      "totalAmount": 12960,
+      "subtotal": 5500,
+      "tax": 440,
+      "totalAmount": 5940,
       "notes": "Q1 logistics contract",
-      "createdAt": "2024-12-10T10:15:00.000Z",
-      "createdBy": "Charlie Davis",
       "urgent": true,
-      "onTimeDelivery": null,
-      "deliveryDelayDays": null,
-      "qualityRating": null,
-      "defectCount": null,
-      "defectRate": null,
-      "returnedItems": null,
-      "paymentStatus": "pending",
-      "paymentDelayDays": null,
-      "leadTime": null,
-      "communicationRating": 5,
-      "complianceIssues": []
+      "createdBy": "Charlie Davis",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "1",
+      "defectCount": 0,
+      "returnedItems": 60,
+      "paymentStatus": "overdue",
+      "paymentDelayDays": 5,
+      "leadTime": 98,
+      "communicationRating": "3",
+      "id": "4"
     },
     {
       "id": "5",
@@ -472,7 +492,9 @@
       "paymentDelayDays": 10,
       "leadTime": 19,
       "communicationRating": 2,
-      "complianceIssues": ["Late delivery notification"]
+      "complianceIssues": [
+        "Late delivery notification"
+      ]
     },
     {
       "id": "8",
@@ -797,14 +819,14 @@
           "description": "Industry leader"
         }
       ],
-      "lastAssessmentDate": "2024-12-01T00:00:00.000Z",
-      "nextReviewDate": "2025-03-01T00:00:00.000Z",
+      "lastAssessmentDate": "2025-12-01T00:00:00.000Z",
+      "nextReviewDate": "2026-03-01T00:00:00.000Z",
       "recommendations": [
         "Continue regular monitoring",
         "Consider for preferred vendor status"
       ],
       "createdAt": "2024-01-15T08:00:00.000Z",
-      "updatedAt": "2024-12-01T10:30:00.000Z"
+      "updatedAt": "2025-12-01T10:30:00.000Z"
     },
     {
       "id": "2",
@@ -842,8 +864,8 @@
           "description": "Good standing"
         }
       ],
-      "lastAssessmentDate": "2024-11-15T00:00:00.000Z",
-      "nextReviewDate": "2025-02-15T00:00:00.000Z",
+      "lastAssessmentDate": "2025-11-15T00:00:00.000Z",
+      "nextReviewDate": "2026-02-15T00:00:00.000Z",
       "recommendations": [
         "Schedule quarterly reviews",
         "Request updated financial statements",
@@ -888,14 +910,14 @@
           "description": "Top rated provider"
         }
       ],
-      "lastAssessmentDate": "2024-12-05T00:00:00.000Z",
-      "nextReviewDate": "2025-03-05T00:00:00.000Z",
+      "lastAssessmentDate": "2025-12-05T00:00:00.000Z",
+      "nextReviewDate": "2026-03-05T00:00:00.000Z",
       "recommendations": [
         "Continue regular monitoring",
         "Consider for preferred vendor status"
       ],
       "createdAt": "2024-03-10T11:30:00.000Z",
-      "updatedAt": "2024-12-05T16:45:00.000Z"
+      "updatedAt": "2025-12-05T16:45:00.000Z"
     },
     {
       "id": "4",
@@ -933,8 +955,8 @@
           "description": "Mixed reviews"
         }
       ],
-      "lastAssessmentDate": "2024-10-01T00:00:00.000Z",
-      "nextReviewDate": "2025-01-01T00:00:00.000Z",
+      "lastAssessmentDate": "2025-08-01T00:00:00.000Z",
+      "nextReviewDate": "2025-11-01T00:00:00.000Z",
       "recommendations": [
         "Increase monitoring frequency",
         "Request performance improvement plan",
@@ -979,14 +1001,14 @@
           "description": "Reliable partner"
         }
       ],
-      "lastAssessmentDate": "2024-12-08T00:00:00.000Z",
-      "nextReviewDate": "2025-03-08T00:00:00.000Z",
+      "lastAssessmentDate": "2025-12-08T00:00:00.000Z",
+      "nextReviewDate": "2026-03-08T00:00:00.000Z",
       "recommendations": [
         "Continue regular monitoring",
         "Consider for preferred vendor status"
       ],
       "createdAt": "2024-04-01T10:00:00.000Z",
-      "updatedAt": "2024-12-08T11:15:00.000Z"
+      "updatedAt": "2025-12-08T11:15:00.000Z"
     },
     {
       "id": "6",
@@ -1024,8 +1046,8 @@
           "description": "Solid reputation"
         }
       ],
-      "lastAssessmentDate": "2024-12-02T00:00:00.000Z",
-      "nextReviewDate": "2025-03-02T00:00:00.000Z",
+      "lastAssessmentDate": "2025-10-02T00:00:00.000Z",
+      "nextReviewDate": "2026-01-02T00:00:00.000Z",
       "recommendations": [
         "Schedule quarterly reviews",
         "Request updated financial statements",
@@ -1306,6 +1328,52 @@
       ],
       "createdAt": "2025-12-12T13:08:25.053Z",
       "updatedAt": "2025-12-12T13:08:25.053Z"
+    },
+    {
+      "id": "50b7",
+      "vendorId": "9938",
+      "vendorName": "Rohan",
+      "riskLevel": "medium",
+      "overallScore": 38,
+      "financialRisk": 20,
+      "operationalRisk": 49,
+      "complianceRisk": 47,
+      "reputationRisk": 34,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 20,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 49,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 47,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 34,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T17:23:35.499Z",
+      "nextReviewDate": "2026-03-12T17:23:35.499Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2025-12-12T17:23:35.499Z",
+      "updatedAt": "2025-12-12T17:23:35.499Z"
     }
   ],
   "items": [
@@ -1649,6 +1717,21 @@
       "itemCode": "ITM-008",
       "createdAt": "2025-12-12T16:11:49.643Z",
       "updatedAt": "2025-12-12T16:11:49.643Z"
+    },
+    {
+      "id": "151e",
+      "vendorId": "fbbb",
+      "itemId": "1",
+      "unitPrice": 2000,
+      "minOrderQuantity": 20,
+      "leadTimeDays": 1,
+      "isPreferred": false,
+      "status": "active",
+      "vendorName": "Pratham Infotech Solution",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-001",
+      "createdAt": "2025-12-12T18:34:00.971Z",
+      "updatedAt": "2025-12-12T18:34:00.971Z"
     }
   ]
 }

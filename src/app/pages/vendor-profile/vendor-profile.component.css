@@ -333,6 +333,61 @@
   color: #d97706;
 }
 
+.stat-icon.gold {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #f59e0b;
+}
+
+.stat-icon.gray {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+/* A-Class Supplier Card */
+.stat-card.a-class-card {
+  border: 2px solid #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.classification-text {
+  font-size: 1rem !important;
+}
+
+.classification-text.a-class-text {
+  color: #92400e;
+  font-weight: 700;
+}
+
+/* Interactive Rating Stars in Profile */
+.rating-interactive {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rating-stars-profile {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.rating-stars-profile i {
+  cursor: pointer;
+  font-size: 1.125rem;
+  transition: all 0.2s ease;
+}
+
+.rating-stars-profile .star-filled {
+  color: #fbbf24;
+}
+
+.rating-stars-profile .star-empty {
+  color: #d1d5db;
+}
+
+.rating-stars-profile i:hover {
+  transform: scale(1.3);
+}
+
 .stat-content {
   display: flex;
   flex-direction: column;

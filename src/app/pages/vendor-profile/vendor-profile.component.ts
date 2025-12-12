@@ -77,6 +77,10 @@ export class VendorProfileComponent implements OnInit {
   activeTab: string = 'overview';
   isLoading: boolean = true;
 
+  // A-Class supplier classification
+  isAClassSupplier: boolean = false;
+  allVendors: Vendor[] = [];
+
   // Real vendor data from API
   vendor: VendorDetail = {} as VendorDetail;
 
@@ -148,14 +152,21 @@ export class VendorProfileComponent implements OnInit {
     forkJoin({
       vendor: this.apiService.getVendorById(this.vendorId),
       purchases: this.apiService.getPurchases(),
+      allVendors: this.apiService.getVendors(),
     }).subscribe({
-      next: ({ vendor, purchases }) => {
+      next: ({ vendor, purchases, allVendors }) => {
         console.log('Vendor data received:', vendor);
         console.log('Purchases received:', purchases.length);
+
+        // Store all vendors for A-Class calculation
+        this.allVendors = allVendors;
 
         // Map API vendor to VendorDetail
         this.vendor = this.mapVendorToDetail(vendor);
         console.log('Mapped vendor:', this.vendor);
+
+        // Calculate A-Class status
+        this.calculateAClassStatus(vendor);
 
         // Filter purchases for this vendor
         const vendorPurchases = purchases.filter(
@@ -184,6 +195,38 @@ export class VendorProfileComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  calculateAClassStatus(vendor: Vendor): void {
+    // Calculate average purchases across all vendors
+    const avgPurchases =
+      this.allVendors.reduce((sum, v) => sum + (v.totalPurchases || 0), 0) /
+      this.allVendors.length;
+
+    // A-Class if rating >= 4 OR totalPurchases >= 1.5x average
+    this.isAClassSupplier =
+      vendor.rating >= 4 || vendor.totalPurchases >= avgPurchases * 1.5;
+  }
+
+  updateVendorRating(newRating: number): void {
+    // Update the vendor rating via API
+    const updatedVendor = { ...this.vendor, rating: newRating };
+    this.apiService
+      .updateVendor(this.vendorId, updatedVendor as any)
+      .subscribe({
+        next: () => {
+          this.vendor.rating = newRating;
+          // Recalculate A-Class status
+          const vendorForCalc = {
+            rating: newRating,
+            totalPurchases: this.vendor.totalPurchases,
+          } as Vendor;
+          this.calculateAClassStatus(vendorForCalc);
+        },
+        error: (err) => {
+          console.error('Error updating rating:', err);
+        },
+      });
   }
 
   mapVendorToDetail(vendor: Vendor): VendorDetail {
