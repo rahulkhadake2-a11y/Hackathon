@@ -15,13 +15,13 @@
       "taxId": "US-74-2487834",
       "paymentTerms": "Net 30",
       "creditLimit": 500000,
-      "totalPurchases": 892450,
+      "totalPurchases": 185925,
       "rating": 4.7,
       "qualityScore": 95,
       "onTimeDeliveryRate": 94,
       "riskScore": 12,
       "createdAt": "2024-01-10T08:00:00.000Z",
-      "updatedAt": "2025-12-01T10:30:00.000Z"
+      "updatedAt": "2025-12-12T23:19:34.395Z"
     },
     {
       "id": "V002",
@@ -199,13 +199,13 @@
       "taxId": "US-91-1234567",
       "paymentTerms": "Net 30",
       "creditLimit": 250000,
-      "totalPurchases": 178900,
+      "totalPurchases": 12390.6,
       "rating": 4.6,
       "qualityScore": 91,
       "onTimeDeliveryRate": 96,
       "riskScore": 8,
       "createdAt": "2024-04-01T08:00:00.000Z",
-      "updatedAt": "2025-12-10T11:00:00.000Z"
+      "updatedAt": "2025-12-12T23:17:20.664Z"
     },
     {
       "id": "V010",
@@ -1230,7 +1230,9 @@
       "paymentDelayDays": 0,
       "leadTime": 13,
       "communicationRating": 3,
-      "complianceIssues": ["Late delivery notification"]
+      "complianceIssues": [
+        "Late delivery notification"
+      ]
     },
     {
       "id": "PO-2025-003",
@@ -1414,7 +1416,11 @@
       "paymentDelayDays": 5,
       "leadTime": 28,
       "communicationRating": 2,
-      "complianceIssues": ["Quality issues", "Late delivery", "Poor packaging"]
+      "complianceIssues": [
+        "Quality issues",
+        "Late delivery",
+        "Poor packaging"
+      ]
     },
     {
       "id": "PO-2025-007",
@@ -1834,7 +1840,9 @@
       "paymentDelayDays": 0,
       "leadTime": 12,
       "communicationRating": 3,
-      "complianceIssues": ["Slight delivery delay"]
+      "complianceIssues": [
+        "Slight delivery delay"
+      ]
     },
     {
       "id": "PO-2025-017",
@@ -2032,7 +2040,12 @@
       "paymentDelayDays": 15,
       "leadTime": 17,
       "communicationRating": 1,
-      "complianceIssues": ["Significant delivery delay", "Poor quality product", "Damaged packaging", "Unresponsive communication"]
+      "complianceIssues": [
+        "Significant delivery delay",
+        "Poor quality product",
+        "Damaged packaging",
+        "Unresponsive communication"
+      ]
     },
     {
       "id": "PO-2025-022",
@@ -2147,6 +2160,167 @@
       "leadTime": 6,
       "communicationRating": 5,
       "complianceIssues": []
+    },
+    {
+      "id": "4699",
+      "vendorId": "V001",
+      "vendorName": "S",
+      "purchaseOrderNumber": "INV-2025-1012",
+      "orderDate": "2025-12-12",
+      "expectedDeliveryDate": "",
+      "status": "pending",
+      "items": [
+        {
+          "description": "mm",
+          "quantity": 10,
+          "unitPrice": 120,
+          "total": 1200
+        },
+        {
+          "description": "Welding Electrodes",
+          "quantity": 5,
+          "unitPrice": 250,
+          "total": 1250
+        },
+        {
+          "description": "L",
+          "quantity": 3,
+          "unitPrice": 300,
+          "total": 900
+        }
+      ],
+      "subtotal": 3350,
+      "tax": 0,
+      "totalAmount": 3350,
+      "notes": "Extracted from invoice document. Invoice #: INV-2025-1012. ",
+      "createdAt": "2025-12-12T23:16:45.659Z"
+    },
+    {
+      "id": "6349",
+      "vendorId": "V009",
+      "vendorName": "Amazon Business",
+      "purchaseOrderNumber": "PO-2025-033",
+      "orderDate": "2025-12-31",
+      "expectedDeliveryDate": "2025-12-30",
+      "status": "pending",
+      "items": [
+        {
+          "itemId": "ITM017",
+          "description": "External SSD 2TB",
+          "quantity": 5,
+          "unitPrice": 169,
+          "total": 845
+        }
+      ],
+      "subtotal": 845,
+      "tax": 67.6,
+      "totalAmount": 912.6,
+      "urgent": false,
+      "createdBy": "RK",
+      "paymentStatus": "pending",
+      "createdAt": "2025-12-12T23:17:18.590Z"
+    },
+    {
+      "id": "269d",
+      "vendorId": "V001",
+      "vendorName": "S",
+      "purchaseOrderNumber": "INV-2025-1012",
+      "orderDate": "2025-12-12",
+      "expectedDeliveryDate": "",
+      "status": "pending",
+      "items": [
+        {
+          "description": "mm",
+          "quantity": 10,
+          "unitPrice": 120,
+          "total": 1200
+        },
+        {
+          "description": "Welding Electrodes",
+          "quantity": 5,
+          "unitPrice": 250,
+          "total": 1250
+        },
+        {
+          "description": "L",
+          "quantity": 3,
+          "unitPrice": 300,
+          "total": 900
+        }
+      ],
+      "subtotal": 3350,
+      "tax": 0,
+      "totalAmount": 3350,
+      "notes": "Extracted from invoice document. Invoice #: INV-2025-1012. ",
+      "createdAt": "2025-12-12T23:19:32.106Z"
+    },
+    {
+      "id": "3c84",
+      "vendorId": "V001",
+      "vendorName": "S",
+      "purchaseOrderNumber": "INV-2025-1012",
+      "orderDate": "2025-12-12",
+      "expectedDeliveryDate": "",
+      "status": "pending",
+      "items": [
+        {
+          "description": "mm",
+          "quantity": 10,
+          "unitPrice": 120,
+          "total": 1200
+        },
+        {
+          "description": "Welding Electrodes",
+          "quantity": 5,
+          "unitPrice": 250,
+          "total": 1250
+        },
+        {
+          "description": "L",
+          "quantity": 3,
+          "unitPrice": 300,
+          "total": 900
+        }
+      ],
+      "subtotal": 3350,
+      "tax": 0,
+      "totalAmount": 3350,
+      "notes": "Extracted from invoice document. Invoice #: INV-2025-1012. ",
+      "createdAt": "2025-12-12T23:19:33.251Z"
+    },
+    {
+      "id": "152e",
+      "vendorId": "V001",
+      "vendorName": "S",
+      "purchaseOrderNumber": "INV-2025-1012",
+      "orderDate": "2025-12-12",
+      "expectedDeliveryDate": "",
+      "status": "pending",
+      "items": [
+        {
+          "description": "mm",
+          "quantity": 10,
+          "unitPrice": 120,
+          "total": 1200
+        },
+        {
+          "description": "Welding Electrodes",
+          "quantity": 5,
+          "unitPrice": 250,
+          "total": 1250
+        },
+        {
+          "description": "L",
+          "quantity": 3,
+          "unitPrice": 300,
+          "total": 900
+        }
+      ],
+      "subtotal": 3350,
+      "tax": 0,
+      "totalAmount": 3350,
+      "notes": "Extracted from invoice document. Invoice #: INV-2025-1012. ",
+      "createdAt": "2025-12-12T23:19:34.146Z"
     }
   ],
   "riskanalysis": [

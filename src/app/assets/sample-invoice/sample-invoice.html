@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sample Invoice for Testing</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+      }
+      .invoice {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 3px solid #6366f1;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+      }
+      .company-info h1 {
+        color: #6366f1;
+        font-size: 28px;
+        margin-bottom: 5px;
+      }
+      .company-info p {
+        color: #666;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .invoice-title {
+        text-align: right;
+      }
+      .invoice-title h2 {
+        font-size: 36px;
+        color: #333;
+        letter-spacing: 2px;
+      }
+      .invoice-title .invoice-number {
+        font-size: 14px;
+        color: #6366f1;
+        margin-top: 5px;
+      }
+      .details-section {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+      }
+      .bill-to,
+      .invoice-details {
+        width: 45%;
+      }
+      .section-title {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+      .bill-to h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 5px;
+      }
+      .bill-to p {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .invoice-details table {
+        width: 100%;
+      }
+      .invoice-details td {
+        padding: 5px 0;
+        font-size: 13px;
+      }
+      .invoice-details td:first-child {
+        color: #999;
+      }
+      .invoice-details td:last-child {
+        text-align: right;
+        color: #333;
+        font-weight: 500;
+      }
+      .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      .items-table th {
+        background: #6366f1;
+        color: white;
+        padding: 12px 15px;
+        text-align: left;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .items-table th:last-child,
+      .items-table td:last-child {
+        text-align: right;
+      }
+      .items-table td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+        color: #333;
+      }
+      .items-table tbody tr:hover {
+        background: #f9f9f9;
+      }
+      .totals-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 30px;
+      }
+      .totals-table {
+        width: 300px;
+      }
+      .totals-table tr td {
+        padding: 8px 0;
+        font-size: 14px;
+      }
+      .totals-table tr td:first-child {
+        color: #666;
+      }
+      .totals-table tr td:last-child {
+        text-align: right;
+        color: #333;
+      }
+      .totals-table .total-row {
+        border-top: 2px solid #6366f1;
+        font-weight: bold;
+      }
+      .totals-table .total-row td {
+        padding-top: 15px;
+        font-size: 18px;
+      }
+      .totals-table .total-row td:last-child {
+        color: #6366f1;
+      }
+      .payment-info {
+        background: #f8f9ff;
+        border: 1px solid #e0e7ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .payment-info h4 {
+        color: #6366f1;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+      .payment-info p {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.6;
+      }
+      .footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        font-size: 12px;
+        color: #999;
+      }
+      .highlight {
+        background: #fff7ed;
+        padding: 2px 5px;
+        border-radius: 3px;
+      }
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+        .invoice {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="invoice">
+      <!-- Header -->
+      <div class="header">
+        <div class="company-info">
+          <h1>Dell Technologies</h1>
+          <p>
+            One Dell Way<br />
+            Round Rock, Texas 78682<br />
+            United States<br />
+            Phone: +1-800-999-3355<br />
+            Email: enterprise.sales@dell.com
+          </p>
+        </div>
+        <div class="invoice-title">
+          <h2>INVOICE</h2>
+          <p class="invoice-number">Invoice #: INV-2024-00847</p>
+        </div>
+      </div>
+
+      <!-- Details Section -->
+      <div class="details-section">
+        <div class="bill-to">
+          <p class="section-title">Bill To:</p>
+          <h3>Acme Corporation</h3>
+          <p>
+            123 Business Park Avenue<br />
+            Suite 500<br />
+            San Francisco, CA 94105<br />
+            United States
+          </p>
+        </div>
+        <div class="invoice-details">
+          <table>
+            <tr>
+              <td>Invoice Date:</td>
+              <td>December 13, 2025</td>
+            </tr>
+            <tr>
+              <td>Due Date:</td>
+              <td>January 12, 2026</td>
+            </tr>
+            <tr>
+              <td>PO Number:</td>
+              <td>PO-2025-00234</td>
+            </tr>
+            <tr>
+              <td>Payment Terms:</td>
+              <td>Net 30</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Dell Latitude 5540 Laptop - Intel Core i7, 16GB RAM, 512GB SSD
+            </td>
+            <td>10</td>
+            <td>$1,299.00</td>
+            <td>$12,990.00</td>
+          </tr>
+          <tr>
+            <td>Dell UltraSharp 27" Monitor U2723QE 4K USB-C Hub</td>
+            <td>10</td>
+            <td>$649.00</td>
+            <td>$6,490.00</td>
+          </tr>
+          <tr>
+            <td>Dell Pro Wireless Keyboard & Mouse KM5221W</td>
+            <td>10</td>
+            <td>$59.99</td>
+            <td>$599.90</td>
+          </tr>
+          <tr>
+            <td>Dell Docking Station WD19TBS Thunderbolt</td>
+            <td>10</td>
+            <td>$329.00</td>
+            <td>$3,290.00</td>
+          </tr>
+          <tr>
+            <td>3-Year ProSupport Plus Service</td>
+            <td>10</td>
+            <td>$199.00</td>
+            <td>$1,990.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Totals Section -->
+      <div class="totals-section">
+        <table class="totals-table">
+          <tr>
+            <td>Subtotal:</td>
+            <td>$25,359.90</td>
+          </tr>
+          <tr>
+            <td>Tax (8.25%):</td>
+            <td>$2,092.19</td>
+          </tr>
+          <tr>
+            <td>Shipping:</td>
+            <td>$0.00</td>
+          </tr>
+          <tr class="total-row">
+            <td>Total Amount:</td>
+            <td>$27,452.09</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Payment Info -->
+      <div class="payment-info">
+        <h4>Payment Information</h4>
+        <p>
+          <strong>Bank:</strong> Bank of America<br />
+          <strong>Account Name:</strong> Dell Technologies Inc.<br />
+          <strong>Account Number:</strong> XXXX-XXXX-4521<br />
+          <strong>Routing Number:</strong> 026009593<br />
+          <strong>Reference:</strong> INV-2024-00847
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>Thank you for your business!</p>
+        <p>
+          Questions? Contact us at enterprise.sales@dell.com or +1-800-999-3355
+        </p>
+      </div>
+    </div>
+
+    <div
+      style="
+        text-align: center;
+        margin-top: 30px;
+        padding: 20px;
+        background: #e0e7ff;
+        border-radius: 8px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      "
+    >
+      <h3 style="color: #6366f1; margin-bottom: 10px">
+        📸 How to use this for testing:
+      </h3>
+      <ol
+        style="
+          text-align: left;
+          max-width: 600px;
+          margin: 0 auto;
+          color: #333;
+          line-height: 1.8;
+        "
+      >
+        <li>Open this HTML file in your browser</li>
+        <li>Take a screenshot (Cmd+Shift+4 on Mac, Win+Shift+S on Windows)</li>
+        <li>Save the screenshot as PNG or JPG</li>
+        <li>
+          Upload to the Document Scanner at <code>/document-scanner</code>
+        </li>
+        <li>The OCR should extract: Invoice #, Vendor, Amounts, Dates, etc.</li>
+      </ol>
+    </div>
+  </body>
+</html>

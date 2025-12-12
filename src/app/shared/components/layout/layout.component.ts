@@ -53,6 +53,12 @@ export class LayoutComponent implements OnInit {
       route: '/master-data',
       active: false,
     },
+    {
+      icon: 'bi-file-earmark-text',
+      label: 'Doc Scanner',
+      route: '/document-scanner',
+      active: false,
+    },
   ];
 
   vendorMenuItems = [
@@ -74,6 +80,12 @@ export class LayoutComponent implements OnInit {
       icon: 'bi-database',
       label: 'Master Data',
       route: '/master-data',
+      active: false,
+    },
+    {
+      icon: 'bi-file-earmark-text',
+      label: 'Doc Scanner',
+      route: '/document-scanner',
       active: false,
     },
   ];
