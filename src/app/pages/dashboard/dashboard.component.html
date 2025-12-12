@@ -1,316 +1,236 @@
-<div class="dashboard-layout">
-  <!-- Sidebar -->
-  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
-    <div class="sidebar-header">
-      <div class="logo">
-        <i class="bi bi-bar-chart-fill logo-icon"></i>
-        <span class="logo-text" *ngIf="!sidebarCollapsed">azia</span>
-      </div>
-      <button class="collapse-btn" (click)="toggleSidebar()">
-        <i
-          class="bi"
-          [ngClass]="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"
-        ></i>
-      </button>
-    </div>
+<div class="dashboard-content">
+  <div class="welcome-section">
+    <h1>Hi, welcome back!</h1>
+    <p>Your finance performance and monitoring dashboard template.</p>
+  </div>
 
-    <div class="sidebar-section">
-      <div class="section-header" *ngIf="!sidebarCollapsed">
-        <i class="bi bi-grid-fill"></i>
-        <span>Dashboard</span>
-      </div>
-      <p class="section-subtitle" *ngIf="!sidebarCollapsed">
-        Choose between layouts to experience different look and feel for your
-        projects.
+  <!-- Dashboard Grid -->
+  <div class="dashboard-grid">
+    <!-- Row 1 -->
+    <!-- Gross Profit Margin Card -->
+    <div class="card profit-card">
+      <h3 class="card-title">GROSS PROFIT MARGIN</h3>
+      <p class="card-subtitle">
+        The profit you make on each dollar of sales...
+        <a href="#">Learn more</a>
       </p>
-    </div>
-
-    <nav class="sidebar-nav">
-      <a
-        *ngFor="let item of menuItems"
-        class="nav-item"
-        [class.active]="item.active"
-        (click)="selectMenuItem(item)"
-      >
-        <i class="bi" [ngClass]="item.icon"></i>
-        <span *ngIf="!sidebarCollapsed">{{ item.label }}</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <a class="nav-item">
-        <i class="bi bi-question-circle"></i>
-        <span *ngIf="!sidebarCollapsed">Help</span>
-      </a>
-      <div class="user-avatar">
-        <img
-          src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"
-          alt="User"
-        />
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main-content">
-    <!-- Top Navbar -->
-    <header class="top-navbar">
-      <div class="search-bar">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="Search for anything..." />
-      </div>
-      <div class="navbar-actions">
-        <button class="action-btn">
-          <i class="bi bi-chat-dots"></i>
-        </button>
-        <button class="action-btn">
-          <i class="bi bi-bell"></i>
-        </button>
-        <div class="user-profile">
-          <img
-            src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"
-            alt="User"
+      <div class="donut-chart">
+        <svg viewBox="0 0 100 100">
+          <circle class="bg-circle" cx="50" cy="50" r="40" />
+          <circle
+            class="progress-circle purple"
+            cx="50"
+            cy="50"
+            r="40"
+            [attr.stroke-dasharray]="grossProfitMargin * 2.51 + ' 251'"
           />
+        </svg>
+        <div class="chart-value">{{ grossProfitMargin }}%</div>
+      </div>
+    </div>
+
+    <!-- Net Profit Margin Card -->
+    <div class="card profit-card">
+      <h3 class="card-title">NET PROFIT MARGIN</h3>
+      <p class="card-subtitle">
+        Measures your business at generating prof...
+        <a href="#">Learn more</a>
+      </p>
+      <div class="donut-chart">
+        <svg viewBox="0 0 100 100">
+          <circle class="bg-circle" cx="50" cy="50" r="40" />
+          <circle
+            class="progress-circle purple"
+            cx="50"
+            cy="50"
+            r="40"
+            [attr.stroke-dasharray]="netProfitMargin * 2.51 + ' 251'"
+          />
+        </svg>
+        <div class="chart-value">{{ netProfitMargin }}%</div>
+      </div>
+    </div>
+
+    <!-- Account Balance Card -->
+    <div class="card balance-card">
+      <div class="balance-header">
+        <span class="balance-label">YOUR BALANCE</span>
+        <div class="visa-logo">
+          <span class="visa-text">VISA</span>
         </div>
       </div>
-    </header>
-
-    <!-- Dashboard Content -->
-    <div class="dashboard-content">
-      <div class="welcome-section">
-        <h1>Hi, welcome back!</h1>
-        <p>Your finance performance and monitoring dashboard template.</p>
+      <div class="balance-amount">{{ formatCurrency(accountBalance) }}</div>
+      <div class="account-details">
+        <div class="account-number">
+          <span class="account-label">YOUR ACCOUNT NUMBER</span>
+          <div class="number-display">
+            <span class="dots">••••</span>
+            <span class="dots">••••</span>
+            <span class="dots">••••</span>
+            <span class="last-digits">{{ accountNumber }}</span>
+          </div>
+        </div>
       </div>
-
-      <!-- Dashboard Grid -->
-      <div class="dashboard-grid">
-        <!-- Row 1 -->
-        <!-- Gross Profit Margin Card -->
-        <div class="card profit-card">
-          <h3 class="card-title">GROSS PROFIT MARGIN</h3>
-          <p class="card-subtitle">
-            The profit you make on each dollar of sales...
-            <a href="#">Learn more</a>
-          </p>
-          <div class="donut-chart">
-            <svg viewBox="0 0 100 100">
-              <circle class="bg-circle" cx="50" cy="50" r="40" />
-              <circle
-                class="progress-circle purple"
-                cx="50"
-                cy="50"
-                r="40"
-                [attr.stroke-dasharray]="grossProfitMargin * 2.51 + ' 251'"
-              />
-            </svg>
-            <div class="chart-value">{{ grossProfitMargin }}%</div>
-          </div>
+      <div class="account-info">
+        <div class="info-item">
+          <span class="info-label">ACCOUNT HOLDER</span>
+          <span class="info-value">{{ accountHolder }}</span>
         </div>
-
-        <!-- Net Profit Margin Card -->
-        <div class="card profit-card">
-          <h3 class="card-title">NET PROFIT MARGIN</h3>
-          <p class="card-subtitle">
-            Measures your business at generating prof...
-            <a href="#">Learn more</a>
-          </p>
-          <div class="donut-chart">
-            <svg viewBox="0 0 100 100">
-              <circle class="bg-circle" cx="50" cy="50" r="40" />
-              <circle
-                class="progress-circle purple"
-                cx="50"
-                cy="50"
-                r="40"
-                [attr.stroke-dasharray]="netProfitMargin * 2.51 + ' 251'"
-              />
-            </svg>
-            <div class="chart-value">{{ netProfitMargin }}%</div>
-          </div>
-        </div>
-
-        <!-- Account Balance Card -->
-        <div class="card balance-card">
-          <div class="balance-header">
-            <span class="balance-label">YOUR BALANCE</span>
-            <div class="visa-logo">
-              <span class="visa-text">VISA</span>
-            </div>
-          </div>
-          <div class="balance-amount">{{ formatCurrency(accountBalance) }}</div>
-          <div class="account-details">
-            <div class="account-number">
-              <span class="account-label">YOUR ACCOUNT NUMBER</span>
-              <div class="number-display">
-                <span class="dots">••••</span>
-                <span class="dots">••••</span>
-                <span class="dots">••••</span>
-                <span class="last-digits">{{ accountNumber }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="account-info">
-            <div class="info-item">
-              <span class="info-label">ACCOUNT HOLDER</span>
-              <span class="info-value">{{ accountHolder }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">ACCOUNT TYPE</span>
-              <span class="info-value">{{ accountType }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 2 -->
-        <!-- Ratio Cards -->
-        <div class="card ratio-card">
-          <div class="ratio-item">
-            <div class="ratio-icon">
-              <svg viewBox="0 0 60 40" class="line-chart">
-                <polyline points="5,35 15,20 25,25 35,10 45,15 55,5" />
-              </svg>
-            </div>
-            <div class="ratio-content">
-              <h3 class="card-title">QUICK RATIO</h3>
-              <div class="ratio-value">{{ quickRatio }}</div>
-              <div class="ratio-progress">
-                <div
-                  class="progress-bar yellow"
-                  [style.width.%]="quickRatioProgress"
-                ></div>
-              </div>
-              <p class="ratio-goal">Quick Ratio Goal: {{ quickRatioGoal }}</p>
-              <p class="ratio-desc">
-                Measures your Current Assets + Accounts Receivable / Current
-                Liabilities <a href="#">Learn more</a>
-              </p>
-            </div>
-          </div>
-
-          <div class="ratio-divider"></div>
-
-          <div class="ratio-item">
-            <div class="ratio-icon">
-              <svg viewBox="0 0 60 40" class="line-chart">
-                <polyline points="5,30 15,25 25,20 35,15 45,10 55,5" />
-              </svg>
-            </div>
-            <div class="ratio-content">
-              <h3 class="card-title">CURRENT RATIO</h3>
-              <div class="ratio-value">{{ currentRatio }}</div>
-              <div class="ratio-progress">
-                <div
-                  class="progress-bar green"
-                  [style.width.%]="currentRatioProgress"
-                ></div>
-              </div>
-              <p class="ratio-goal">Quick Ratio Goal: {{ currentRatioGoal }}</p>
-              <p class="ratio-desc">
-                Measures your Current Assets / Current Liabilities.
-                <a href="#">Learn more</a>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Income & Expenses -->
-        <div class="card stats-card">
-          <div class="stat-item">
-            <h3 class="card-title">TOTAL INCOME</h3>
-            <div class="mini-chart income-chart">
-              <div class="bar" style="height: 60%"></div>
-              <div class="bar" style="height: 80%"></div>
-              <div class="bar" style="height: 40%"></div>
-              <div class="bar" style="height: 90%"></div>
-              <div class="bar" style="height: 70%"></div>
-              <div class="bar" style="height: 50%"></div>
-              <div class="bar" style="height: 85%"></div>
-            </div>
-            <div class="stat-value">{{ formatCurrency(totalIncome) }}</div>
-            <div
-              class="stat-change"
-              [class.positive]="incomeChangePositive"
-              [class.negative]="!incomeChangePositive"
-            >
-              {{ incomeChange }}% higher vs previous month
-            </div>
-          </div>
-        </div>
-
-        <div class="card stats-card">
-          <div class="stat-item">
-            <h3 class="card-title">TOTAL EXPENSES</h3>
-            <div class="mini-chart expense-chart">
-              <div class="bar" style="height: 50%"></div>
-              <div class="bar" style="height: 70%"></div>
-              <div class="bar" style="height: 45%"></div>
-              <div class="bar" style="height: 60%"></div>
-              <div class="bar" style="height: 55%"></div>
-              <div class="bar" style="height: 40%"></div>
-              <div class="bar" style="height: 65%"></div>
-            </div>
-            <div class="stat-value">{{ formatCurrency(totalExpenses) }}</div>
-            <div
-              class="stat-change"
-              [class.positive]="expenseChangePositive"
-              [class.negative]="!expenseChangePositive"
-            >
-              {{ expenseChange }}% higher vs previous month
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 3 - Empty space for ratio card span -->
-
-        <!-- Accounts Receivable & Payable -->
-        <div class="card stats-card accounts-card">
-          <div class="stat-item">
-            <h3 class="card-title">ACCOUNTS RECEIVABLE</h3>
-            <div class="mini-chart receivable-chart">
-              <div class="bar" style="height: 55%"></div>
-              <div class="bar" style="height: 75%"></div>
-              <div class="bar" style="height: 50%"></div>
-              <div class="bar" style="height: 85%"></div>
-              <div class="bar" style="height: 65%"></div>
-              <div class="bar" style="height: 45%"></div>
-              <div class="bar" style="height: 70%"></div>
-            </div>
-            <div class="stat-value">
-              {{ formatCurrency(accountsReceivable) }}
-            </div>
-            <div
-              class="stat-change"
-              [class.positive]="receivableChangePositive"
-              [class.negative]="!receivableChangePositive"
-            >
-              {{ receivableChange }}% higher vs previous month
-            </div>
-          </div>
-        </div>
-
-        <div class="card stats-card accounts-card">
-          <div class="stat-item">
-            <h3 class="card-title">ACCOUNTS PAYABLE</h3>
-            <div class="mini-chart payable-chart">
-              <div class="bar" style="height: 60%"></div>
-              <div class="bar" style="height: 80%"></div>
-              <div class="bar" style="height: 55%"></div>
-              <div class="bar" style="height: 70%"></div>
-              <div class="bar" style="height: 60%"></div>
-              <div class="bar" style="height: 50%"></div>
-              <div class="bar" style="height: 75%"></div>
-            </div>
-            <div class="stat-value">{{ formatCurrency(accountsPayable) }}</div>
-            <div
-              class="stat-change"
-              [class.positive]="payableChangePositive"
-              [class.negative]="!payableChangePositive"
-            >
-              {{ payableChange }}% higher vs previous month
-            </div>
-          </div>
+        <div class="info-item">
+          <span class="info-label">ACCOUNT TYPE</span>
+          <span class="info-value">{{ accountType }}</span>
         </div>
       </div>
     </div>
-  </main>
+
+    <!-- Row 2 -->
+    <!-- Ratio Cards -->
+    <div class="card ratio-card">
+      <div class="ratio-item">
+        <div class="ratio-icon">
+          <svg viewBox="0 0 60 40" class="line-chart">
+            <polyline points="5,35 15,20 25,25 35,10 45,15 55,5" />
+          </svg>
+        </div>
+        <div class="ratio-content">
+          <h3 class="card-title">QUICK RATIO</h3>
+          <div class="ratio-value">{{ quickRatio }}</div>
+          <div class="ratio-progress">
+            <div
+              class="progress-bar yellow"
+              [style.width.%]="quickRatioProgress"
+            ></div>
+          </div>
+          <p class="ratio-goal">Quick Ratio Goal: {{ quickRatioGoal }}</p>
+          <p class="ratio-desc">
+            Measures your Current Assets + Accounts Receivable / Current
+            Liabilities <a href="#">Learn more</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="ratio-divider"></div>
+
+      <div class="ratio-item">
+        <div class="ratio-icon">
+          <svg viewBox="0 0 60 40" class="line-chart">
+            <polyline points="5,30 15,25 25,20 35,15 45,10 55,5" />
+          </svg>
+        </div>
+        <div class="ratio-content">
+          <h3 class="card-title">CURRENT RATIO</h3>
+          <div class="ratio-value">{{ currentRatio }}</div>
+          <div class="ratio-progress">
+            <div
+              class="progress-bar green"
+              [style.width.%]="currentRatioProgress"
+            ></div>
+          </div>
+          <p class="ratio-goal">Quick Ratio Goal: {{ currentRatioGoal }}</p>
+          <p class="ratio-desc">
+            Measures your Current Assets / Current Liabilities.
+            <a href="#">Learn more</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income & Expenses -->
+    <div class="card stats-card">
+      <div class="stat-item">
+        <h3 class="card-title">TOTAL INCOME</h3>
+        <div class="mini-chart income-chart">
+          <div class="bar" style="height: 60%"></div>
+          <div class="bar" style="height: 80%"></div>
+          <div class="bar" style="height: 40%"></div>
+          <div class="bar" style="height: 90%"></div>
+          <div class="bar" style="height: 70%"></div>
+          <div class="bar" style="height: 50%"></div>
+          <div class="bar" style="height: 85%"></div>
+        </div>
+        <div class="stat-value">{{ formatCurrency(totalIncome) }}</div>
+        <div
+          class="stat-change"
+          [class.positive]="incomeChangePositive"
+          [class.negative]="!incomeChangePositive"
+        >
+          {{ incomeChange }}% higher vs previous month
+        </div>
+      </div>
+    </div>
+
+    <div class="card stats-card">
+      <div class="stat-item">
+        <h3 class="card-title">TOTAL EXPENSES</h3>
+        <div class="mini-chart expense-chart">
+          <div class="bar" style="height: 50%"></div>
+          <div class="bar" style="height: 70%"></div>
+          <div class="bar" style="height: 45%"></div>
+          <div class="bar" style="height: 60%"></div>
+          <div class="bar" style="height: 55%"></div>
+          <div class="bar" style="height: 40%"></div>
+          <div class="bar" style="height: 65%"></div>
+        </div>
+        <div class="stat-value">{{ formatCurrency(totalExpenses) }}</div>
+        <div
+          class="stat-change"
+          [class.positive]="expenseChangePositive"
+          [class.negative]="!expenseChangePositive"
+        >
+          {{ expenseChange }}% higher vs previous month
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3 - Empty space for ratio card span -->
+
+    <!-- Accounts Receivable & Payable -->
+    <div class="card stats-card accounts-card">
+      <div class="stat-item">
+        <h3 class="card-title">ACCOUNTS RECEIVABLE</h3>
+        <div class="mini-chart receivable-chart">
+          <div class="bar" style="height: 55%"></div>
+          <div class="bar" style="height: 75%"></div>
+          <div class="bar" style="height: 50%"></div>
+          <div class="bar" style="height: 85%"></div>
+          <div class="bar" style="height: 65%"></div>
+          <div class="bar" style="height: 45%"></div>
+          <div class="bar" style="height: 70%"></div>
+        </div>
+        <div class="stat-value">
+          {{ formatCurrency(accountsReceivable) }}
+        </div>
+        <div
+          class="stat-change"
+          [class.positive]="receivableChangePositive"
+          [class.negative]="!receivableChangePositive"
+        >
+          {{ receivableChange }}% higher vs previous month
+        </div>
+      </div>
+    </div>
+
+    <div class="card stats-card accounts-card">
+      <div class="stat-item">
+        <h3 class="card-title">ACCOUNTS PAYABLE</h3>
+        <div class="mini-chart payable-chart">
+          <div class="bar" style="height: 60%"></div>
+          <div class="bar" style="height: 80%"></div>
+          <div class="bar" style="height: 55%"></div>
+          <div class="bar" style="height: 70%"></div>
+          <div class="bar" style="height: 60%"></div>
+          <div class="bar" style="height: 50%"></div>
+          <div class="bar" style="height: 75%"></div>
+        </div>
+        <div class="stat-value">{{ formatCurrency(accountsPayable) }}</div>
+        <div
+          class="stat-change"
+          [class.positive]="payableChangePositive"
+          [class.negative]="!payableChangePositive"
+        >
+          {{ payableChange }}% higher vs previous month
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

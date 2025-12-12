@@ -1,1 +1,227 @@
-<p>vender-list works!</p>
+<div class="vendor-list-container">
+  <!-- Header Card -->
+  <div class="header-card">
+    <h5 class="card-header">Vendor Management</h5>
+    <nav class="breadcrumb-nav">
+      <span>Home</span>
+      <i class="bi bi-chevron-right"></i>
+      <span class="active">Vendor List</span>
+    </nav>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="text"
+          placeholder="Search vendors..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+        />
+      </div>
+      <button class="btn btn-new" (click)="handleAddNewVendor()">
+        <i class="bi bi-plus-lg"></i> New Vendor
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="vendor-table">
+        <thead>
+          <tr>
+            <th class="t-head" (click)="sortBy('vendorName')">
+              Vendor Name
+              <i
+                class="bi"
+                [ngClass]="
+                  sortField === 'vendorName'
+                    ? sortOrder === 'asc'
+                      ? 'bi-sort-up'
+                      : 'bi-sort-down'
+                    : 'bi-arrow-down-up'
+                "
+              ></i>
+            </th>
+            <ng-container *ngFor="let col of selectedColumns">
+              <th class="t-head" (click)="sortBy(col.field)">
+                {{ col.columnLabel }}
+                <i
+                  class="bi"
+                  [ngClass]="
+                    sortField === col.field
+                      ? sortOrder === 'asc'
+                        ? 'bi-sort-up'
+                        : 'bi-sort-down'
+                      : 'bi-arrow-down-up'
+                  "
+                ></i>
+              </th>
+            </ng-container>
+            <th class="t-head">Action</th>
+            <th class="t-head filter-column">
+              <div class="filter-button-container">
+                <i
+                  class="bi bi-sliders"
+                  (click)="handleFilterColumns($event)"
+                ></i>
+                <div *ngIf="showFilter" class="filter-dropdown">
+                  <label class="filter-label">Filter by (Columns):</label>
+                  <div class="filter-options">
+                    <div class="filter-checkbox-group">
+                      <div
+                        *ngFor="let column of availableColumns"
+                        class="checkbox-items"
+                      >
+                        <input
+                          type="checkbox"
+                          [id]="column.field"
+                          [(ngModel)]="column.isSelected"
+                          (change)="updateSelectedFilterColumns()"
+                        />
+                        <label [for]="column.field">{{
+                          column.columnLabel
+                        }}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="filter-buttons">
+                    <button
+                      class="btn btn-select-all"
+                      (click)="selectAllFilterOnColumns()"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      class="btn btn-cancel"
+                      (click)="cancelFilterOnColumns()"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let vendor of visibleVendorList">
+            <td class="t-col vendor-name">{{ vendor.vendorName }}</td>
+            <ng-container *ngFor="let col of selectedColumns">
+              <td class="t-col">
+                <ng-container *ngIf="col.field === 'status'">
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(vendor.status)"
+                  >
+                    {{ vendor.status }}
+                  </span>
+                </ng-container>
+                <ng-container *ngIf="col.field === 'totalPurchases'">
+                  {{ vendor.totalPurchases | currency }}
+                </ng-container>
+                <ng-container *ngIf="col.field === 'rating'">
+                  <div class="rating">
+                    <i class="bi bi-star-fill"></i>
+                    {{ vendor.rating }}
+                  </div>
+                </ng-container>
+                <ng-container
+                  *ngIf="
+                    col.field !== 'status' &&
+                    col.field !== 'totalPurchases' &&
+                    col.field !== 'rating'
+                  "
+                >
+                  {{ vendor[col.field] }}
+                </ng-container>
+              </td>
+            </ng-container>
+            <td class="t-col actions-col" colspan="2">
+              <div class="action-buttons">
+                <button
+                  class="btn-action btn-view"
+                  (click)="handleViewVendor(vendor.id)"
+                  title="View"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  class="btn-action btn-edit"
+                  (click)="handleEditVendor(vendor.id)"
+                  title="Edit"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="visibleVendorList.length === 0">
+            <td [attr.colspan]="selectedColumns.length + 3" class="no-data">
+              No vendors found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <span class="pagination-info">
+        Showing {{ first + 1 }} to
+        {{
+          first + rows > allVendorList.length
+            ? allVendorList.length
+            : first + rows
+        }}
+        of {{ allVendorList.length }} entries
+      </span>
+      <div class="pagination-controls">
+        <select
+          [(ngModel)]="rows"
+          (change)="onRowsChange()"
+          class="rows-select"
+        >
+          <option *ngFor="let opt of rowsPerPageOptions" [value]="opt">
+            {{ opt }} / page
+          </option>
+        </select>
+        <div class="pagination-buttons">
+          <button
+            class="btn-page"
+            (click)="goToPage(1)"
+            [disabled]="currentPage === 1"
+          >
+            <i class="bi bi-chevron-double-left"></i>
+          </button>
+          <button
+            class="btn-page"
+            (click)="previousPage()"
+            [disabled]="first === 0"
+          >
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <span class="page-info"
+            >Page {{ currentPage }} of {{ totalPages }}</span
+          >
+          <button
+            class="btn-page"
+            (click)="nextPage()"
+            [disabled]="first + rows >= allVendorList.length"
+          >
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <button
+            class="btn-page"
+            (click)="goToPage(totalPages)"
+            [disabled]="currentPage === totalPages"
+          >
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

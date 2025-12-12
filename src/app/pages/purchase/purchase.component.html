@@ -1,0 +1,300 @@
+<div class="purchase-container">
+  <!-- Header Card -->
+  <div class="header-card">
+    <h5 class="card-header">Purchase Orders</h5>
+    <nav class="breadcrumb-nav">
+      <span>Home</span>
+      <i class="bi bi-chevron-right"></i>
+      <span class="active">Purchase Orders</span>
+    </nav>
+  </div>
+
+  <!-- Status Cards -->
+  <div class="status-cards-container">
+    <div class="status-card status-rfq-card">
+      <span class="status-count">{{ getStatusCount("RFQ") }}</span>
+      <span class="status-label">RFQ</span>
+    </div>
+    <div class="status-card status-rfq-cancelled-card">
+      <span class="status-count">{{ getStatusCount("RFQ Cancelled") }}</span>
+      <span class="status-label">RFQ Cancelled</span>
+    </div>
+    <div class="status-card status-sent-card">
+      <span class="status-count">{{ getStatusCount("RFQ Sent") }}</span>
+      <span class="status-label">RFQ Sent</span>
+    </div>
+    <div class="status-card status-po-card">
+      <span class="status-count">{{ getStatusCount("Purchase Order") }}</span>
+      <span class="status-label">Purchase Order</span>
+    </div>
+    <div class="status-card status-cancelled-card">
+      <span class="status-count">{{ getStatusCount("Cancelled") }}</span>
+      <span class="status-label">Cancelled</span>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <div class="left-actions">
+        <button class="btn btn-outline" (click)="openFilterDialog = true">
+          <i class="bi bi-funnel"></i> Filter
+        </button>
+        <button class="btn btn-outline" (click)="exportToExcel()">
+          <i class="bi bi-upload"></i> Export
+        </button>
+      </div>
+
+      <div class="right-actions">
+        <ng-container *ngIf="selectedQuotations.length === 0">
+          <div class="search-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input
+              type="text"
+              placeholder="Search by PO Number"
+              class="search-input"
+              [(ngModel)]="filterDTO.searchTerm"
+              (input)="addToSearchTerm()"
+            />
+            <i
+              *ngIf="filterDTO.searchTerm"
+              class="bi bi-x clear-icon"
+              (click)="clearSearchInput()"
+            ></i>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedQuotations.length > 0">
+          <button
+            class="btn btn-outline"
+            (click)="clearQuotationCheckBoxSelection()"
+          >
+            <i class="bi bi-x"></i> {{ selectedQuotations.length }} Selected
+          </button>
+        </ng-container>
+
+        <button class="btn btn-new" (click)="handleNewQuotation()">
+          <i class="bi bi-plus-lg"></i> New Purchase
+        </button>
+      </div>
+    </div>
+
+    <!-- Column Filter Dropdown -->
+    <div class="filter-dropdown" *ngIf="showFilter">
+      <label class="filter-label">Filter by (Columns):</label>
+      <div class="filter-options">
+        <div class="filter-checkbox-group">
+          <ng-container *ngFor="let option of availableColumns">
+            <div class="checkbox-items" *ngIf="option.canBeRemoved">
+              <input
+                type="checkbox"
+                [id]="option.field"
+                [(ngModel)]="option.isSelected"
+              />
+              <label [for]="option.field">{{ option.columnLabel }}</label>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="filter-buttons">
+        <button class="btn btn-select-all" (click)="selectAllFilter()">
+          Select All
+        </button>
+        <button class="btn btn-cancel" (click)="closeFilter()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="purchase-table">
+        <thead>
+          <tr>
+            <th class="t-head checkbox-col">
+              <input
+                type="checkbox"
+                [(ngModel)]="selectAll"
+                (change)="toggleSelectAll()"
+              />
+            </th>
+            <ng-container *ngFor="let col of availableColumns">
+              <th class="t-head" *ngIf="col.isSelected">
+                {{ col.columnLabel }}
+              </th>
+            </ng-container>
+            <th class="t-head">Action</th>
+            <th class="t-head filter-column">
+              <i class="bi bi-sliders" (click)="toggleFilter($event)"></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let quotation of quotationsList">
+            <td class="t-col checkbox-col">
+              <input
+                type="checkbox"
+                [checked]="isSelected(quotation)"
+                (change)="onSelectionChange(quotation)"
+              />
+            </td>
+            <ng-container *ngFor="let col of availableColumns">
+              <td class="t-col" *ngIf="col.isSelected">
+                <ng-container
+                  *ngIf="col.type === 'string' && col.field !== 'status'"
+                >
+                  {{ quotation[col.field] }}
+                </ng-container>
+                <ng-container *ngIf="col.field === 'status'">
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(quotation.status)"
+                  >
+                    {{ quotation.status }}
+                  </span>
+                </ng-container>
+                <ng-container *ngIf="col.type === 'date'">
+                  {{ quotation[col.field] | date : "MMM dd, yyyy" }}
+                </ng-container>
+                <ng-container *ngIf="col.type === 'number'">
+                  {{ quotation[col.field] | currency }}
+                </ng-container>
+              </td>
+            </ng-container>
+            <td class="t-col actions-col" colspan="2">
+              <div class="action-buttons">
+                <button
+                  class="btn-action btn-edit"
+                  (click)="handleEdit(quotation.id)"
+                  title="Edit"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn-action btn-delete"
+                  (click)="handleDeleteSalesQuotation(quotation.id)"
+                  title="Delete"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="quotationsList.length === 0">
+            <td [attr.colspan]="selectedColumns.length + 3" class="no-data">
+              No data to display
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <span class="pagination-info">
+        Showing {{ first + 1 }} to
+        {{
+          first + rows > allQuotationsList.length
+            ? allQuotationsList.length
+            : first + rows
+        }}
+        of {{ allQuotationsList.length }} entries
+      </span>
+      <div class="pagination-controls">
+        <select
+          [(ngModel)]="rows"
+          (change)="onRowsChange()"
+          class="rows-select"
+        >
+          <option *ngFor="let opt of rowsPerPageOptions" [value]="opt">
+            {{ opt }} / page
+          </option>
+        </select>
+        <div class="pagination-buttons">
+          <button
+            class="btn-page"
+            (click)="goToPage(1)"
+            [disabled]="currentPage === 1"
+          >
+            <i class="bi bi-chevron-double-left"></i>
+          </button>
+          <button
+            class="btn-page"
+            (click)="previousPage()"
+            [disabled]="first === 0"
+          >
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <span class="page-info"
+            >Page {{ currentPage }} of {{ totalPages }}</span
+          >
+          <button
+            class="btn-page"
+            (click)="nextPage()"
+            [disabled]="first + rows >= allQuotationsList.length"
+          >
+            <i class="bi bi-chevron-right"></i>
+          </button>
+          <button
+            class="btn-page"
+            (click)="goToPage(totalPages)"
+            [disabled]="currentPage === totalPages"
+          >
+            <i class="bi bi-chevron-double-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Dialog -->
+  <div
+    class="dialog-overlay"
+    *ngIf="openFilterDialog"
+    (click)="openFilterDialog = false"
+  >
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h5>Filter</h5>
+        <button class="dialog-close" (click)="openFilterDialog = false">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label>Status:</label>
+          <select [(ngModel)]="filterDTO.status" class="form-control">
+            <option
+              *ngFor="let opt of statusDropdownOptions"
+              [value]="opt.value"
+            >
+              {{ opt.key }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Supplier:</label>
+          <select [(ngModel)]="filterDTO.supplierId" class="form-control">
+            <option
+              *ngFor="let opt of suppliersDropdownOptions"
+              [value]="opt.value"
+            >
+              {{ opt.key }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="filterDTO.urgent" />
+            Urgent Only
+          </label>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-outline" (click)="clearFilter()">Clear</button>
+        <button class="btn btn-new" (click)="filterPurchaseQuotations()">
+          Apply Filter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
