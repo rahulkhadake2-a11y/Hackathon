@@ -116,7 +116,7 @@
                     class="status-badge"
                     [ngClass]="getStatusClass(vendor.status)"
                   >
-                    {{ vendor.status }}
+                    {{ vendor.status || 'pending' }}
                   </span>
                 </ng-container>
                 <ng-container *ngIf="col.field === 'riskLevel'">

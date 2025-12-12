@@ -115,45 +115,61 @@
       "updatedAt": "2024-12-02T13:00:00.000Z"
     },
     {
-      "vendorName": "Nithin",
-      "contactPerson": "Rahul",
+      "id": "17d3",
+      "vendorName": "Rahul ",
+      "contactPerson": "nithin",
       "email": "rahul@gmail.com",
-      "phone": "08600429295",
-      "category": "General",
+      "phone": "9876545678",
+      "category": "Manufacturing",
       "status": "active",
       "address": "",
-      "city": "BENGALURU",
+      "city": "Hyderabad",
       "country": "India",
       "taxId": "",
       "paymentTerms": "Net 30",
       "creditLimit": 0,
-      "totalPurchases": 0,
+      "totalPurchases": 454325.76,
       "rating": 0,
-      "updatedAt": "2025-12-12T08:37:54.169Z",
-      "id": "2bc1"
+      "createdAt": "2025-12-12T09:35:40.386Z",
+      "updatedAt": "2025-12-12T09:36:36.336Z"
     },
     {
-      "vendorName": "RK9295",
-      "contactPerson": "Rahul Khadake",
-      "email": "",
-      "phone": "08600429295",
+      "id": "3a2f",
+      "vendorName": "Sahil Solutions ",
+      "contactPerson": "Darshan",
+      "email": "darshan@gmail.com",
+      "phone": "987654567",
       "category": "IT Services",
       "status": "active",
       "address": "",
-      "city": "BENGALURU",
+      "city": "Gujurat",
       "country": "India",
       "taxId": "",
       "paymentTerms": "Net 30",
       "creditLimit": 0,
-      "totalPurchases": 0,
+      "totalPurchases": 11232725.76,
       "rating": 0,
-      "updatedAt": "2025-12-12T08:47:08.450Z",
-      "id": "aea4"
+      "createdAt": "2025-12-12T09:37:42.002Z",
+      "updatedAt": "2025-12-12T09:38:47.308Z"
     },
     {
-      "totalPurchases": 14148,
-      "updatedAt": "2025-12-12T08:51:41.856Z",
-      "id": "0948"
+      "id": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "contactPerson": "Rahul K",
+      "email": "pratham@gmail.com",
+      "phone": "987654356",
+      "category": "IT Services",
+      "status": "active",
+      "address": "",
+      "city": "Bengaluru",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 4967537.76,
+      "rating": 0,
+      "createdAt": "2025-12-12T09:40:01.177Z",
+      "updatedAt": "2025-12-12T09:42:46.198Z"
     }
   ],
   "purchases": [
@@ -480,31 +496,8 @@
       "complianceIssues": []
     },
     {
-      "vendorId": null,
-      "vendorName": "",
-      "purchaseOrderNumber": "PO-2025-725",
-      "orderDate": "2025-12-12",
-      "status": "pending",
-      "items": [
-        {
-          "description": "this is very good",
-          "quantity": 11,
-          "unitPrice": 100,
-          "total": 1100
-        }
-      ],
-      "subtotal": 1100,
-      "tax": 88,
-      "totalAmount": 1188,
-      "urgent": true,
-      "createdBy": "Rahul",
-      "paymentStatus": "pending",
-      "paymentDelayDays": 1,
-      "id": "708a"
-    },
-    {
       "id": "32c0",
-      "vendorId": "0948",
+      "vendorId": null,
       "vendorName": "Gemba",
       "purchaseOrderNumber": "PO-2025-159",
       "orderDate": "2025-11-30",
@@ -535,6 +528,221 @@
       "leadTime": 4,
       "communicationRating": "3",
       "createdAt": "2025-12-12T08:51:40.158Z"
+    },
+    {
+      "vendorId": null,
+      "vendorName": "RK9295",
+      "purchaseOrderNumber": "PO-2025-102",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-11",
+      "status": "delivered",
+      "items": [
+        {
+          "description": "Test Item",
+          "quantity": 100,
+          "unitPrice": 200,
+          "total": 20000
+        }
+      ],
+      "subtotal": 20000,
+      "tax": 1600,
+      "totalAmount": 21600,
+      "urgent": false,
+      "createdBy": "Nithin",
+      "paymentStatus": "paid",
+      "paymentDelayDays": 4,
+      "id": "05e8"
+    },
+    {
+      "id": "5494",
+      "vendorId": null,
+      "vendorName": "Nithin Chilumula",
+      "purchaseOrderNumber": "PO-2025-483",
+      "orderDate": "2025-10-06",
+      "expectedDeliveryDate": "2025-12-20",
+      "status": "delivered",
+      "items": [
+        {
+          "description": "Spare Parts",
+          "quantity": 345,
+          "unitPrice": 982,
+          "total": 338790
+        }
+      ],
+      "subtotal": 338790,
+      "tax": 27103.2,
+      "totalAmount": 365893.2,
+      "urgent": false,
+      "createdBy": "Nithin",
+      "qualityRating": "4",
+      "defectCount": 100,
+      "defectRate": 28.985507246376812,
+      "returnedItems": 90,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 10,
+      "leadTime": 10,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T09:24:23.526Z"
+    },
+    {
+      "id": "abb2",
+      "vendorId": null,
+      "vendorName": "Rahul K",
+      "purchaseOrderNumber": "PO-2025-871",
+      "orderDate": "2025-11-30",
+      "expectedDeliveryDate": "2025-12-03",
+      "actualDeliveryDate": "2025-12-05",
+      "status": "delivered",
+      "items": [
+        {
+          "description": "Test",
+          "quantity": 123,
+          "unitPrice": 234,
+          "total": 28782
+        }
+      ],
+      "subtotal": 28782,
+      "tax": 2302.56,
+      "totalAmount": 31084.56,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 2,
+      "qualityRating": "3",
+      "defectCount": 40,
+      "defectRate": 32.52032520325203,
+      "returnedItems": 30,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 2,
+      "leadTime": 5,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T09:31:48.795Z"
+    },
+    {
+      "id": "0b6c",
+      "vendorId": "17d3",
+      "vendorName": "Rahul ",
+      "purchaseOrderNumber": "PO-2025-946",
+      "orderDate": "2025-11-23",
+      "expectedDeliveryDate": "2025-12-10",
+      "actualDeliveryDate": "2025-12-12",
+      "status": "delivered",
+      "items": [
+        {
+          "description": "Item1",
+          "quantity": 100,
+          "unitPrice": 200,
+          "total": 20000
+        }
+      ],
+      "subtotal": 20000,
+      "tax": 1600,
+      "totalAmount": 21600,
+      "urgent": false,
+      "createdBy": "Nithin",
+      "onTimeDelivery": false,
+      "deliveryDelayDays": 2,
+      "qualityRating": "3",
+      "defectCount": 40,
+      "defectRate": 40,
+      "returnedItems": 40,
+      "paymentStatus": "paid",
+      "paymentDelayDays": 2,
+      "leadTime": 19,
+      "communicationRating": "3",
+      "createdAt": "2025-12-12T09:36:34.835Z"
+    },
+    {
+      "id": "16c4",
+      "vendorId": "3a2f",
+      "vendorName": "Sahil Solutions ",
+      "purchaseOrderNumber": "PO-2025-798",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-11",
+      "actualDeliveryDate": "2025-12-04",
+      "status": "delivered",
+      "items": [
+        {
+          "description": "Laptops",
+          "quantity": 250,
+          "unitPrice": 40000,
+          "total": 10000000
+        }
+      ],
+      "subtotal": 10000000,
+      "tax": 800000,
+      "totalAmount": 10800000,
+      "urgent": false,
+      "createdBy": "Darshan",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "2",
+      "defectCount": 70,
+      "defectRate": 28.000000000000004,
+      "returnedItems": 40,
+      "paymentStatus": "overdue",
+      "paymentDelayDays": 10,
+      "leadTime": 2,
+      "communicationRating": "5",
+      "createdAt": "2025-12-12T09:38:46.074Z"
+    },
+    {
+      "id": "2680",
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "purchaseOrderNumber": "PO-2025-651",
+      "orderDate": "2025-12-04",
+      "expectedDeliveryDate": "2025-12-11",
+      "status": "shipped",
+      "items": [
+        {
+          "description": "Chairs",
+          "quantity": 200,
+          "unitPrice": 1000,
+          "total": 200000
+        }
+      ],
+      "subtotal": 200000,
+      "tax": 16000,
+      "totalAmount": 216000,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "paymentStatus": "partial",
+      "paymentDelayDays": 10,
+      "createdAt": "2025-12-12T09:41:48.632Z"
+    },
+    {
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "purchaseOrderNumber": "PO-2025-668",
+      "orderDate": "2025-12-02",
+      "expectedDeliveryDate": "2025-12-04",
+      "actualDeliveryDate": "2025-12-04",
+      "status": "delivered",
+      "items": [
+        {
+          "description": "Laotops",
+          "quantity": 200,
+          "unitPrice": 20000,
+          "total": 4000000
+        }
+      ],
+      "subtotal": 4000000,
+      "tax": 320000,
+      "totalAmount": 4320000,
+      "urgent": false,
+      "createdBy": "Rahul",
+      "onTimeDelivery": true,
+      "deliveryDelayDays": 0,
+      "qualityRating": "2",
+      "defectCount": 100,
+      "defectRate": 50,
+      "returnedItems": 100,
+      "paymentStatus": "overdue",
+      "paymentDelayDays": 2,
+      "leadTime": 2,
+      "communicationRating": "4",
+      "id": "c740"
     }
   ],
   "riskanalysis": [
@@ -812,111 +1020,19 @@
       "updatedAt": "2024-12-02T13:00:00.000Z"
     },
     {
-      "id": "064b",
+      "id": "fb35",
       "vendorId": null,
-      "vendorName": "test",
+      "vendorName": "Nithin Chilumula",
       "riskLevel": "medium",
-      "overallScore": 29,
-      "financialRisk": 32,
-      "operationalRisk": 38,
-      "complianceRisk": 22,
-      "reputationRisk": 24,
-      "riskFactors": [
-        {
-          "name": "Payment History",
-          "score": 32,
-          "weight": 0.3,
-          "description": "Based on past payment behavior"
-        },
-        {
-          "name": "Delivery Performance",
-          "score": 38,
-          "weight": 0.25,
-          "description": "On-time delivery rate"
-        },
-        {
-          "name": "Regulatory Compliance",
-          "score": 22,
-          "weight": 0.25,
-          "description": "Adherence to regulations"
-        },
-        {
-          "name": "Market Reputation",
-          "score": 24,
-          "weight": 0.2,
-          "description": "Industry standing"
-        }
-      ],
-      "lastAssessmentDate": "2025-12-12T07:44:41.731Z",
-      "nextReviewDate": "2026-03-12T07:44:41.731Z",
-      "recommendations": [
-        "Schedule quarterly reviews",
-        "Request updated financial statements",
-        "Monitor delivery metrics"
-      ],
-      "createdAt": "2025-12-12T07:44:41.731Z",
-      "updatedAt": "2025-12-12T07:44:41.731Z"
-    },
-    {
-      "id": "c82a",
-      "vendorId": "2bc1",
-      "vendorName": "Nithin",
-      "riskLevel": "medium",
-      "overallScore": 27,
-      "financialRisk": 21,
-      "operationalRisk": 24,
-      "complianceRisk": 38,
-      "reputationRisk": 23,
-      "riskFactors": [
-        {
-          "name": "Payment History",
-          "score": 21,
-          "weight": 0.3,
-          "description": "Based on past payment behavior"
-        },
-        {
-          "name": "Delivery Performance",
-          "score": 24,
-          "weight": 0.25,
-          "description": "On-time delivery rate"
-        },
-        {
-          "name": "Regulatory Compliance",
-          "score": 38,
-          "weight": 0.25,
-          "description": "Adherence to regulations"
-        },
-        {
-          "name": "Market Reputation",
-          "score": 23,
-          "weight": 0.2,
-          "description": "Industry standing"
-        }
-      ],
-      "lastAssessmentDate": "2025-12-12T07:45:50.931Z",
-      "nextReviewDate": "2026-03-12T07:45:50.931Z",
-      "recommendations": [
-        "Schedule quarterly reviews",
-        "Request updated financial statements",
-        "Monitor delivery metrics"
-      ],
-      "createdAt": "2025-12-12T07:45:50.931Z",
-      "updatedAt": "2025-12-12T07:45:50.931Z"
-    },
-    {
-      "id": "8868",
-      "vendorId": "aea4",
-      "vendorName": "RK9295",
-      "riskLevel": "medium",
-      "overallScore": 37,
-      "financialRisk": 23,
+      "overallScore": 33,
+      "financialRisk": 37,
       "operationalRisk": 43,
-      "complianceRisk": 36,
-      "reputationRisk": 47,
+      "complianceRisk": 26,
+      "reputationRisk": 27,
       "riskFactors": [
         {
           "name": "Payment History",
-          "score": 23,
+          "score": 37,
           "weight": 0.3,
           "description": "Based on past payment behavior"
         },
@@ -928,72 +1044,208 @@
         },
         {
           "name": "Regulatory Compliance",
-          "score": 36,
+          "score": 26,
           "weight": 0.25,
           "description": "Adherence to regulations"
         },
         {
           "name": "Market Reputation",
-          "score": 47,
+          "score": 27,
           "weight": 0.2,
           "description": "Industry standing"
         }
       ],
-      "lastAssessmentDate": "2025-12-12T08:37:26.049Z",
-      "nextReviewDate": "2026-03-12T08:37:26.049Z",
+      "lastAssessmentDate": "2025-12-12T09:23:03.270Z",
+      "nextReviewDate": "2026-03-12T09:23:03.270Z",
       "recommendations": [
         "Schedule quarterly reviews",
         "Request updated financial statements",
         "Monitor delivery metrics"
       ],
-      "createdAt": "2025-12-12T08:37:26.050Z",
-      "updatedAt": "2025-12-12T08:37:26.050Z"
+      "createdAt": "2025-12-12T09:23:03.270Z",
+      "updatedAt": "2025-12-12T09:23:03.270Z"
     },
     {
-      "id": "05ad",
-      "vendorId": "0948",
-      "vendorName": "Gemba",
+      "id": "0363",
+      "vendorId": null,
+      "vendorName": "Rahul K",
       "riskLevel": "medium",
-      "overallScore": 39,
-      "financialRisk": 28,
-      "operationalRisk": 36,
-      "complianceRisk": 48,
-      "reputationRisk": 45,
+      "overallScore": 26,
+      "financialRisk": 15,
+      "operationalRisk": 27,
+      "complianceRisk": 38,
+      "reputationRisk": 24,
       "riskFactors": [
         {
           "name": "Payment History",
-          "score": 28,
+          "score": 15,
           "weight": 0.3,
           "description": "Based on past payment behavior"
         },
         {
           "name": "Delivery Performance",
-          "score": 36,
+          "score": 27,
           "weight": 0.25,
           "description": "On-time delivery rate"
         },
         {
           "name": "Regulatory Compliance",
-          "score": 48,
+          "score": 38,
           "weight": 0.25,
           "description": "Adherence to regulations"
         },
         {
           "name": "Market Reputation",
-          "score": 45,
+          "score": 24,
           "weight": 0.2,
           "description": "Industry standing"
         }
       ],
-      "lastAssessmentDate": "2025-12-12T08:49:34.413Z",
-      "nextReviewDate": "2026-03-12T08:49:34.413Z",
+      "lastAssessmentDate": "2025-12-12T09:30:41.844Z",
+      "nextReviewDate": "2026-03-12T09:30:41.844Z",
       "recommendations": [
         "Schedule quarterly reviews",
         "Request updated financial statements",
         "Monitor delivery metrics"
       ],
-      "createdAt": "2025-12-12T08:49:34.413Z",
-      "updatedAt": "2025-12-12T08:49:34.413Z"
+      "createdAt": "2025-12-12T09:30:41.844Z",
+      "updatedAt": "2025-12-12T09:30:41.844Z"
+    },
+    {
+      "id": "23ee",
+      "vendorId": "17d3",
+      "vendorName": "Rahul ",
+      "riskLevel": "medium",
+      "overallScore": 37,
+      "financialRisk": 31,
+      "operationalRisk": 39,
+      "complianceRisk": 47,
+      "reputationRisk": 29,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 31,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 39,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 47,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 29,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:35:40.416Z",
+      "nextReviewDate": "2026-03-12T09:35:40.416Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2025-12-12T09:35:40.416Z",
+      "updatedAt": "2025-12-12T09:35:40.416Z"
+    },
+    {
+      "id": "8b82",
+      "vendorId": "3a2f",
+      "vendorName": "Sahil Solutions ",
+      "riskLevel": "low",
+      "overallScore": 19,
+      "financialRisk": 17,
+      "operationalRisk": 30,
+      "complianceRisk": 19,
+      "reputationRisk": 10,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 17,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 30,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 19,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 10,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:37:42.037Z",
+      "nextReviewDate": "2026-03-12T09:37:42.037Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2025-12-12T09:37:42.037Z",
+      "updatedAt": "2025-12-12T09:37:42.037Z"
+    },
+    {
+      "id": "c39b",
+      "vendorId": "fbbb",
+      "vendorName": "Pratham Infotech Solution",
+      "riskLevel": "low",
+      "overallScore": 21,
+      "financialRisk": 17,
+      "operationalRisk": 34,
+      "complianceRisk": 13,
+      "reputationRisk": 20,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 17,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 34,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 13,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 20,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T09:40:01.208Z",
+      "nextReviewDate": "2026-03-12T09:40:01.208Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2025-12-12T09:40:01.208Z",
+      "updatedAt": "2025-12-12T09:40:01.208Z"
     }
   ]
 }

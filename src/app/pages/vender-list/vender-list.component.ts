@@ -218,7 +218,8 @@ export class VenderListComponent implements OnInit, OnDestroy {
     }
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status: string | undefined): string {
+    if (!status) return 'status-pending';
     switch (status.toLowerCase()) {
       case 'active':
         return 'status-active';
@@ -229,7 +230,7 @@ export class VenderListComponent implements OnInit, OnDestroy {
       case 'suspended':
         return 'status-suspended';
       default:
-        return '';
+        return 'status-pending';
     }
   }
 

@@ -174,11 +174,18 @@ export class ApiService {
 
     return this.http.post<Vendor>(`${this.BASE_URL}/vendors`, newVendor).pipe(
       tap((created) => {
+        // Ensure status is set (in case server doesn't return it)
+        const createdWithDefaults: Vendor = {
+          ...created,
+          status: created.status || 'active',
+          totalPurchases: created.totalPurchases || 0,
+          rating: created.rating || 0,
+        };
         // Auto-generate risk analysis for new vendor
-        this.generateRiskAnalysis(created).subscribe();
+        this.generateRiskAnalysis(createdWithDefaults).subscribe();
         // Update local cache
         const current = this.vendorsSubject.getValue();
-        this.vendorsSubject.next([...current, created]);
+        this.vendorsSubject.next([...current, createdWithDefaults]);
       }),
       catchError(this.handleError)
     );
@@ -193,8 +200,9 @@ export class ApiService {
       updatedAt: new Date().toISOString(),
     };
 
+    // Use PATCH instead of PUT to only update provided fields (not replace entire resource)
     return this.http
-      .put<Vendor>(`${this.BASE_URL}/vendors/${id}`, updatedVendor)
+      .patch<Vendor>(`${this.BASE_URL}/vendors/${id}`, updatedVendor)
       .pipe(
         tap((updated) => {
           const current = this.vendorsSubject.getValue();
@@ -534,7 +542,14 @@ export class ApiService {
       map(({ vendors, risks }) => {
         return vendors.map((vendor) => {
           const riskAnalysis = risks.find((r) => r.vendorId === vendor.id);
-          return { ...vendor, riskAnalysis };
+          // Ensure vendor has all required fields with defaults
+          return {
+            ...vendor,
+            status: vendor.status || 'active',
+            totalPurchases: vendor.totalPurchases || 0,
+            rating: vendor.rating || 0,
+            riskAnalysis,
+          };
         });
       })
     );
@@ -575,16 +590,28 @@ export class ApiService {
           };
         }
 
-        // Calculate on-time delivery rate
-        const onTimeCount = deliveredPurchases.filter(
-          (p) => p.onTimeDelivery === true
-        ).length;
+        // Calculate on-time delivery rate - handle missing field
+        const onTimeCount = deliveredPurchases.filter((p) => {
+          if (p.onTimeDelivery !== undefined) {
+            return p.onTimeDelivery === true;
+          }
+          // Fallback: compare actual vs expected delivery date
+          if (p.actualDeliveryDate && p.expectedDeliveryDate) {
+            return new Date(p.actualDeliveryDate) <= new Date(p.expectedDeliveryDate);
+          }
+          return true; // Assume on-time if no data
+        }).length;
         const onTimeDeliveryRate = (onTimeCount / totalDelivered) * 100;
 
         // Calculate average quality score (1-5 scale, convert to 0-100)
+        // Handle string values from form inputs
         const qualityRatings = deliveredPurchases
           .filter((p) => p.qualityRating != null)
-          .map((p) => p.qualityRating!);
+          .map((p) => {
+            const rating = p.qualityRating;
+            return typeof rating === 'string' ? parseFloat(rating) : rating!;
+          })
+          .filter((r) => !isNaN(r));
         const avgQuality =
           qualityRatings.length > 0
             ? qualityRatings.reduce((sum, r) => sum + r, 0) /
@@ -605,29 +632,41 @@ export class ApiService {
         const defectRate =
           totalItems > 0 ? (totalDefects / totalItems) * 100 : 0;
 
-        // Calculate average lead time
+        // Calculate average lead time - handle string values
         const leadTimes = deliveredPurchases
           .filter((p) => p.leadTime != null)
-          .map((p) => p.leadTime!);
+          .map((p) => {
+            const lt = p.leadTime;
+            return typeof lt === 'string' ? parseFloat(lt) : lt!;
+          })
+          .filter((l) => !isNaN(l));
         const avgLeadTime =
           leadTimes.length > 0
             ? leadTimes.reduce((sum, l) => sum + l, 0) / leadTimes.length
             : 14;
 
-        // Calculate average payment delay
+        // Calculate average payment delay - handle string values
         const paymentDelays = deliveredPurchases
           .filter((p) => p.paymentDelayDays != null)
-          .map((p) => p.paymentDelayDays!);
+          .map((p) => {
+            const pd = p.paymentDelayDays;
+            return typeof pd === 'string' ? parseFloat(pd) : pd!;
+          })
+          .filter((d) => !isNaN(d));
         const avgPaymentDelay =
           paymentDelays.length > 0
             ? paymentDelays.reduce((sum, d) => sum + d, 0) /
               paymentDelays.length
             : 0;
 
-        // Calculate average communication rating
+        // Calculate average communication rating - handle string values
         const commRatings = deliveredPurchases
           .filter((p) => p.communicationRating != null)
-          .map((p) => p.communicationRating!);
+          .map((p) => {
+            const cr = p.communicationRating;
+            return typeof cr === 'string' ? parseFloat(cr) : cr!;
+          })
+          .filter((r) => !isNaN(r));
         const avgCommunicationRating =
           commRatings.length > 0
             ? commRatings.reduce((sum, r) => sum + r, 0) / commRatings.length
@@ -657,8 +696,10 @@ export class ApiService {
     }).pipe(
       map(({ vendors, purchases }) => {
         return vendors.map((vendor) => {
+          // Filter purchases by vendorId OR vendorName (fallback for legacy data)
           const vendorPurchases = purchases.filter(
-            (p) => p.vendorId === vendor.id
+            (p) => p.vendorId === vendor.id || 
+                   (p.vendorId === null && p.vendorName === vendor.vendorName)
           );
           const deliveredPurchases = vendorPurchases.filter(
             (p) => p.status === 'delivered'
@@ -672,14 +713,28 @@ export class ApiService {
           let responseTime = 12; // Default hours
 
           if (totalDelivered > 0) {
-            const onTimeCount = deliveredPurchases.filter(
-              (p) => p.onTimeDelivery === true
-            ).length;
+            // Calculate on-time delivery rate
+            // Check onTimeDelivery field, or calculate from dates if not present
+            const onTimeCount = deliveredPurchases.filter((p) => {
+              if (p.onTimeDelivery !== undefined) {
+                return p.onTimeDelivery === true;
+              }
+              // Fallback: compare actual vs expected delivery date
+              if (p.actualDeliveryDate && p.expectedDeliveryDate) {
+                return new Date(p.actualDeliveryDate) <= new Date(p.expectedDeliveryDate);
+              }
+              return true; // Assume on-time if no data
+            }).length;
             onTimeDeliveryRate = (onTimeCount / totalDelivered) * 100;
 
+            // Calculate quality score - convert string to number if needed
             const qualityRatings = deliveredPurchases
               .filter((p) => p.qualityRating != null)
-              .map((p) => p.qualityRating!);
+              .map((p) => {
+                const rating = p.qualityRating;
+                return typeof rating === 'string' ? parseFloat(rating) : rating!;
+              })
+              .filter((r) => !isNaN(r));
             const avgQuality =
               qualityRatings.length > 0
                 ? qualityRatings.reduce((sum, r) => sum + r, 0) /
@@ -687,6 +742,7 @@ export class ApiService {
                 : 4;
             qualityScore = (avgQuality / 5) * 100;
 
+            // Calculate defect rate from actual defects
             const totalItems = deliveredPurchases.reduce(
               (sum, p) =>
                 sum + p.items.reduce((iSum, item) => iSum + item.quantity, 0),
@@ -701,7 +757,11 @@ export class ApiService {
             // Calculate response time from lead time (approximate)
             const leadTimes = deliveredPurchases
               .filter((p) => p.leadTime != null)
-              .map((p) => p.leadTime!);
+              .map((p) => {
+                const lt = p.leadTime;
+                return typeof lt === 'string' ? parseFloat(lt) : lt!;
+              })
+              .filter((l) => !isNaN(l));
             if (leadTimes.length > 0) {
               const avgLeadTime =
                 leadTimes.reduce((sum, l) => sum + l, 0) / leadTimes.length;
@@ -723,8 +783,10 @@ export class ApiService {
             id: vendor.id,
             name: vendor.vendorName,
             email: vendor.email,
-            category: vendor.category,
-            status: vendor.status,
+            phone: vendor.phone,
+            address: vendor.address ? `${vendor.address}, ${vendor.city || ''}, ${vendor.country || ''}` : undefined,
+            category: vendor.category || 'General',
+            status: vendor.status || 'active',
             createdAt: vendor.createdAt
               ? new Date(vendor.createdAt)
               : new Date(),
@@ -744,6 +806,10 @@ export class ApiService {
             complianceStatus:
               vendor.status === 'active' ? 'compliant' : 'pending-review',
             lastAuditDate: new Date(),
+            // Include purchase-derived metrics for AI analysis
+            purchaseCount: vendorPurchases.length,
+            deliveredCount: totalDelivered,
+            rating: vendor.rating || 0,
           };
         });
       })
