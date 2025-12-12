@@ -1,14 +1,23 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  AfterViewChecked,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AiChatService, ChatMessage } from '../../../core/services/ai-chat/ai-chat.service';
+import {
+  AiChatService,
+  ChatMessage,
+} from '../../../core/services/ai-chat/ai-chat.service';
 
 @Component({
   selector: 'app-ai-chat',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './ai-chat.component.html',
-  styleUrls: ['./ai-chat.component.css']
+  styleUrls: ['./ai-chat.component.css'],
 })
 export class AiChatComponent implements OnInit, AfterViewChecked {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
@@ -19,12 +28,12 @@ export class AiChatComponent implements OnInit, AfterViewChecked {
   isTyping = false;
   userMessage = '';
   messages: ChatMessage[] = [];
-  
+
   quickSuggestions = [
     'Total suppliers',
     'Total products',
     'Accounts payable',
-    'Product status'
+    'Product status',
   ];
 
   constructor(private aiChatService: AiChatService) {}
@@ -32,7 +41,7 @@ export class AiChatComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     // Load conversation history
     this.messages = this.aiChatService.getConversationHistory();
-    
+
     // If no history, add welcome message
     if (this.messages.length === 0) {
       this.addWelcomeMessage();
@@ -71,17 +80,17 @@ export class AiChatComponent implements OnInit, AfterViewChecked {
       id: this.generateId(),
       type: 'user',
       content: message,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
     this.messages.push(userMsg);
     this.aiChatService.addToHistory(userMsg);
-    
+
     // Clear input
     this.userMessage = '';
-    
+
     // Show typing indicator
     this.isTyping = true;
-    
+
     // Process query
     this.aiChatService.processQuery(message).subscribe({
       next: (response) => {
@@ -95,10 +104,10 @@ export class AiChatComponent implements OnInit, AfterViewChecked {
           id: this.generateId(),
           type: 'assistant',
           content: 'Sorry, I encountered an error. Please try again.',
-          timestamp: new Date()
+          timestamp: new Date(),
         };
         this.messages.push(errorMsg);
-      }
+      },
     });
   }
 
@@ -133,7 +142,12 @@ For example:
 
 Type **help** for more options.`,
       timestamp: new Date(),
-      suggestions: ['Show top vendors', 'Pending orders', 'Risk summary', 'Help']
+      suggestions: [
+        'Show top vendors',
+        'Pending orders',
+        'Risk summary',
+        'Help',
+      ],
     };
     this.messages.push(welcomeMsg);
     this.aiChatService.addToHistory(welcomeMsg);
@@ -142,7 +156,7 @@ Type **help** for more options.`,
   private scrollToBottom(): void {
     try {
       if (this.messagesContainer) {
-        this.messagesContainer.nativeElement.scrollTop = 
+        this.messagesContainer.nativeElement.scrollTop =
           this.messagesContainer.nativeElement.scrollHeight;
       }
     } catch (err) {}
