@@ -144,7 +144,6 @@
 .t-col {
   padding: 1rem;
   font-size: 0.875rem;
-  color: #374151;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -473,4 +472,101 @@
     width: 100%;
     justify-content: space-between;
   }
+}
+
+/* ==================== DARK THEME STYLES ==================== */
+:host-context(.dark-theme) .header-card,
+:host-context(.dark-theme) .table-card {
+  background: var(--card-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+:host-context(.dark-theme) .card-header {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .breadcrumb-nav {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .search-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+:host-context(.dark-theme) .search-box input {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+:host-context(.dark-theme) .vendors-table th {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+:host-context(.dark-theme) .vendors-table td {
+  color: var(--text);
+  border-bottom-color: var(--border-color);
+}
+
+:host-context(.dark-theme) .vendors-table tr:hover td {
+  background: var(--bg-secondary);
+}
+
+:host-context(.dark-theme) .vendor-name {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .pagination-info {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .btn-page {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .btn-page:hover:not(:disabled) {
+  background: var(--bg-secondary);
+}
+
+:host-context(.dark-theme) .page-info {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .empty-state {
+  color: var(--text-muted);
+}
+
+:host-context(.dark-theme) .modal-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+:host-context(.dark-theme) .modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+:host-context(.dark-theme) .modal-header h5 {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .modal-body {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .form-label {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .form-control,
+:host-context(.dark-theme) .form-select {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text);
 }

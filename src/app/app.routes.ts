@@ -12,6 +12,7 @@ import { UploadComponent } from './pages/upload/upload.component';
 import { PurchaseComponent } from './pages/purchase/purchase.component';
 import { AddPurchaseComponent } from './pages/add-purchase/add-purchase.component';
 import { AIRiskAnalysisService } from './core/services/ai-risk-analysis/ai-risk-analysis.service';
+import { MasterDataComponent } from './shared/components/master-data/master-data.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -32,6 +33,7 @@ export const routes: Routes = [
       { path: 'purchase/:id', component: AddPurchaseComponent },
       { path: 'purchase/:id/edit', component: AddPurchaseComponent },
       { path: 'aianalysis', component: RiskAnalysisComponent },
+      { path: 'master-data', component: MasterDataComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

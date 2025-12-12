@@ -1,85 +1,295 @@
-:root{
-  /* Primary color palette (pick your brand colors) */
-  --brand-primary: #0d6efd;    /* Bootstrap blue */
-  --brand-secondary: #0ea5a4;  /* teal-ish */
-  --brand-accent: #ffb020;     /* amber accent */
-  --bg: #f8fafc;               /* page background */
-  --card-bg: #ffffff;
-  --muted: #6c757d;
-  --danger: #dc3545;
-  --success: #198754;
-  --glass: rgba(255,255,255,0.7);
-  --text: #1f2937;
+/* ==================== LIGHT THEME (Default) ==================== */
+:root,
+.light-theme {
+  /* Primary Colors */
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: rgba(99, 102, 241, 0.1);
+  --secondary: #0ea5a4;
+  --accent: #ffb020;
+
+  /* Background Colors */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-sidebar: linear-gradient(180deg, #1e2a4a 0%, #2d3a5c 100%);
+  --bg-navbar: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #f1f5f9;
+
+  /* Text Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
+
+  /* Border Colors */
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  /* Status Colors */
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.1);
+  --danger: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.1);
+  --warning: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.1);
+  --info: #3b82f6;
+  --info-light: rgba(59, 130, 246, 0.1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Table */
+  --table-header-bg: #f8fafc;
+  --table-row-hover: #f1f5f9;
+  --table-border: #e2e8f0;
+
+  /* Overlay */
+  --overlay-bg: rgba(0, 0, 0, 0.5);
 }
 
-/* apply background */
+/* ==================== DARK THEME ==================== */
+.dark-theme {
+  /* Primary Colors */
+  --primary: #818cf8;
+  --primary-hover: #a5b4fc;
+  --primary-light: rgba(129, 140, 248, 0.15);
+  --secondary: #2dd4bf;
+  --accent: #fbbf24;
+
+  /* Background Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-sidebar: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  --bg-navbar: #1e293b;
+  --bg-input: #334155;
+  --bg-hover: #334155;
+
+  /* Text Colors */
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #0f172a;
+
+  /* Border Colors */
+  --border-color: #334155;
+  --border-light: #475569;
+
+  /* Status Colors */
+  --success: #34d399;
+  --success-light: rgba(52, 211, 153, 0.15);
+  --danger: #f87171;
+  --danger-light: rgba(248, 113, 113, 0.15);
+  --warning: #fbbf24;
+  --warning-light: rgba(251, 191, 36, 0.15);
+  --info: #60a5fa;
+  --info-light: rgba(96, 165, 250, 0.15);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+  /* Table */
+  --table-header-bg: #1e293b;
+  --table-row-hover: #334155;
+  --table-border: #334155;
+
+  /* Overlay */
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* ==================== BASE STYLES ==================== */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-/* navbar */
-.app-navbar {
-  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
-  color: white;
-  box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+/* ==================== CARDS ==================== */
+.card, .app-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
 }
 
-/* sidebar */
-.app-sidebar {
-  background: white;
-  border-right: 1px solid #e6e9ee;
-}
-
-/* cards */
-.app-card {
-  background: var(--card-bg);
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(31,41,55,0.05);
-  padding: 1rem;
-}
-
-/* primary button */
+/* ==================== BUTTONS ==================== */
 .btn-primary {
-  background: var(--brand-primary);
-  border-color: var(--brand-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-inverse);
 }
 .btn-primary:hover {
-  background: #0b5ed7;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
-/* accent */
-.badge-accent {
-  background: var(--brand-accent);
-  color: #102a43;
+.btn-outline, .btn-outline-secondary {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.btn-outline:hover, .btn-outline-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
 }
 
-/* subtle text */
+/* ==================== FORMS ==================== */
+.form-control, .form-select, input, select, textarea {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.form-control:focus, .form-select:focus, input:focus, select:focus, textarea:focus {
+  background-color: var(--bg-input);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+  color: var(--text-primary);
+}
+.form-control::placeholder, input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ==================== TABLES ==================== */
+.table {
+  color: var(--text-primary);
+}
+.table thead th {
+  background-color: var(--table-header-bg);
+  border-color: var(--table-border);
+  color: var(--text-secondary);
+}
+.table tbody tr {
+  border-color: var(--table-border);
+}
+.table tbody tr:hover {
+  background-color: var(--table-row-hover);
+}
+.table td, .table th {
+  border-color: var(--table-border);
+}
+
+/* ==================== MODALS ==================== */
+.modal-content {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.modal-header, .modal-footer {
+  border-color: var(--border-color);
+}
+.modal-backdrop {
+  background-color: var(--overlay-bg);
+}
+
+/* ==================== DROPDOWNS ==================== */
+.dropdown-menu {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+.dropdown-item {
+  color: var(--text-primary);
+}
+.dropdown-item:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+.dropdown-divider {
+  border-color: var(--border-color);
+}
+
+/* ==================== BADGES ==================== */
+.badge-success, .status-active {
+  background: var(--success-light);
+  color: var(--success);
+}
+.badge-danger, .status-inactive {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+.badge-warning {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+.badge-info {
+  background: var(--info-light);
+  color: var(--info);
+}
+
+/* ==================== TEXT HELPERS ==================== */
 .text-muted {
-  color: var(--muted) !important;
+  color: var(--text-muted) !important;
+}
+.text-secondary {
+  color: var(--text-secondary) !important;
 }
 
-/* page animation */
+/* ==================== BORDERS ==================== */
+.border, .border-bottom, .border-top {
+  border-color: var(--border-color) !important;
+}
+hr {
+  border-color: var(--border-color);
+}
+
+/* ==================== LIST GROUPS ==================== */
+.list-group-item {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+.list-group-item:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ==================== ANIMATIONS ==================== */
 .page-animate {
   animation: fadeInMove 0.4s ease-out;
 }
 @keyframes fadeInMove {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* card hover */
 .card-hover {
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.card-hover:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(31,41,55,0.08); }
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
 
-/* small helpers */
-.full-height { min-height: 100vh; }
-.align-center { display:flex; align-items:center; justify-content:center; }
+/* ==================== HELPERS ==================== */
+.full-height {
+  min-height: 100vh;
+}
+.align-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* toast top-right (simple) */
+/* Toast */
 .app-toast {
   position: fixed;
   top: 1rem;

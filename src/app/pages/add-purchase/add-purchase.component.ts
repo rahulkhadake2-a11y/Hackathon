@@ -1,16 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import {
   ApiService,
   Purchase,
   PurchaseItem,
   Vendor,
+  VendorItem,
+  Item,
 } from '../../core/services/api/api.service';
 
 interface PurchaseFormItem {
+  itemId: string;
   description: string;
   quantity: number;
   unitPrice: number;
@@ -20,7 +23,7 @@ interface PurchaseFormItem {
 @Component({
   selector: 'app-add-purchase',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './add-purchase.component.html',
   styleUrl: './add-purchase.component.css',
 })
@@ -33,6 +36,11 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
   isSaving = false;
 
   vendors: Vendor[] = [];
+
+  // Master items and vendor-specific items
+  allItems: Item[] = [];
+  vendorItems: VendorItem[] = [];
+  availableItems: VendorItem[] = []; // Items available for selected vendor
 
   // Form fields
   vendorId = '';
@@ -59,7 +67,7 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
 
   // Purchase items
   items: PurchaseFormItem[] = [
-    { description: '', quantity: 1, unitPrice: 0, total: 0 },
+    { itemId: '', description: '', quantity: 1, unitPrice: 0, total: 0 },
   ];
 
   // Tax rate (8%)
@@ -104,6 +112,8 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadVendors();
+    this.loadItems();
+    this.loadVendorItems();
     this.generatePONumber();
 
     // Check if editing
@@ -127,6 +137,58 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
       .subscribe((vendors) => {
         this.vendors = vendors.filter((v) => v.status === 'active');
       });
+  }
+
+  loadItems() {
+    this.apiService
+      .getItems()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((items) => {
+        this.allItems = items.filter((i) => i.status === 'active');
+      });
+  }
+
+  loadVendorItems() {
+    this.apiService
+      .getVendorItems()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((vendorItems) => {
+        this.vendorItems = vendorItems.filter((vi) => vi.status === 'active');
+        // If vendor is already selected, filter available items
+        if (this.vendorId) {
+          this.onVendorChange();
+        }
+      });
+  }
+
+  // Called when vendor selection changes
+  onVendorChange() {
+    // Filter vendor items based on selected vendor
+    this.availableItems = this.vendorItems.filter(
+      (vi) => vi.vendorId === this.vendorId && vi.status === 'active'
+    );
+
+    // Clear item selections if vendor changed (except in edit mode when first loading)
+    if (!this.isLoading) {
+      this.items = [
+        { itemId: '', description: '', quantity: 1, unitPrice: 0, total: 0 },
+      ];
+    }
+  }
+
+  // Called when an item is selected from dropdown
+  onItemSelect(index: number) {
+    const item = this.items[index];
+    const vendorItem = this.availableItems.find(
+      (vi) => vi.itemId === item.itemId
+    );
+
+    if (vendorItem) {
+      item.description = vendorItem.itemName || '';
+      item.unitPrice = vendorItem.unitPrice;
+      item.quantity = Math.max(item.quantity, vendorItem.minOrderQuantity || 1);
+      this.updateItemTotal(index);
+    }
   }
 
   loadPurchase(id: string) {
@@ -168,14 +230,25 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     this.leadTime = purchase.leadTime ?? null;
     this.communicationRating = purchase.communicationRating ?? null;
 
-    // Items
+    // Filter available items for this vendor
+    this.onVendorChange();
+
+    // Items - try to match with vendor items for itemId
     if (purchase.items && purchase.items.length > 0) {
-      this.items = purchase.items.map((item) => ({
-        description: item.description,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        total: item.total,
-      }));
+      this.items = purchase.items.map((item) => {
+        // Try to find matching vendor item by description
+        const matchingVendorItem = this.availableItems.find(
+          (vi) =>
+            vi.itemName === item.description || vi.itemCode === item.description
+        );
+        return {
+          itemId: matchingVendorItem?.itemId || '',
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          total: item.total,
+        };
+      });
     }
   }
 
@@ -189,7 +262,13 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
 
   // Item management
   addItem() {
-    this.items.push({ description: '', quantity: 1, unitPrice: 0, total: 0 });
+    this.items.push({
+      itemId: '',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      total: 0,
+    });
   }
 
   removeItem(index: number) {
@@ -249,13 +328,40 @@ export class AddPurchaseComponent implements OnInit, OnDestroy {
     return vendor ? vendor.vendorName : '';
   }
 
+  // Check if an item is already selected in another row (to avoid duplicates)
+  isItemAlreadySelected(itemId: string, currentIndex: number): boolean {
+    return this.items.some(
+      (item, index) => item.itemId === itemId && index !== currentIndex
+    );
+  }
+
+  // Get available items for dropdown, excluding already selected items
+  getAvailableItemsForRow(currentIndex: number): VendorItem[] {
+    const selectedItemIds = this.items
+      .filter((_, index) => index !== currentIndex)
+      .map((item) => item.itemId)
+      .filter((id) => id); // Filter out empty strings
+
+    return this.availableItems.filter(
+      (vi) => !selectedItemIds.includes(vi.itemId)
+    );
+  }
+
+  // Get minimum order quantity for an item
+  getMinOrderQuantity(itemId: string): number {
+    const vendorItem = this.availableItems.find((vi) => vi.itemId === itemId);
+    return vendorItem?.minOrderQuantity || 1;
+  }
+
   isFormValid(): boolean {
     return (
       !!this.vendorId &&
       !!this.purchaseOrderNumber &&
       !!this.orderDate &&
       this.items.length > 0 &&
-      this.items.every((item) => item.description && item.quantity > 0)
+      this.items.every(
+        (item) => (item.itemId || item.description) && item.quantity > 0
+      )
     );
   }
 

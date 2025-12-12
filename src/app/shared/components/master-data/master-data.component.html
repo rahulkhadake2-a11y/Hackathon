@@ -1,0 +1,736 @@
+<div class="master-data-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1><i class="bi bi-database"></i> Master Data Management</h1>
+      <p class="subtitle">Manage items and vendor-item mappings</p>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" *ngIf="errorMessage || successMessage">
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      <i class="bi bi-exclamation-triangle"></i> {{ errorMessage }}
+    </div>
+    <div class="alert alert-success" *ngIf="successMessage">
+      <i class="bi bi-check-circle"></i> {{ successMessage }}
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'items'"
+          (click)="switchTab('items')"
+        >
+          <i class="bi bi-box-seam"></i> Items ({{ items.length }})
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'vendor-items'"
+          (click)="switchTab('vendor-items')"
+        >
+          <i class="bi bi-link-45deg"></i> Vendor-Item Mappings ({{
+            vendorItems.length
+          }})
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Items Tab Content -->
+  <div class="tab-content" *ngIf="activeTab === 'items' && !isLoading">
+    <!-- Items Toolbar -->
+    <div class="toolbar">
+      <div class="search-filters">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search items..."
+            [(ngModel)]="itemSearchTerm"
+            (ngModelChange)="filterItems()"
+          />
+        </div>
+        <select
+          class="form-select category-filter"
+          [(ngModel)]="itemCategoryFilter"
+          (ngModelChange)="filterItems()"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of itemCategories" [value]="cat">
+            {{ cat }}
+          </option>
+        </select>
+      </div>
+      <button class="btn btn-primary add-btn" (click)="openAddItemModal()">
+        <i class="bi bi-plus-circle"></i> Add Item
+      </button>
+    </div>
+
+    <!-- Items Table -->
+    <div class="table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Item Code</th>
+            <th>Item Name</th>
+            <th>Category</th>
+            <th>Unit</th>
+            <th>Default Price</th>
+            <th>Status</th>
+            <th>Vendors</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of paginatedItems">
+            <td>
+              <span class="item-code">{{ item.itemCode }}</span>
+            </td>
+            <td>
+              <div class="item-name">{{ item.itemName }}</div>
+              <div class="item-desc text-muted" *ngIf="item.description">
+                {{ item.description }}
+              </div>
+            </td>
+            <td>
+              <span class="category-badge">{{ item.category }}</span>
+            </td>
+            <td>{{ item.unit }}</td>
+            <td>{{ item.defaultPrice | currency }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [class.active]="item.status === 'active'"
+                [class.inactive]="item.status === 'inactive'"
+              >
+                {{ item.status }}
+              </span>
+            </td>
+            <td>
+              <span class="vendor-count"
+                >{{ getVendorsForItem(item.id!).length }} vendors</span
+              >
+            </td>
+            <td class="actions-col">
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditItemModal(item)"
+                title="Edit"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="confirmDeleteItem(item)"
+                title="Delete"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredItems.length === 0">
+            <td colspan="8" class="text-center empty-state">
+              <i class="bi bi-inbox"></i>
+              <p>No items found</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Items Pagination -->
+    <div class="pagination-container" *ngIf="filteredItems.length > 0">
+      <div class="pagination-info">
+        <span
+          >Showing {{ itemsStartIndex }} to {{ itemsEndIndex }} of
+          {{ filteredItems.length }} items</span
+        >
+        <div class="page-size-selector">
+          <label>Items per page:</label>
+          <select
+            [(ngModel)]="itemsPageSize"
+            (ngModelChange)="changeItemsPageSize($event)"
+          >
+            <option *ngFor="let size of itemsPageSizeOptions" [value]="size">
+              {{ size }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="pagination-controls" *ngIf="itemsTotalPages > 1">
+        <button
+          class="page-btn"
+          (click)="changeItemsPage(1)"
+          [disabled]="itemsCurrentPage === 1"
+          title="First"
+        >
+          <i class="bi bi-chevron-double-left"></i>
+        </button>
+        <button
+          class="page-btn"
+          (click)="changeItemsPage(itemsCurrentPage - 1)"
+          [disabled]="itemsCurrentPage === 1"
+          title="Previous"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button
+          *ngFor="let page of getItemsPageNumbers()"
+          class="page-btn page-number"
+          [class.active]="page === itemsCurrentPage"
+          (click)="changeItemsPage(page)"
+        >
+          {{ page }}
+        </button>
+        <button
+          class="page-btn"
+          (click)="changeItemsPage(itemsCurrentPage + 1)"
+          [disabled]="itemsCurrentPage === itemsTotalPages"
+          title="Next"
+        >
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        <button
+          class="page-btn"
+          (click)="changeItemsPage(itemsTotalPages)"
+          [disabled]="itemsCurrentPage === itemsTotalPages"
+          title="Last"
+        >
+          <i class="bi bi-chevron-double-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor Items Tab Content -->
+  <div class="tab-content" *ngIf="activeTab === 'vendor-items' && !isLoading">
+    <!-- Vendor Items Toolbar -->
+    <div class="toolbar">
+      <div class="search-filters">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search by vendor or item..."
+            [(ngModel)]="vendorItemSearchTerm"
+            (ngModelChange)="filterVendorItems()"
+          />
+        </div>
+        <select
+          class="form-select vendor-filter"
+          [(ngModel)]="vendorItemVendorFilter"
+          (ngModelChange)="filterVendorItems()"
+        >
+          <option value="">All Vendors</option>
+          <option *ngFor="let vendor of vendors" [value]="vendor.id">
+            {{ vendor.vendorName }}
+          </option>
+        </select>
+      </div>
+      <button
+        class="btn btn-primary add-btn"
+        (click)="openAddVendorItemModal()"
+      >
+        <i class="bi bi-plus-circle"></i> Add Vendor-Item Mapping
+      </button>
+    </div>
+
+    <!-- Vendor Items Table -->
+    <div class="table-container">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Item Code</th>
+            <th>Item Name</th>
+            <th>Unit Price</th>
+            <th>Min Order Qty</th>
+            <th>Lead Time (Days)</th>
+            <th>Preferred</th>
+            <th>Status</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let vi of paginatedVendorItems">
+            <td>
+              <span class="vendor-name">{{ vi.vendorName }}</span>
+            </td>
+            <td>
+              <span class="item-code">{{ vi.itemCode }}</span>
+            </td>
+            <td>{{ vi.itemName }}</td>
+            <td class="price">{{ vi.unitPrice | currency }}</td>
+            <td>{{ vi.minOrderQuantity || 1 }}</td>
+            <td>{{ vi.leadTimeDays || 0 }} days</td>
+            <td>
+              <i
+                class="bi"
+                [class.bi-star-fill]="vi.isPreferred"
+                [class.bi-star]="!vi.isPreferred"
+                [class.preferred]="vi.isPreferred"
+              ></i>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [class.active]="vi.status === 'active'"
+                [class.inactive]="vi.status === 'inactive'"
+              >
+                {{ vi.status }}
+              </span>
+            </td>
+            <td class="actions-col">
+              <button
+                class="btn btn-sm btn-outline-primary"
+                (click)="openEditVendorItemModal(vi)"
+                title="Edit"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="confirmDeleteVendorItem(vi)"
+                title="Delete"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredVendorItems.length === 0">
+            <td colspan="9" class="text-center empty-state">
+              <i class="bi bi-inbox"></i>
+              <p>No vendor-item mappings found</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Vendor Items Pagination -->
+    <div class="pagination-container" *ngIf="filteredVendorItems.length > 0">
+      <div class="pagination-info">
+        <span
+          >Showing {{ vendorItemsStartIndex }} to {{ vendorItemsEndIndex }} of
+          {{ filteredVendorItems.length }} mappings</span
+        >
+        <div class="page-size-selector">
+          <label>Items per page:</label>
+          <select
+            [(ngModel)]="vendorItemsPageSize"
+            (ngModelChange)="changeVendorItemsPageSize($event)"
+          >
+            <option
+              *ngFor="let size of vendorItemsPageSizeOptions"
+              [value]="size"
+            >
+              {{ size }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="pagination-controls" *ngIf="vendorItemsTotalPages > 1">
+        <button
+          class="page-btn"
+          (click)="changeVendorItemsPage(1)"
+          [disabled]="vendorItemsCurrentPage === 1"
+          title="First"
+        >
+          <i class="bi bi-chevron-double-left"></i>
+        </button>
+        <button
+          class="page-btn"
+          (click)="changeVendorItemsPage(vendorItemsCurrentPage - 1)"
+          [disabled]="vendorItemsCurrentPage === 1"
+          title="Previous"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button
+          *ngFor="let page of getVendorItemsPageNumbers()"
+          class="page-btn page-number"
+          [class.active]="page === vendorItemsCurrentPage"
+          (click)="changeVendorItemsPage(page)"
+        >
+          {{ page }}
+        </button>
+        <button
+          class="page-btn"
+          (click)="changeVendorItemsPage(vendorItemsCurrentPage + 1)"
+          [disabled]="vendorItemsCurrentPage === vendorItemsTotalPages"
+          title="Next"
+        >
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        <button
+          class="page-btn"
+          (click)="changeVendorItemsPage(vendorItemsTotalPages)"
+          [disabled]="vendorItemsCurrentPage === vendorItemsTotalPages"
+          title="Last"
+        >
+          <i class="bi bi-chevron-double-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Item Modal -->
+<div
+  class="modal-backdrop"
+  *ngIf="showItemModal"
+  (click)="closeItemModal()"
+></div>
+<div class="modal-dialog-custom" *ngIf="showItemModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i
+          class="bi"
+          [class.bi-plus-circle]="!isEditingItem"
+          [class.bi-pencil]="isEditingItem"
+        ></i>
+        {{ isEditingItem ? "Edit Item" : "Add New Item" }}
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="closeItemModal()"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="itemForm">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Item Code *</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="itemCode"
+              [readonly]="isEditingItem"
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="itemForm.get('itemCode')?.touched && itemForm.get('itemCode')?.errors?.['required']"
+            >
+              Item code is required
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Item Name *</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="itemName"
+            />
+            <div
+              class="invalid-feedback"
+              *ngIf="itemForm.get('itemName')?.touched && itemForm.get('itemName')?.errors?.['required']"
+            >
+              Item name is required
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            formControlName="description"
+            rows="2"
+          ></textarea>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Category *</label>
+            <select class="form-select" formControlName="category">
+              <option *ngFor="let cat of itemCategories" [value]="cat">
+                {{ cat }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Unit *</label>
+            <select class="form-select" formControlName="unit">
+              <option value="piece">Piece</option>
+              <option value="kg">Kilogram (kg)</option>
+              <option value="liter">Liter</option>
+              <option value="box">Box</option>
+              <option value="pack">Pack</option>
+              <option value="ream">Ream</option>
+              <option value="set">Set</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Default Price *</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="defaultPrice"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Status *</label>
+            <select class="form-select" formControlName="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="closeItemModal()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="saveItem()"
+        [disabled]="itemForm.invalid || isLoading"
+      >
+        <span
+          class="spinner-border spinner-border-sm me-1"
+          *ngIf="isLoading"
+        ></span>
+        {{ isEditingItem ? "Update" : "Create" }} Item
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Vendor Item Modal -->
+<div
+  class="modal-backdrop"
+  *ngIf="showVendorItemModal"
+  (click)="closeVendorItemModal()"
+></div>
+<div class="modal-dialog-custom" *ngIf="showVendorItemModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i
+          class="bi"
+          [class.bi-plus-circle]="!isEditingVendorItem"
+          [class.bi-pencil]="isEditingVendorItem"
+        ></i>
+        {{
+          isEditingVendorItem
+            ? "Edit Vendor-Item Mapping"
+            : "Add Vendor-Item Mapping"
+        }}
+      </h5>
+      <button
+        type="button"
+        class="btn-close"
+        (click)="closeVendorItemModal()"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="vendorItemForm">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Vendor *</label>
+            <select
+              class="form-select"
+              formControlName="vendorId"
+              [attr.disabled]="isEditingVendorItem ? true : null"
+            >
+              <option value="">Select Vendor</option>
+              <option *ngFor="let vendor of vendors" [value]="vendor.id">
+                {{ vendor.vendorName }}
+              </option>
+            </select>
+            <div
+              class="invalid-feedback"
+              *ngIf="vendorItemForm.get('vendorId')?.touched && vendorItemForm.get('vendorId')?.errors?.['required']"
+            >
+              Vendor is required
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Item *</label>
+            <select
+              class="form-select"
+              formControlName="itemId"
+              [attr.disabled]="isEditingVendorItem ? true : null"
+            >
+              <option value="">Select Item</option>
+              <option *ngFor="let item of items" [value]="item.id">
+                {{ item.itemCode }} - {{ item.itemName }}
+              </option>
+            </select>
+            <div
+              class="invalid-feedback"
+              *ngIf="vendorItemForm.get('itemId')?.touched && vendorItemForm.get('itemId')?.errors?.['required']"
+            >
+              Item is required
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Unit Price *</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="unitPrice"
+                min="0"
+                step="0.01"
+              />
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Min Order Quantity *</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="minOrderQuantity"
+              min="1"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Lead Time (Days) *</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="leadTimeDays"
+              min="0"
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Status *</label>
+            <select class="form-select" formControlName="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              formControlName="isPreferred"
+              id="isPreferred"
+            />
+            <label class="form-check-label" for="isPreferred">
+              <i class="bi bi-star-fill text-warning"></i> Mark as Preferred
+              Vendor for this Item
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="closeVendorItemModal()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="saveVendorItem()"
+        [disabled]="vendorItemForm.invalid || isLoading"
+      >
+        <span
+          class="spinner-border spinner-border-sm me-1"
+          *ngIf="isLoading"
+        ></span>
+        {{ isEditingVendorItem ? "Update" : "Create" }} Mapping
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  class="modal-backdrop"
+  *ngIf="showDeleteConfirm"
+  (click)="closeDeleteConfirm()"
+></div>
+<div class="modal-dialog-custom delete-modal" *ngIf="showDeleteConfirm">
+  <div class="modal-content">
+    <div class="modal-header bg-danger text-white">
+      <h5 class="modal-title">
+        <i class="bi bi-exclamation-triangle"></i> Confirm Delete
+      </h5>
+      <button
+        type="button"
+        class="btn-close btn-close-white"
+        (click)="closeDeleteConfirm()"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <p *ngIf="deleteType === 'item'">
+        Are you sure you want to delete the item
+        <strong>{{ selectedItem?.itemName }}</strong
+        >? <br /><br />
+        <span class="text-warning"
+          ><i class="bi bi-exclamation-circle"></i> This will also remove all
+          vendor mappings for this item.</span
+        >
+      </p>
+      <p *ngIf="deleteType === 'vendor-item'">
+        Are you sure you want to remove the mapping between
+        <strong>{{ selectedVendorItem?.vendorName }}</strong> and
+        <strong>{{ selectedVendorItem?.itemName }}</strong
+        >?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="closeDeleteConfirm()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="deleteType === 'item' ? deleteItem() : deleteVendorItem()"
+        [disabled]="isLoading"
+      >
+        <span
+          class="spinner-border spinner-border-sm me-1"
+          *ngIf="isLoading"
+        ></span>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>

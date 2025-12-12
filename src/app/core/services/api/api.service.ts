@@ -97,6 +97,36 @@ export interface DashboardStats {
   pendingOrders: number;
 }
 
+// ==================== MASTER DATA INTERFACES ====================
+export interface Item {
+  id?: string;
+  itemCode: string;
+  itemName: string;
+  description?: string;
+  category: string;
+  unit: string; // e.g., 'piece', 'kg', 'liter', 'box'
+  defaultPrice?: number;
+  status: 'active' | 'inactive';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface VendorItem {
+  id?: string;
+  vendorId: string;
+  itemId: string;
+  vendorName?: string;
+  itemName?: string;
+  itemCode?: string;
+  unitPrice: number;
+  minOrderQuantity?: number;
+  leadTimeDays?: number;
+  isPreferred?: boolean;
+  status: 'active' | 'inactive';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -109,11 +139,15 @@ export class ApiService {
   private vendorsSubject = new BehaviorSubject<Vendor[]>([]);
   private purchasesSubject = new BehaviorSubject<Purchase[]>([]);
   private riskAnalysisSubject = new BehaviorSubject<RiskAnalysis[]>([]);
+  private itemsSubject = new BehaviorSubject<Item[]>([]);
+  private vendorItemsSubject = new BehaviorSubject<VendorItem[]>([]);
 
   // Public observables
   public vendors$ = this.vendorsSubject.asObservable();
   public purchases$ = this.purchasesSubject.asObservable();
   public riskAnalysis$ = this.riskAnalysisSubject.asObservable();
+  public items$ = this.itemsSubject.asObservable();
+  public vendorItems$ = this.vendorItemsSubject.asObservable();
 
   constructor(private http: HttpClient) {
     // Initial data load from API
@@ -125,6 +159,8 @@ export class ApiService {
     this.refreshVendors();
     this.refreshPurchases();
     this.refreshRiskAnalysis();
+    this.refreshItems();
+    this.refreshVendorItems();
   }
 
   private refreshVendors(): void {
@@ -146,6 +182,20 @@ export class ApiService {
       .get<RiskAnalysis[]>(`${this.BASE_URL}/riskanalysis`)
       .pipe(catchError(() => of([])))
       .subscribe((risks) => this.riskAnalysisSubject.next(risks));
+  }
+
+  private refreshItems(): void {
+    this.http
+      .get<Item[]>(`${this.BASE_URL}/items`)
+      .pipe(catchError(() => of([])))
+      .subscribe((items) => this.itemsSubject.next(items));
+  }
+
+  private refreshVendorItems(): void {
+    this.http
+      .get<VendorItem[]>(`${this.BASE_URL}/vendorItems`)
+      .pipe(catchError(() => of([])))
+      .subscribe((vendorItems) => this.vendorItemsSubject.next(vendorItems));
   }
 
   // ==================== VENDORS ====================
@@ -597,7 +647,9 @@ export class ApiService {
           }
           // Fallback: compare actual vs expected delivery date
           if (p.actualDeliveryDate && p.expectedDeliveryDate) {
-            return new Date(p.actualDeliveryDate) <= new Date(p.expectedDeliveryDate);
+            return (
+              new Date(p.actualDeliveryDate) <= new Date(p.expectedDeliveryDate)
+            );
           }
           return true; // Assume on-time if no data
         }).length;
@@ -698,8 +750,9 @@ export class ApiService {
         return vendors.map((vendor) => {
           // Filter purchases by vendorId OR vendorName (fallback for legacy data)
           const vendorPurchases = purchases.filter(
-            (p) => p.vendorId === vendor.id || 
-                   (p.vendorId === null && p.vendorName === vendor.vendorName)
+            (p) =>
+              p.vendorId === vendor.id ||
+              (p.vendorId === null && p.vendorName === vendor.vendorName)
           );
           const deliveredPurchases = vendorPurchases.filter(
             (p) => p.status === 'delivered'
@@ -721,7 +774,10 @@ export class ApiService {
               }
               // Fallback: compare actual vs expected delivery date
               if (p.actualDeliveryDate && p.expectedDeliveryDate) {
-                return new Date(p.actualDeliveryDate) <= new Date(p.expectedDeliveryDate);
+                return (
+                  new Date(p.actualDeliveryDate) <=
+                  new Date(p.expectedDeliveryDate)
+                );
               }
               return true; // Assume on-time if no data
             }).length;
@@ -732,7 +788,9 @@ export class ApiService {
               .filter((p) => p.qualityRating != null)
               .map((p) => {
                 const rating = p.qualityRating;
-                return typeof rating === 'string' ? parseFloat(rating) : rating!;
+                return typeof rating === 'string'
+                  ? parseFloat(rating)
+                  : rating!;
               })
               .filter((r) => !isNaN(r));
             const avgQuality =
@@ -784,7 +842,11 @@ export class ApiService {
             name: vendor.vendorName,
             email: vendor.email,
             phone: vendor.phone,
-            address: vendor.address ? `${vendor.address}, ${vendor.city || ''}, ${vendor.country || ''}` : undefined,
+            address: vendor.address
+              ? `${vendor.address}, ${vendor.city || ''}, ${
+                  vendor.country || ''
+                }`
+              : undefined,
             category: vendor.category || 'General',
             status: vendor.status || 'active',
             createdAt: vendor.createdAt
@@ -820,6 +882,215 @@ export class ApiService {
     if (!terms) return 30;
     const match = terms.match(/\d+/);
     return match ? parseInt(match[0], 10) : 30;
+  }
+
+  // ==================== ITEMS (Master Data) ====================
+  getItems(): Observable<Item[]> {
+    return this.http.get<Item[]>(`${this.BASE_URL}/items`).pipe(
+      tap((items) => this.itemsSubject.next(items)),
+      catchError(this.handleError)
+    );
+  }
+
+  getItemById(id: string): Observable<Item> {
+    return this.http
+      .get<Item>(`${this.BASE_URL}/items/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  createItem(item: Partial<Item>): Observable<Item> {
+    const newItem: Partial<Item> = {
+      ...item,
+      itemCode: item.itemCode || this.generateItemCode(),
+      status: item.status || 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    return this.http.post<Item>(`${this.BASE_URL}/items`, newItem).pipe(
+      tap((created) => {
+        const current = this.itemsSubject.getValue();
+        this.itemsSubject.next([...current, created]);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  updateItem(id: string, item: Partial<Item>): Observable<Item> {
+    const updatedItem = {
+      ...item,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return this.http
+      .patch<Item>(`${this.BASE_URL}/items/${id}`, updatedItem)
+      .pipe(
+        tap((updated) => {
+          const current = this.itemsSubject.getValue();
+          const index = current.findIndex((i) => i.id === id);
+          if (index !== -1) {
+            current[index] = updated;
+            this.itemsSubject.next([...current]);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  deleteItem(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.BASE_URL}/items/${id}`).pipe(
+      tap(() => {
+        const current = this.itemsSubject.getValue();
+        this.itemsSubject.next(current.filter((i) => i.id !== id));
+        // Also delete related vendor-item mappings
+        this.deleteVendorItemsByItemId(id).subscribe();
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  private generateItemCode(): string {
+    return 'ITM-' + Date.now().toString(36).toUpperCase();
+  }
+
+  // ==================== VENDOR ITEMS (Vendor-Item Mapping) ====================
+  getVendorItems(): Observable<VendorItem[]> {
+    return this.http.get<VendorItem[]>(`${this.BASE_URL}/vendorItems`).pipe(
+      tap((vendorItems) => this.vendorItemsSubject.next(vendorItems)),
+      catchError(this.handleError)
+    );
+  }
+
+  getVendorItemById(id: string): Observable<VendorItem> {
+    return this.http
+      .get<VendorItem>(`${this.BASE_URL}/vendorItems/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getItemsByVendorId(vendorId: string): Observable<VendorItem[]> {
+    return this.http
+      .get<VendorItem[]>(`${this.BASE_URL}/vendorItems?vendorId=${vendorId}`)
+      .pipe(
+        map((vendorItems) =>
+          vendorItems.filter((vi) => vi.status === 'active')
+        ),
+        catchError(this.handleError)
+      );
+  }
+
+  getVendorsByItemId(itemId: string): Observable<VendorItem[]> {
+    return this.http
+      .get<VendorItem[]>(`${this.BASE_URL}/vendorItems?itemId=${itemId}`)
+      .pipe(
+        map((vendorItems) =>
+          vendorItems.filter((vi) => vi.status === 'active')
+        ),
+        catchError(this.handleError)
+      );
+  }
+
+  createVendorItem(vendorItem: Partial<VendorItem>): Observable<VendorItem> {
+    const newVendorItem: Partial<VendorItem> = {
+      ...vendorItem,
+      status: vendorItem.status || 'active',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    return this.http
+      .post<VendorItem>(`${this.BASE_URL}/vendorItems`, newVendorItem)
+      .pipe(
+        tap((created) => {
+          const current = this.vendorItemsSubject.getValue();
+          this.vendorItemsSubject.next([...current, created]);
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  updateVendorItem(
+    id: string,
+    vendorItem: Partial<VendorItem>
+  ): Observable<VendorItem> {
+    const updatedVendorItem = {
+      ...vendorItem,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return this.http
+      .patch<VendorItem>(
+        `${this.BASE_URL}/vendorItems/${id}`,
+        updatedVendorItem
+      )
+      .pipe(
+        tap((updated) => {
+          const current = this.vendorItemsSubject.getValue();
+          const index = current.findIndex((vi) => vi.id === id);
+          if (index !== -1) {
+            current[index] = updated;
+            this.vendorItemsSubject.next([...current]);
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  deleteVendorItem(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.BASE_URL}/vendorItems/${id}`).pipe(
+      tap(() => {
+        const current = this.vendorItemsSubject.getValue();
+        this.vendorItemsSubject.next(current.filter((vi) => vi.id !== id));
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteVendorItemsByItemId(itemId: string): Observable<void> {
+    return this.getVendorsByItemId(itemId).pipe(
+      switchMap((vendorItems) => {
+        if (vendorItems.length === 0) return of(undefined);
+        const deleteOps = vendorItems.map((vi) =>
+          this.http.delete(`${this.BASE_URL}/vendorItems/${vi.id}`)
+        );
+        return forkJoin(deleteOps);
+      }),
+      map(() => undefined),
+      tap(() => this.refreshVendorItems()),
+      catchError(this.handleError)
+    );
+  }
+
+  deleteVendorItemsByVendorId(vendorId: string): Observable<void> {
+    return this.getItemsByVendorId(vendorId).pipe(
+      switchMap((vendorItems) => {
+        if (vendorItems.length === 0) return of(undefined);
+        const deleteOps = vendorItems.map((vi) =>
+          this.http.delete(`${this.BASE_URL}/vendorItems/${vi.id}`)
+        );
+        return forkJoin(deleteOps);
+      }),
+      map(() => undefined),
+      tap(() => this.refreshVendorItems()),
+      catchError(this.handleError)
+    );
+  }
+
+  // Get items with vendor details for dropdown
+  getItemsForVendor(
+    vendorId: string
+  ): Observable<(VendorItem & { item?: Item })[]> {
+    return forkJoin({
+      vendorItems: this.getItemsByVendorId(vendorId),
+      items: this.getItems(),
+    }).pipe(
+      map(({ vendorItems, items }) => {
+        return vendorItems.map((vi) => ({
+          ...vi,
+          item: items.find((i) => i.id === vi.itemId),
+        }));
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // ==================== ERROR HANDLING ====================
