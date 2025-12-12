@@ -1,0 +1,112 @@
+<div class="app-layout">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loader-container">
+      <div class="loader-spinner"></div>
+      <span class="loader-text">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="bi bi-bar-chart-fill logo-icon"></i>
+        <span class="logo-text" *ngIf="!sidebarCollapsed">azia</span>
+      </div>
+      <button class="collapse-btn" (click)="toggleSidebar()">
+        <i
+          class="bi"
+          [ngClass]="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"
+        ></i>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-header" *ngIf="!sidebarCollapsed">
+        <i class="bi bi-grid-fill"></i>
+        <span>Menu</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a
+        *ngFor="let item of menuItems"
+        class="nav-item"
+        [class.active]="item.active"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        (click)="selectMenuItem(item)"
+      >
+        <i class="bi" [ngClass]="item.icon"></i>
+        <span *ngIf="!sidebarCollapsed">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" routerLink="/settings" *ngIf="!sidebarCollapsed">
+        <i class="bi bi-gear"></i>
+        <span>Settings</span>
+      </a>
+      <a
+        class="nav-item logout-item"
+        (click)="logout()"
+        *ngIf="!sidebarCollapsed"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Logout</span>
+      </a>
+      <div class="user-avatar">
+        <img
+          src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"
+          alt="User"
+        />
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
+    <!-- Top Navbar -->
+    <header class="top-navbar">
+      <div class="search-bar">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search for anything..." />
+      </div>
+      <div class="navbar-actions">
+        <button class="action-btn">
+          <i class="bi bi-chat-dots"></i>
+        </button>
+        <button class="action-btn">
+          <i class="bi bi-bell"></i>
+        </button>
+        <div class="user-profile" (click)="toggleUserMenu()">
+          <img
+            src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff"
+            alt="User"
+          />
+          <div class="user-dropdown" *ngIf="showUserMenu">
+            <div class="dropdown-header">
+              <span class="user-name">User</span>
+              <span class="user-email">user&#64;example.com</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" routerLink="/settings">
+              <i class="bi bi-gear"></i>
+              <span>Settings</span>
+            </a>
+            <a class="dropdown-item logout" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

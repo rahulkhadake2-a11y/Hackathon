@@ -5,21 +5,27 @@ import { VenderListComponent } from './pages/vender-list/vender-list.component';
 import { VendorProfileComponent } from './pages/vendor-profile/vendor-profile.component';
 import { RiskAnalysisComponent } from './pages/risk-analysis/risk-analysis.component';
 import { InsightsComponent } from './pages/insights/insights.component';
+import { LayoutComponent } from './shared/components/layout/layout.component';
+import { UploadComponent } from './pages/upload/upload.component';
+import { InsightsComponent } from './pages/insights/insights.component';
+import { PurchaseComponent } from './pages/purchase/purchase.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
 
-  { path: 'dashboard', component: DashboardComponent },
-
-  { path: 'vendors', component: VenderListComponent },
-
-  { path: 'vendor/:id', component: VendorProfileComponent },
-
-  { path: 'risk-analysis', component: RiskAnalysisComponent },
-
-  { path: 'insights', component: InsightsComponent },
-
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: '',
+    component: LayoutComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'vendors', component: VenderListComponent },
+      { path: 'vendor/:id', component: VendorProfileComponent },
+      { path: 'upload', component: UploadComponent },
+      { path: 'insights', component: InsightsComponent },
+      { path: 'purchase', component: PurchaseComponent },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
+  },
 
   { path: '**', redirectTo: 'login' },
 ];
