@@ -1,36 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-
-export interface PurchaseOrder {
-  id: number;
-  poNumber: string;
-  supplierName: string;
-  creationDate: Date;
-  dueDate: Date;
-  status: string;
-  totalAmount: number;
-  createdBy: string;
-  urgent: boolean;
-  [key: string]: any;
-}
+import { Subject, takeUntil } from 'rxjs';
+import {
+  ApiService,
+  Purchase,
+  Vendor,
+} from '../../core/services/api/api.service';
 
 export interface TableColumn {
   field: string;
   columnLabel: string;
   isSelected: boolean;
   canBeRemoved: boolean;
-  type: 'string' | 'date' | 'number';
+  type: 'string' | 'date' | 'number' | 'boolean';
 }
 
 export interface FilterDTO {
   searchTerm: string;
-  quotationDateFrom: Date | null;
-  quotationDateTo: Date | null;
-  dueDateFrom: Date | null;
-  dueDateTo: Date | null;
-  supplierId: string;
+  orderDateFrom: string | null;
+  orderDateTo: string | null;
+  expectedDeliveryFrom: string | null;
+  expectedDeliveryTo: string | null;
+  vendorId: string;
   status: string;
   urgent: boolean;
   createdBy: string;
@@ -42,7 +35,9 @@ export interface FilterDTO {
   templateUrl: './purchase.component.html',
   styleUrl: './purchase.component.css',
 })
-export class PurchaseComponent implements OnInit {
+export class PurchaseComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   // Pagination
   first = 0;
   rows = 10;
@@ -53,57 +48,54 @@ export class PurchaseComponent implements OnInit {
   openFilterDialog = false;
 
   // Selection
-  selectedQuotations: PurchaseOrder[] = [];
+  selectedPurchases: Purchase[] = [];
   selectAll = false;
+
+  // Loading state
+  isLoading = false;
+
+  // Vendors list for dropdown
+  vendors: Vendor[] = [];
 
   // Filter DTO
   filterDTO: FilterDTO = {
     searchTerm: '',
-    quotationDateFrom: null,
-    quotationDateTo: null,
-    dueDateFrom: null,
-    dueDateTo: null,
-    supplierId: '',
+    orderDateFrom: null,
+    orderDateTo: null,
+    expectedDeliveryFrom: null,
+    expectedDeliveryTo: null,
+    vendorId: '',
     status: '',
     urgent: false,
     createdBy: '',
   };
 
-  // Status cards data
-  statusCounts = {
-    RFQ: 12,
-    'RFQ Cancelled': 3,
-    'RFQ Sent': 8,
-    'Purchase Order': 25,
-    Cancelled: 5,
-  };
-
   // Columns configuration
   availableColumns: TableColumn[] = [
     {
-      field: 'poNumber',
+      field: 'purchaseOrderNumber',
       columnLabel: 'PO Number',
       isSelected: true,
       canBeRemoved: false,
       type: 'string',
     },
     {
-      field: 'supplierName',
-      columnLabel: 'Supplier',
+      field: 'vendorName',
+      columnLabel: 'Vendor',
       isSelected: true,
       canBeRemoved: true,
       type: 'string',
     },
     {
-      field: 'creationDate',
-      columnLabel: 'Creation Date',
+      field: 'orderDate',
+      columnLabel: 'Order Date',
       isSelected: true,
       canBeRemoved: true,
       type: 'date',
     },
     {
-      field: 'dueDate',
-      columnLabel: 'Due Date',
+      field: 'expectedDeliveryDate',
+      columnLabel: 'Expected Delivery',
       isSelected: true,
       canBeRemoved: true,
       type: 'date',
@@ -123,6 +115,20 @@ export class PurchaseComponent implements OnInit {
       type: 'number',
     },
     {
+      field: 'qualityRating',
+      columnLabel: 'Quality Rating',
+      isSelected: false,
+      canBeRemoved: true,
+      type: 'number',
+    },
+    {
+      field: 'onTimeDelivery',
+      columnLabel: 'On-Time Delivery',
+      isSelected: false,
+      canBeRemoved: true,
+      type: 'boolean',
+    },
+    {
       field: 'createdBy',
       columnLabel: 'Created By',
       isSelected: false,
@@ -134,166 +140,61 @@ export class PurchaseComponent implements OnInit {
   // Dropdown options
   statusDropdownOptions = [
     { key: 'All', value: '' },
-    { key: 'RFQ', value: 'RFQ' },
-    { key: 'RFQ Sent', value: 'RFQ Sent' },
-    { key: 'RFQ Cancelled', value: 'RFQ Cancelled' },
-    { key: 'Purchase Order', value: 'Purchase Order' },
-    { key: 'Cancelled', value: 'Cancelled' },
+    { key: 'Pending', value: 'pending' },
+    { key: 'Approved', value: 'approved' },
+    { key: 'Shipped', value: 'shipped' },
+    { key: 'Delivered', value: 'delivered' },
+    { key: 'Cancelled', value: 'cancelled' },
   ];
 
-  suppliersDropdownOptions = [
-    { key: 'All Suppliers', value: '' },
-    { key: 'Acme Corp', value: '1' },
-    { key: 'Global Supplies', value: '2' },
-    { key: 'Tech Solutions', value: '3' },
+  vendorsDropdownOptions: { key: string; value: string }[] = [
+    { key: 'All Vendors', value: '' },
   ];
 
-  // Sample purchase order data
-  allQuotationsList: PurchaseOrder[] = [
-    {
-      id: 1,
-      poNumber: 'PO-2024-001',
-      supplierName: 'Acme Corp',
-      creationDate: new Date('2024-01-15'),
-      dueDate: new Date('2024-02-15'),
-      status: 'RFQ',
-      totalAmount: 15000,
-      createdBy: 'John Smith',
-      urgent: false,
-    },
-    {
-      id: 2,
-      poNumber: 'PO-2024-002',
-      supplierName: 'Global Supplies',
-      creationDate: new Date('2024-01-18'),
-      dueDate: new Date('2024-02-20'),
-      status: 'RFQ Sent',
-      totalAmount: 8500,
-      createdBy: 'Jane Doe',
-      urgent: true,
-    },
-    {
-      id: 3,
-      poNumber: 'PO-2024-003',
-      supplierName: 'Tech Solutions',
-      creationDate: new Date('2024-01-20'),
-      dueDate: new Date('2024-02-25'),
-      status: 'Purchase Order',
-      totalAmount: 32000,
-      createdBy: 'Bob Wilson',
-      urgent: false,
-    },
-    {
-      id: 4,
-      poNumber: 'PO-2024-004',
-      supplierName: 'Prime Materials',
-      creationDate: new Date('2024-01-22'),
-      dueDate: new Date('2024-02-28'),
-      status: 'RFQ Cancelled',
-      totalAmount: 5600,
-      createdBy: 'Alice Brown',
-      urgent: false,
-    },
-    {
-      id: 5,
-      poNumber: 'PO-2024-005',
-      supplierName: 'Swift Logistics',
-      creationDate: new Date('2024-01-25'),
-      dueDate: new Date('2024-03-01'),
-      status: 'Purchase Order',
-      totalAmount: 18900,
-      createdBy: 'Charlie Davis',
-      urgent: true,
-    },
-    {
-      id: 6,
-      poNumber: 'PO-2024-006',
-      supplierName: 'Quality Parts Inc',
-      creationDate: new Date('2024-01-28'),
-      dueDate: new Date('2024-03-05'),
-      status: 'Cancelled',
-      totalAmount: 7200,
-      createdBy: 'Diana Evans',
-      urgent: false,
-    },
-    {
-      id: 7,
-      poNumber: 'PO-2024-007',
-      supplierName: 'Green Energy Co',
-      creationDate: new Date('2024-02-01'),
-      dueDate: new Date('2024-03-10'),
-      status: 'RFQ',
-      totalAmount: 45000,
-      createdBy: 'Edward Foster',
-      urgent: false,
-    },
-    {
-      id: 8,
-      poNumber: 'PO-2024-008',
-      supplierName: 'Smart Systems',
-      creationDate: new Date('2024-02-05'),
-      dueDate: new Date('2024-03-15'),
-      status: 'RFQ Sent',
-      totalAmount: 12300,
-      createdBy: 'Fiona Garcia',
-      urgent: true,
-    },
-    {
-      id: 9,
-      poNumber: 'PO-2024-009',
-      supplierName: 'Metro Distribution',
-      creationDate: new Date('2024-02-08'),
-      dueDate: new Date('2024-03-20'),
-      status: 'Purchase Order',
-      totalAmount: 28500,
-      createdBy: 'George Harris',
-      urgent: false,
-    },
-    {
-      id: 10,
-      poNumber: 'PO-2024-010',
-      supplierName: 'National Supplies',
-      creationDate: new Date('2024-02-10'),
-      dueDate: new Date('2024-03-25'),
-      status: 'RFQ',
-      totalAmount: 9800,
-      createdBy: 'Helen Irving',
-      urgent: false,
-    },
-    {
-      id: 11,
-      poNumber: 'PO-2024-011',
-      supplierName: 'Pacific Trading',
-      creationDate: new Date('2024-02-12'),
-      dueDate: new Date('2024-03-30'),
-      status: 'Purchase Order',
-      totalAmount: 67000,
-      createdBy: 'Ian Jackson',
-      urgent: true,
-    },
-    {
-      id: 12,
-      poNumber: 'PO-2024-012',
-      supplierName: 'Central Hardware',
-      creationDate: new Date('2024-02-15'),
-      dueDate: new Date('2024-04-01'),
-      status: 'Cancelled',
-      totalAmount: 4500,
-      createdBy: 'Julia King',
-      urgent: false,
-    },
-  ];
+  // All purchases from API
+  allPurchases: Purchase[] = [];
+  // Filtered and paginated purchases for display
+  purchasesList: Purchase[] = [];
 
-  quotationsList: PurchaseOrder[] = [];
-
-  constructor(private router: Router) {}
+  constructor(private router: Router, private apiService: ApiService) {}
 
   ngOnInit() {
-    this.updateVisibleList();
+    this.loadData();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadData() {
+    this.isLoading = true;
+
+    // Load vendors for dropdown
+    this.apiService
+      .getVendors()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((vendors) => {
+        this.vendors = vendors;
+        this.vendorsDropdownOptions = [
+          { key: 'All Vendors', value: '' },
+          ...vendors.map((v) => ({ key: v.vendorName, value: v.id || '' })),
+        ];
+      });
+
+    // Load purchases
+    this.apiService
+      .getPurchases()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((purchases) => {
+        this.allPurchases = purchases;
+        this.updateVisibleList();
+        this.isLoading = false;
+      });
   }
 
   getStatusCount(status: string): number {
-    return this.allQuotationsList.filter((q) => q.status === status).length;
+    return this.allPurchases.filter((p) => p.status === status).length;
   }
 
   get selectedColumns(): TableColumn[] {
@@ -301,23 +202,41 @@ export class PurchaseComponent implements OnInit {
   }
 
   updateVisibleList() {
-    let filtered = [...this.allQuotationsList];
+    let filtered = [...this.allPurchases];
 
     // Apply search filter
     if (this.filterDTO.searchTerm) {
       const term = this.filterDTO.searchTerm.toLowerCase();
-      filtered = filtered.filter((q) =>
-        q.poNumber.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (p) =>
+          p.purchaseOrderNumber.toLowerCase().includes(term) ||
+          (p.vendorName && p.vendorName.toLowerCase().includes(term))
       );
     }
 
     // Apply status filter
     if (this.filterDTO.status) {
-      filtered = filtered.filter((q) => q.status === this.filterDTO.status);
+      filtered = filtered.filter((p) => p.status === this.filterDTO.status);
     }
 
+    // Apply vendor filter
+    if (this.filterDTO.vendorId) {
+      filtered = filtered.filter((p) => p.vendorId === this.filterDTO.vendorId);
+    }
+
+    // Apply urgent filter
+    if (this.filterDTO.urgent) {
+      filtered = filtered.filter((p) => p.urgent === true);
+    }
+
+    // Sort by order date (newest first)
+    filtered.sort(
+      (a, b) =>
+        new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+    );
+
     // Apply pagination
-    this.quotationsList = filtered.slice(this.first, this.first + this.rows);
+    this.purchasesList = filtered.slice(this.first, this.first + this.rows);
   }
 
   toggleFilter(event: Event) {
@@ -345,48 +264,59 @@ export class PurchaseComponent implements OnInit {
     this.updateVisibleList();
   }
 
-  handleNewQuotation() {
-    console.log('Create new purchase order');
+  handleNewPurchase() {
+    this.router.navigate(['/purchase/new']);
   }
 
-  handleEdit(id: number) {
-    console.log('Edit purchase order:', id);
+  handleEdit(id: string | number) {
+    this.router.navigate(['/purchase', id, 'edit']);
   }
 
-  handleDeleteSalesQuotation(id: number) {
-    this.allQuotationsList = this.allQuotationsList.filter((q) => q.id !== id);
-    this.updateVisibleList();
+  handleView(id: string | number) {
+    this.router.navigate(['/purchase', id]);
   }
 
-  onSelectionChange(quotation: PurchaseOrder) {
-    const index = this.selectedQuotations.findIndex(
-      (q) => q.id === quotation.id
-    );
+  handleDeletePurchase(id: string | number) {
+    if (confirm('Are you sure you want to delete this purchase order?')) {
+      this.apiService
+        .deletePurchase(id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.allPurchases = this.allPurchases.filter(
+            (p) => p.id !== id.toString()
+          );
+          this.updateVisibleList();
+        });
+    }
+  }
+
+  onSelectionChange(purchase: Purchase) {
+    const index = this.selectedPurchases.findIndex((p) => p.id === purchase.id);
     if (index > -1) {
-      this.selectedQuotations.splice(index, 1);
+      this.selectedPurchases.splice(index, 1);
     } else {
-      this.selectedQuotations.push(quotation);
+      this.selectedPurchases.push(purchase);
     }
   }
 
   toggleSelectAll() {
     if (this.selectAll) {
-      this.selectedQuotations = [...this.quotationsList];
+      this.selectedPurchases = [...this.purchasesList];
     } else {
-      this.selectedQuotations = [];
+      this.selectedPurchases = [];
     }
   }
 
-  isSelected(quotation: PurchaseOrder): boolean {
-    return this.selectedQuotations.some((q) => q.id === quotation.id);
+  isSelected(purchase: Purchase): boolean {
+    return this.selectedPurchases.some((p) => p.id === purchase.id);
   }
 
-  clearQuotationCheckBoxSelection() {
-    this.selectedQuotations = [];
+  clearPurchaseCheckBoxSelection() {
+    this.selectedPurchases = [];
     this.selectAll = false;
   }
 
-  filterPurchaseQuotations() {
+  filterPurchases() {
     this.first = 0;
     this.updateVisibleList();
     this.openFilterDialog = false;
@@ -395,11 +325,11 @@ export class PurchaseComponent implements OnInit {
   clearFilter() {
     this.filterDTO = {
       searchTerm: '',
-      quotationDateFrom: null,
-      quotationDateTo: null,
-      dueDateFrom: null,
-      dueDateTo: null,
-      supplierId: '',
+      orderDateFrom: null,
+      orderDateTo: null,
+      expectedDeliveryFrom: null,
+      expectedDeliveryTo: null,
+      vendorId: '',
       status: '',
       urgent: false,
       createdBy: '',
@@ -409,23 +339,28 @@ export class PurchaseComponent implements OnInit {
 
   exportToExcel() {
     console.log('Exporting to Excel...');
+    // Could implement CSV/Excel export here
   }
 
   getStatusClass(status: string): string {
     switch (status) {
-      case 'RFQ':
-        return 'status-rfq';
-      case 'RFQ Sent':
-        return 'status-sent';
-      case 'RFQ Cancelled':
-        return 'status-rfq-cancelled';
-      case 'Purchase Order':
-        return 'status-purchaseOrder';
-      case 'Cancelled':
+      case 'pending':
+        return 'status-pending';
+      case 'approved':
+        return 'status-approved';
+      case 'shipped':
+        return 'status-shipped';
+      case 'delivered':
+        return 'status-delivered';
+      case 'cancelled':
         return 'status-cancelled';
       default:
         return '';
     }
+  }
+
+  getStatusLabel(status: string): string {
+    return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
   onPageChange(page: number) {
@@ -438,8 +373,12 @@ export class PurchaseComponent implements OnInit {
     this.updateVisibleList();
   }
 
+  get totalRecords(): number {
+    return this.allPurchases.length;
+  }
+
   get totalPages(): number {
-    return Math.ceil(this.allQuotationsList.length / this.rows);
+    return Math.ceil(this.allPurchases.length / this.rows);
   }
 
   get currentPage(): number {
@@ -459,9 +398,35 @@ export class PurchaseComponent implements OnInit {
   }
 
   nextPage() {
-    if (this.first + this.rows < this.allQuotationsList.length) {
+    if (this.first + this.rows < this.allPurchases.length) {
       this.first += this.rows;
       this.updateVisibleList();
     }
+  }
+
+  formatDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  }
+
+  getQualityStars(rating: number | null | undefined): number[] {
+    if (!rating) return [];
+    return Array(rating).fill(0);
+  }
+
+  // Helper to access purchase properties dynamically
+  getPurchaseValue(purchase: Purchase, field: string): any {
+    return (purchase as any)[field];
   }
 }
