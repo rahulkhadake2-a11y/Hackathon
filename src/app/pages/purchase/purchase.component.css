@@ -69,22 +69,23 @@
   opacity: 0.9;
 }
 
-.status-rfq-card {
+/* New status cards for API data */
+.status-pending-card {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #8b4513;
+}
+
+.status-approved-card {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.status-rfq-cancelled-card {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: white;
-}
-
-.status-sent-card {
+.status-shipped-card {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   color: white;
 }
 
-.status-po-card {
+.status-delivered-card {
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
   color: white;
 }
@@ -92,6 +93,37 @@
 .status-cancelled-card {
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
   color: white;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Table Card */
@@ -338,6 +370,77 @@ tbody tr:hover {
 .status-cancelled {
   background: #fff3e5;
   color: #fd7e14;
+}
+
+/* New status styles for API data */
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background: #e8e5ff;
+  color: #6b5ce7;
+}
+
+.status-shipped {
+  background: #e5f6ff;
+  color: #0dcaf0;
+}
+
+.status-delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Quality Stars */
+.quality-stars {
+  color: #ffc107;
+  font-size: 0.875rem;
+}
+
+.quality-stars i {
+  margin-right: 2px;
+}
+
+/* On-Time Delivery Badges */
+.badge-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: #d4edda;
+  color: #155724;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: #f8d7da;
+  color: #721c24;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+/* View Button */
+.btn-view {
+  background: #e5f6ff;
+  color: #0dcaf0;
+}
+
+.btn-view:hover {
+  background: #0dcaf0;
+  color: white;
 }
 
 /* Action Buttons */

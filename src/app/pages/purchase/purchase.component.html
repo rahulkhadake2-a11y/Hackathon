@@ -9,26 +9,32 @@
     </nav>
   </div>
 
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <span>Loading purchases...</span>
+  </div>
+
   <!-- Status Cards -->
-  <div class="status-cards-container">
-    <div class="status-card status-rfq-card">
-      <span class="status-count">{{ getStatusCount("RFQ") }}</span>
-      <span class="status-label">RFQ</span>
+  <div class="status-cards-container" *ngIf="!isLoading">
+    <div class="status-card status-pending-card">
+      <span class="status-count">{{ getStatusCount("pending") }}</span>
+      <span class="status-label">Pending</span>
     </div>
-    <div class="status-card status-rfq-cancelled-card">
-      <span class="status-count">{{ getStatusCount("RFQ Cancelled") }}</span>
-      <span class="status-label">RFQ Cancelled</span>
+    <div class="status-card status-approved-card">
+      <span class="status-count">{{ getStatusCount("approved") }}</span>
+      <span class="status-label">Approved</span>
     </div>
-    <div class="status-card status-sent-card">
-      <span class="status-count">{{ getStatusCount("RFQ Sent") }}</span>
-      <span class="status-label">RFQ Sent</span>
+    <div class="status-card status-shipped-card">
+      <span class="status-count">{{ getStatusCount("shipped") }}</span>
+      <span class="status-label">Shipped</span>
     </div>
-    <div class="status-card status-po-card">
-      <span class="status-count">{{ getStatusCount("Purchase Order") }}</span>
-      <span class="status-label">Purchase Order</span>
+    <div class="status-card status-delivered-card">
+      <span class="status-count">{{ getStatusCount("delivered") }}</span>
+      <span class="status-label">Delivered</span>
     </div>
     <div class="status-card status-cancelled-card">
-      <span class="status-count">{{ getStatusCount("Cancelled") }}</span>
+      <span class="status-count">{{ getStatusCount("cancelled") }}</span>
       <span class="status-label">Cancelled</span>
     </div>
   </div>
@@ -47,12 +53,12 @@
       </div>
 
       <div class="right-actions">
-        <ng-container *ngIf="selectedQuotations.length === 0">
+        <ng-container *ngIf="selectedPurchases.length === 0">
           <div class="search-wrapper">
             <i class="bi bi-search search-icon"></i>
             <input
               type="text"
-              placeholder="Search by PO Number"
+              placeholder="Search by PO Number or Vendor"
               class="search-input"
               [(ngModel)]="filterDTO.searchTerm"
               (input)="addToSearchTerm()"
@@ -65,16 +71,16 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="selectedQuotations.length > 0">
+        <ng-container *ngIf="selectedPurchases.length > 0">
           <button
             class="btn btn-outline"
-            (click)="clearQuotationCheckBoxSelection()"
+            (click)="clearPurchaseCheckBoxSelection()"
           >
-            <i class="bi bi-x"></i> {{ selectedQuotations.length }} Selected
+            <i class="bi bi-x"></i> {{ selectedPurchases.length }} Selected
           </button>
         </ng-container>
 
-        <button class="btn btn-new" (click)="handleNewQuotation()">
+        <button class="btn btn-new" (click)="handleNewPurchase()">
           <i class="bi bi-plus-lg"></i> New Purchase
         </button>
       </div>
@@ -129,49 +135,99 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let quotation of quotationsList">
+          <tr *ngFor="let purchase of purchasesList">
             <td class="t-col checkbox-col">
               <input
                 type="checkbox"
-                [checked]="isSelected(quotation)"
-                (change)="onSelectionChange(quotation)"
+                [checked]="isSelected(purchase)"
+                (change)="onSelectionChange(purchase)"
               />
             </td>
             <ng-container *ngFor="let col of availableColumns">
               <td class="t-col" *ngIf="col.isSelected">
+                <!-- String fields -->
                 <ng-container
                   *ngIf="col.type === 'string' && col.field !== 'status'"
                 >
-                  {{ quotation[col.field] }}
+                  {{ getPurchaseValue(purchase, col.field) }}
                 </ng-container>
+                <!-- Status badge -->
                 <ng-container *ngIf="col.field === 'status'">
                   <span
                     class="status-badge"
-                    [ngClass]="getStatusClass(quotation.status)"
+                    [ngClass]="getStatusClass(purchase.status)"
                   >
-                    {{ quotation.status }}
+                    {{ getStatusLabel(purchase.status) }}
                   </span>
                 </ng-container>
+                <!-- Date fields -->
                 <ng-container *ngIf="col.type === 'date'">
-                  {{ quotation[col.field] | date : "MMM dd, yyyy" }}
+                  {{ formatDate(getPurchaseValue(purchase, col.field)) }}
                 </ng-container>
-                <ng-container *ngIf="col.type === 'number'">
-                  {{ quotation[col.field] | currency }}
+                <!-- Number/Currency fields -->
+                <ng-container
+                  *ngIf="col.type === 'number' && col.field === 'totalAmount'"
+                >
+                  {{ formatCurrency(getPurchaseValue(purchase, col.field)) }}
+                </ng-container>
+                <!-- Quality Rating -->
+                <ng-container *ngIf="col.field === 'qualityRating'">
+                  <span *ngIf="purchase.qualityRating" class="quality-stars">
+                    <i
+                      class="bi bi-star-fill"
+                      *ngFor="
+                        let star of getQualityStars(purchase.qualityRating)
+                      "
+                    ></i>
+                  </span>
+                  <span *ngIf="!purchase.qualityRating" class="text-muted"
+                    >-</span
+                  >
+                </ng-container>
+                <!-- On-Time Delivery -->
+                <ng-container *ngIf="col.field === 'onTimeDelivery'">
+                  <span
+                    *ngIf="purchase.onTimeDelivery === true"
+                    class="badge-success"
+                  >
+                    <i class="bi bi-check-circle"></i> Yes
+                  </span>
+                  <span
+                    *ngIf="purchase.onTimeDelivery === false"
+                    class="badge-danger"
+                  >
+                    <i class="bi bi-x-circle"></i> No
+                  </span>
+                  <span
+                    *ngIf="
+                      purchase.onTimeDelivery === null ||
+                      purchase.onTimeDelivery === undefined
+                    "
+                    class="text-muted"
+                    >-</span
+                  >
                 </ng-container>
               </td>
             </ng-container>
             <td class="t-col actions-col" colspan="2">
               <div class="action-buttons">
                 <button
+                  class="btn-action btn-view"
+                  (click)="handleView(purchase.id!)"
+                  title="View"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
                   class="btn-action btn-edit"
-                  (click)="handleEdit(quotation.id)"
+                  (click)="handleEdit(purchase.id!)"
                   title="Edit"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button
                   class="btn-action btn-delete"
-                  (click)="handleDeleteSalesQuotation(quotation.id)"
+                  (click)="handleDeletePurchase(purchase.id!)"
                   title="Delete"
                 >
                   <i class="bi bi-trash"></i>
@@ -179,9 +235,9 @@
               </div>
             </td>
           </tr>
-          <tr *ngIf="quotationsList.length === 0">
+          <tr *ngIf="purchasesList.length === 0">
             <td [attr.colspan]="selectedColumns.length + 3" class="no-data">
-              No data to display
+              No purchase orders found
             </td>
           </tr>
         </tbody>
@@ -193,11 +249,11 @@
       <span class="pagination-info">
         Showing {{ first + 1 }} to
         {{
-          first + rows > allQuotationsList.length
-            ? allQuotationsList.length
+          first + rows > allPurchases.length
+            ? allPurchases.length
             : first + rows
         }}
-        of {{ allQuotationsList.length }} entries
+        of {{ allPurchases.length }} entries
       </span>
       <div class="pagination-controls">
         <select
@@ -230,7 +286,7 @@
           <button
             class="btn-page"
             (click)="nextPage()"
-            [disabled]="first + rows >= allQuotationsList.length"
+            [disabled]="first + rows >= allPurchases.length"
           >
             <i class="bi bi-chevron-right"></i>
           </button>
@@ -254,7 +310,7 @@
   >
     <div class="dialog" (click)="$event.stopPropagation()">
       <div class="dialog-header">
-        <h5>Filter</h5>
+        <h5>Filter Purchase Orders</h5>
         <button class="dialog-close" (click)="openFilterDialog = false">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -272,10 +328,10 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Supplier:</label>
-          <select [(ngModel)]="filterDTO.supplierId" class="form-control">
+          <label>Vendor:</label>
+          <select [(ngModel)]="filterDTO.vendorId" class="form-control">
             <option
-              *ngFor="let opt of suppliersDropdownOptions"
+              *ngFor="let opt of vendorsDropdownOptions"
               [value]="opt.value"
             >
               {{ opt.key }}
@@ -291,7 +347,7 @@
       </div>
       <div class="dialog-footer">
         <button class="btn btn-outline" (click)="clearFilter()">Clear</button>
-        <button class="btn btn-new" (click)="filterPurchaseQuotations()">
+        <button class="btn btn-new" (click)="filterPurchases()">
           Apply Filter
         </button>
       </div>

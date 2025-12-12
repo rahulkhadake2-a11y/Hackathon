@@ -1,1 +1,681 @@
-<p>vendor-profile works!</p>
+<div class="vendor-profile-container">
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading vendor details...</p>
+  </div>
+
+  <!-- Header Section -->
+  <div class="profile-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i>
+        Back to Vendors
+      </button>
+      <div class="vendor-title">
+        <div class="vendor-avatar">
+          {{ vendor.vendorName.charAt(0) }}
+        </div>
+        <div class="vendor-info">
+          <h1>{{ vendor.vendorName }}</h1>
+          <div class="vendor-meta">
+            <span class="category-badge">
+              <i class="bi bi-tag"></i>
+              {{ vendor.category }}
+            </span>
+            <span
+              class="status-badge"
+              [ngClass]="getStatusClass(vendor.status)"
+            >
+              {{ vendor.status }}
+            </span>
+            <span
+              class="risk-badge"
+              [ngClass]="getRiskLevelClass(vendor.riskLevel)"
+            >
+              <i class="bi bi-shield-check"></i>
+              {{ vendor.riskLevel }} Risk
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="editVendor()">
+        <i class="bi bi-pencil"></i>
+        Edit
+      </button>
+      <button class="btn-primary" (click)="createPurchaseOrder()">
+        <i class="bi bi-plus-lg"></i>
+        New Purchase Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Stats Cards -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <i class="bi bi-currency-dollar"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Purchases</span>
+        <span class="stat-value">{{
+          formatCurrency(vendor.totalPurchases)
+        }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <i class="bi bi-graph-up-arrow"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">On-Time Delivery</span>
+        <span class="stat-value">{{ vendor.onTimeDeliveryRate }}%</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <i class="bi bi-award"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Quality Score</span>
+        <span class="stat-value">{{ vendor.qualityScore }}/100</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Rating</span>
+        <span class="stat-value">{{ vendor.rating }}/5</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-container">
+    <div class="tabs-nav">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'overview'"
+        (click)="setActiveTab('overview')"
+      >
+        <i class="bi bi-house"></i>
+        Overview
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'orders'"
+        (click)="setActiveTab('orders')"
+      >
+        <i class="bi bi-cart3"></i>
+        Purchase Orders
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'performance'"
+        (click)="setActiveTab('performance')"
+      >
+        <i class="bi bi-bar-chart-line"></i>
+        Performance
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'financial'"
+        (click)="setActiveTab('financial')"
+      >
+        <i class="bi bi-wallet2"></i>
+        Financial
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'compliance'"
+        (click)="setActiveTab('compliance')"
+      >
+        <i class="bi bi-shield-check"></i>
+        Compliance & Risk
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Overview Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'overview'">
+        <div class="content-grid">
+          <!-- Contact Information -->
+          <div class="info-card">
+            <div class="card-header">
+              <h3>
+                <i class="bi bi-person-lines-fill"></i> Contact Information
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">Contact Person</span>
+                <span class="info-value">{{ vendor.contactPerson }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">
+                  <a href="mailto:{{ vendor.email }}">{{ vendor.email }}</a>
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Phone</span>
+                <span class="info-value">{{ vendor.phone }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Address</span>
+                <span class="info-value">{{ vendor.address }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Location</span>
+                <span class="info-value"
+                  >{{ vendor.city }}, {{ vendor.country }}</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Metrics -->
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="bi bi-speedometer2"></i> Quick Metrics</h3>
+            </div>
+            <div class="card-body">
+              <div class="metric-item">
+                <div class="metric-header">
+                  <span>On-Time Delivery</span>
+                  <span class="metric-value"
+                    >{{ vendor.onTimeDeliveryRate }}%</span
+                  >
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill green"
+                    [style.width]="
+                      getPerformanceBarWidth(vendor.onTimeDeliveryRate)
+                    "
+                  ></div>
+                </div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-header">
+                  <span>Quality Score</span>
+                  <span class="metric-value">{{ vendor.qualityScore }}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill blue"
+                    [style.width]="getPerformanceBarWidth(vendor.qualityScore)"
+                  ></div>
+                </div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-header">
+                  <span>Defect Rate</span>
+                  <span class="metric-value">{{ vendor.defectRate }}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill amber"
+                    [style.width]="
+                      getPerformanceBarWidth(vendor.defectRate * 10)
+                    "
+                  ></div>
+                </div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-header">
+                  <span>Response Time</span>
+                  <span class="metric-value"
+                    >{{ vendor.responseTime }} hrs</span
+                  >
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill purple"
+                    [style.width]="
+                      getPerformanceBarWidth(100 - vendor.responseTime * 10)
+                    "
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Orders -->
+          <div class="info-card wide">
+            <div class="card-header">
+              <h3><i class="bi bi-clock-history"></i> Recent Orders</h3>
+              <button class="view-all-btn" (click)="setActiveTab('orders')">
+                View All
+              </button>
+            </div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let order of recentOrders.slice(0, 3)">
+                    <td class="order-number">{{ order.orderNumber }}</td>
+                    <td>{{ order.date | date : "MMM dd, yyyy" }}</td>
+                    <td>{{ order.items }} items</td>
+                    <td class="amount">{{ formatCurrency(order.amount) }}</td>
+                    <td>
+                      <span
+                        class="status-badge small"
+                        [ngClass]="getStatusClass(order.status)"
+                      >
+                        {{ order.status }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'orders'">
+        <div class="orders-header">
+          <h3>Purchase Order History</h3>
+          <button class="btn-primary" (click)="createPurchaseOrder()">
+            <i class="bi bi-plus-lg"></i>
+            New Order
+          </button>
+        </div>
+        <div class="info-card">
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Items</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of recentOrders">
+                  <td class="order-number">{{ order.orderNumber }}</td>
+                  <td>{{ order.date | date : "MMM dd, yyyy" }}</td>
+                  <td>{{ order.items }} items</td>
+                  <td class="amount">{{ formatCurrency(order.amount) }}</td>
+                  <td>
+                    <span
+                      class="status-badge small"
+                      [ngClass]="getStatusClass(order.status)"
+                    >
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="action-btn" (click)="viewOrder(order.id)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'performance'">
+        <div class="content-grid">
+          <div class="info-card wide">
+            <div class="card-header">
+              <h3><i class="bi bi-graph-up"></i> Performance Trends</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <div class="chart-legend">
+                  <span class="legend-item"
+                    ><span class="dot green"></span> Delivery</span
+                  >
+                  <span class="legend-item"
+                    ><span class="dot blue"></span> Quality</span
+                  >
+                  <span class="legend-item"
+                    ><span class="dot purple"></span> Response</span
+                  >
+                </div>
+                <div class="bar-chart">
+                  <div
+                    class="chart-row"
+                    *ngFor="let data of performanceHistory"
+                  >
+                    <span class="chart-label">{{ data.month }}</span>
+                    <div class="chart-bars">
+                      <div
+                        class="bar green"
+                        [style.width.%]="data.deliveryScore"
+                      >
+                        <span class="bar-value">{{ data.deliveryScore }}%</span>
+                      </div>
+                      <div class="bar blue" [style.width.%]="data.qualityScore">
+                        <span class="bar-value">{{ data.qualityScore }}%</span>
+                      </div>
+                      <div
+                        class="bar purple"
+                        [style.width.%]="data.responseScore"
+                      >
+                        <span class="bar-value">{{ data.responseScore }}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="bi bi-trophy"></i> Performance Summary</h3>
+            </div>
+            <div class="card-body">
+              <div class="summary-stat">
+                <div class="summary-icon green">
+                  <i class="bi bi-truck"></i>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-value"
+                    >{{ vendor.onTimeDeliveryRate }}%</span
+                  >
+                  <span class="summary-label">On-Time Delivery Rate</span>
+                </div>
+              </div>
+              <div class="summary-stat">
+                <div class="summary-icon blue">
+                  <i class="bi bi-patch-check"></i>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-value"
+                    >{{ vendor.qualityScore }}/100</span
+                  >
+                  <span class="summary-label">Quality Score</span>
+                </div>
+              </div>
+              <div class="summary-stat">
+                <div class="summary-icon amber">
+                  <i class="bi bi-clock"></i>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-value"
+                    >{{ vendor.responseTime }} hrs</span
+                  >
+                  <span class="summary-label">Avg Response Time</span>
+                </div>
+              </div>
+              <div class="summary-stat">
+                <div class="summary-icon red">
+                  <i class="bi bi-x-circle"></i>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-value">{{ vendor.defectRate }}%</span>
+                  <span class="summary-label">Defect Rate</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="bi bi-star-fill"></i> Vendor Rating</h3>
+            </div>
+            <div class="card-body rating-card">
+              <div class="rating-display">
+                <span class="rating-number">{{ vendor.rating }}</span>
+                <span class="rating-max">/5</span>
+              </div>
+              <div class="rating-stars">
+                <i
+                  *ngFor="let star of getRatingStars(vendor.rating)"
+                  class="bi"
+                  [ngClass]="
+                    star === 1
+                      ? 'bi-star-fill'
+                      : star === 0.5
+                      ? 'bi-star-half'
+                      : 'bi-star'
+                  "
+                >
+                </i>
+              </div>
+              <p class="rating-text">Based on 80 orders</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'financial'">
+        <div class="content-grid">
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="bi bi-cash-stack"></i> Financial Overview</h3>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">Total Purchases</span>
+                <span class="info-value highlight">{{
+                  formatCurrency(vendor.totalPurchases)
+                }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Average Order Value</span>
+                <span class="info-value">{{
+                  formatCurrency(vendor.averageOrderValue)
+                }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Outstanding Balance</span>
+                <span class="info-value warning">{{
+                  formatCurrency(vendor.outstandingBalance)
+                }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Credit Limit</span>
+                <span class="info-value">{{
+                  formatCurrency(vendor.creditLimit)
+                }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Payment Terms</span>
+                <span class="info-value">{{ vendor.paymentTerms }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="bi bi-bank"></i> Banking Information</h3>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">Bank Name</span>
+                <span class="info-value">{{ vendor.bankName }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Account Number</span>
+                <span class="info-value">{{ vendor.accountNumber }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Tax ID</span>
+                <span class="info-value">{{ vendor.taxId }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card wide">
+            <div class="card-header">
+              <h3><i class="bi bi-credit-card"></i> Credit Utilization</h3>
+            </div>
+            <div class="card-body">
+              <div class="credit-meter">
+                <div class="credit-info">
+                  <span
+                    >Used: {{ formatCurrency(vendor.outstandingBalance) }}</span
+                  >
+                  <span
+                    >Available:
+                    {{
+                      formatCurrency(
+                        vendor.creditLimit - vendor.outstandingBalance
+                      )
+                    }}</span
+                  >
+                </div>
+                <div class="credit-bar">
+                  <div
+                    class="credit-fill"
+                    [style.width.%]="
+                      (vendor.outstandingBalance / vendor.creditLimit) * 100
+                    "
+                  ></div>
+                </div>
+                <div class="credit-labels">
+                  <span>0%</span>
+                  <span
+                    >{{
+                      (
+                        (vendor.outstandingBalance / vendor.creditLimit) *
+                        100
+                      ).toFixed(1)
+                    }}% Used</span
+                  >
+                  <span>100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compliance & Risk Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'compliance'">
+        <div class="content-grid">
+          <div class="info-card">
+            <div class="card-header">
+              <h3><i class="bi bi-shield-check"></i> Compliance Status</h3>
+            </div>
+            <div class="card-body">
+              <div class="compliance-status">
+                <span
+                  class="status-badge large"
+                  [ngClass]="getStatusClass(vendor.complianceStatus)"
+                >
+                  {{ vendor.complianceStatus }}
+                </span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Last Audit Date</span>
+                <span class="info-value">{{
+                  vendor.lastAuditDate | date : "MMM dd, yyyy"
+                }}</span>
+              </div>
+              <div class="certifications">
+                <h4>Certifications</h4>
+                <div class="cert-list">
+                  <span
+                    class="cert-badge"
+                    *ngFor="let cert of vendor.certifications"
+                  >
+                    <i class="bi bi-patch-check-fill"></i>
+                    {{ cert }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header">
+              <h3>
+                <i class="bi bi-exclamation-triangle"></i> Risk Assessment
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="risk-score-display">
+                <div class="risk-gauge">
+                  <svg viewBox="0 0 100 50">
+                    <path class="gauge-bg" d="M10,50 A40,40 0 0,1 90,50" />
+                    <path
+                      class="gauge-fill"
+                      [ngClass]="getRiskLevelClass(vendor.riskLevel)"
+                      d="M10,50 A40,40 0 0,1 90,50"
+                      [style.stroke-dasharray]="
+                        (vendor.riskScore / 100) * 126 + ' 126'
+                      "
+                    />
+                  </svg>
+                  <div class="gauge-value">
+                    <span class="score">{{ vendor.riskScore }}</span>
+                    <span class="label">{{ vendor.riskLevel }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card wide">
+            <div class="card-header">
+              <h3><i class="bi bi-list-check"></i> Risk Factors</h3>
+            </div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Factor</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let factor of riskFactors">
+                    <td>{{ factor.category }}</td>
+                    <td>{{ factor.name }}</td>
+                    <td>
+                      <div class="score-bar">
+                        <div
+                          class="score-fill"
+                          [style.width.%]="factor.score"
+                          [ngClass]="getRiskLevelClass(factor.status)"
+                        ></div>
+                      </div>
+                      <span class="score-text">{{ factor.score }}/100</span>
+                    </td>
+                    <td>
+                      <span
+                        class="status-badge small"
+                        [ngClass]="getRiskLevelClass(factor.status)"
+                      >
+                        {{ factor.status }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

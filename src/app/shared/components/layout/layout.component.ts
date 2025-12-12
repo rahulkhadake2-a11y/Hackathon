@@ -32,22 +32,16 @@ export class LayoutComponent implements OnInit {
       route: '/dashboard',
       active: true,
     },
-    { icon: 'bi-upload', label: 'Upload', route: '/upload', active: false },
+    // { icon: 'bi-upload', label: 'Upload', route: '/upload', active: false },
     { icon: 'bi-people', label: 'Vendors', route: '/vendors', active: false },
     { icon: 'bi-cart', label: 'Purchase', route: '/purchase', active: false },
-    {
-      icon: 'bi-lightbulb',
-      label: 'Insights',
-      route: '/insights',
-      active: false,
-    },
+    
     {
       icon: 'bi-bar-chart',
       label: 'Analytics',
-      route: '/analytics',
+      route: '/aianalysis',
       active: false,
     },
-    { icon: 'bi-gear', label: 'Settings', route: '/settings', active: false },
   ];
 
   // Vendor section menu items (shown when in vendor pages)
@@ -59,12 +53,7 @@ export class LayoutComponent implements OnInit {
       active: false,
     },
     { icon: 'bi-people', label: 'Vendor', route: '/vendors', active: true },
-    {
-      icon: 'bi-lightbulb',
-      label: 'Vendor Insights',
-      route: '/insights',
-      active: false,
-    },
+
   ];
 
   // Current menu items to display
@@ -107,8 +96,8 @@ export class LayoutComponent implements OnInit {
     // Check if we're in vendor section (vendors, vendor/:id, or insights)
     const isVendor =
       url.includes('/vendors') ||
-      url.includes('/vendor/') ||
-      url.includes('/insights');
+      url.includes('/vendor/');
+
 
     if (isVendor) {
       this.isVendorSection = true;

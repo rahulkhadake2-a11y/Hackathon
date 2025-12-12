@@ -1,20 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-
-export interface Vendor {
-  id: number;
-  vendorName: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-  category: string;
-  status: string;
-  totalPurchases: number;
-  rating: number;
-  [key: string]: any;
-}
+import { Subscription } from 'rxjs';
+import { Vendor, RiskAnalysis, ApiService } from '../../core/services/api/api.service';
 
 export interface TableColumn {
   field: string;
@@ -22,13 +11,22 @@ export interface TableColumn {
   isSelected: boolean;
 }
 
+// Extended vendor type with risk analysis for display
+type VendorWithRisk = Vendor & { riskAnalysis?: RiskAnalysis };
+
 @Component({
   selector: 'app-vender-list',
   imports: [CommonModule, FormsModule],
   templateUrl: './vender-list.component.html',
   styleUrl: './vender-list.component.css',
 })
-export class VenderListComponent implements OnInit {
+export class VenderListComponent implements OnInit, OnDestroy {
+  // Subscription management
+  private vendorSubscription?: Subscription;
+
+  // Loading state
+  isLoading = true;
+
   // Pagination
   first = 0;
   rows = 10;
@@ -49,6 +47,7 @@ export class VenderListComponent implements OnInit {
     { field: 'phone', columnLabel: 'Phone', isSelected: true },
     { field: 'category', columnLabel: 'Category', isSelected: true },
     { field: 'status', columnLabel: 'Status', isSelected: true },
+    { field: 'riskLevel', columnLabel: 'Risk Level', isSelected: true },
     {
       field: 'totalPurchases',
       columnLabel: 'Total Purchases',
@@ -59,149 +58,37 @@ export class VenderListComponent implements OnInit {
 
   selectedColumns: TableColumn[] = [];
 
-  // Sample vendor data
-  allVendorList: Vendor[] = [
-    {
-      id: 1,
-      vendorName: 'Acme Corp',
-      contactPerson: 'John Smith',
-      email: 'john@acme.com',
-      phone: '555-0101',
-      category: 'Electronics',
-      status: 'Active',
-      totalPurchases: 125000,
-      rating: 4.5,
-    },
-    {
-      id: 2,
-      vendorName: 'Global Supplies',
-      contactPerson: 'Jane Doe',
-      email: 'jane@global.com',
-      phone: '555-0102',
-      category: 'Office Supplies',
-      status: 'Active',
-      totalPurchases: 89000,
-      rating: 4.2,
-    },
-    {
-      id: 3,
-      vendorName: 'Tech Solutions',
-      contactPerson: 'Bob Wilson',
-      email: 'bob@techsol.com',
-      phone: '555-0103',
-      category: 'IT Services',
-      status: 'Active',
-      totalPurchases: 210000,
-      rating: 4.8,
-    },
-    {
-      id: 4,
-      vendorName: 'Prime Materials',
-      contactPerson: 'Alice Brown',
-      email: 'alice@prime.com',
-      phone: '555-0104',
-      category: 'Raw Materials',
-      status: 'Inactive',
-      totalPurchases: 45000,
-      rating: 3.9,
-    },
-    {
-      id: 5,
-      vendorName: 'Swift Logistics',
-      contactPerson: 'Charlie Davis',
-      email: 'charlie@swift.com',
-      phone: '555-0105',
-      category: 'Logistics',
-      status: 'Active',
-      totalPurchases: 178000,
-      rating: 4.6,
-    },
-    {
-      id: 6,
-      vendorName: 'Quality Parts Inc',
-      contactPerson: 'Diana Evans',
-      email: 'diana@quality.com',
-      phone: '555-0106',
-      category: 'Manufacturing',
-      status: 'Active',
-      totalPurchases: 156000,
-      rating: 4.3,
-    },
-    {
-      id: 7,
-      vendorName: 'Green Energy Co',
-      contactPerson: 'Edward Foster',
-      email: 'edward@green.com',
-      phone: '555-0107',
-      category: 'Energy',
-      status: 'Active',
-      totalPurchases: 92000,
-      rating: 4.1,
-    },
-    {
-      id: 8,
-      vendorName: 'Smart Systems',
-      contactPerson: 'Fiona Garcia',
-      email: 'fiona@smart.com',
-      phone: '555-0108',
-      category: 'IT Services',
-      status: 'Pending',
-      totalPurchases: 67000,
-      rating: 4.0,
-    },
-    {
-      id: 9,
-      vendorName: 'Metro Distribution',
-      contactPerson: 'George Harris',
-      email: 'george@metro.com',
-      phone: '555-0109',
-      category: 'Logistics',
-      status: 'Active',
-      totalPurchases: 134000,
-      rating: 4.4,
-    },
-    {
-      id: 10,
-      vendorName: 'National Supplies',
-      contactPerson: 'Helen Irving',
-      email: 'helen@national.com',
-      phone: '555-0110',
-      category: 'Office Supplies',
-      status: 'Active',
-      totalPurchases: 78000,
-      rating: 4.2,
-    },
-    {
-      id: 11,
-      vendorName: 'Pacific Trading',
-      contactPerson: 'Ian Jackson',
-      email: 'ian@pacific.com',
-      phone: '555-0111',
-      category: 'Import/Export',
-      status: 'Active',
-      totalPurchases: 245000,
-      rating: 4.7,
-    },
-    {
-      id: 12,
-      vendorName: 'Central Hardware',
-      contactPerson: 'Julia King',
-      email: 'julia@central.com',
-      phone: '555-0112',
-      category: 'Hardware',
-      status: 'Inactive',
-      totalPurchases: 34000,
-      rating: 3.5,
-    },
-  ];
+  // Vendor data from API
+  allVendorList: VendorWithRisk[] = [];
+  visibleVendorList: VendorWithRisk[] = [];
 
-  visibleVendorList: Vendor[] = [];
-
-  constructor(private router: Router) {}
+  private router = inject(Router);
+  private apiService = inject(ApiService);
 
   ngOnInit() {
     this.updateSelectedFilterColumns();
-    this.updateVisibleList();
+    this.loadVendors();
+  }
+
+  ngOnDestroy() {
+    if (this.vendorSubscription) {
+      this.vendorSubscription.unsubscribe();
+    }
+  }
+
+  loadVendors() {
+    this.isLoading = true;
+    this.vendorSubscription = this.apiService.getVendorsWithRisk().subscribe({
+      next: (vendors: VendorWithRisk[]) => {
+        this.allVendorList = vendors;
+        this.updateVisibleList();
+        this.isLoading = false;
+      },
+      error: (err: Error) => {
+        console.error('Error loading vendors:', err);
+        this.isLoading = false;
+      },
+    });
   }
 
   updateSelectedFilterColumns() {
@@ -275,16 +162,28 @@ export class VenderListComponent implements OnInit {
   }
 
   handleAddNewVendor() {
-    // Navigate to add vendor page or open modal
-    console.log('Add new vendor');
+    this.router.navigate(['/vendor/new']);
   }
 
-  handleEditVendor(id: number) {
+  handleEditVendor(id: string) {
+    this.router.navigate(['/vendor', id, 'edit']);
+  }
+
+  handleViewVendor(id: string) {
     this.router.navigate(['/vendor', id]);
   }
 
-  handleViewVendor(id: number) {
-    this.router.navigate(['/vendor', id]);
+  handleDeleteVendor(id: string) {
+    if (confirm('Are you sure you want to delete this vendor?')) {
+      this.apiService.deleteVendor(id).subscribe({
+        next: () => {
+          this.loadVendors(); // Reload the list
+        },
+        error: (err: Error) => {
+          console.error('Error deleting vendor:', err);
+        },
+      });
+    }
   }
 
   onSearch() {
@@ -327,6 +226,24 @@ export class VenderListComponent implements OnInit {
         return 'status-inactive';
       case 'pending':
         return 'status-pending';
+      case 'suspended':
+        return 'status-suspended';
+      default:
+        return '';
+    }
+  }
+
+  getRiskClass(riskLevel?: string): string {
+    if (!riskLevel) return '';
+    switch (riskLevel.toLowerCase()) {
+      case 'low':
+        return 'risk-low';
+      case 'medium':
+        return 'risk-medium';
+      case 'high':
+        return 'risk-high';
+      case 'critical':
+        return 'risk-critical';
       default:
         return '';
     }
