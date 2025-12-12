@@ -1,12 +1,37 @@
 <div class="vendor-profile-container">
+  <!-- Debug Info - Remove after testing -->
+  <!-- <div
+    style="
+      background: #fef3c7;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+    "
+  >
+    <strong>Debug:</strong> isLoading: {{ isLoading }} | vendorName:
+    {{ vendor.vendorName || "empty" }} | activeTab: {{ activeTab }}
+  </div> -->
+
   <!-- Loading State -->
   <div class="loading-overlay" *ngIf="isLoading">
     <div class="spinner"></div>
     <p>Loading vendor details...</p>
   </div>
 
+  <!-- No Data State -->
+  <div class="no-data-state" *ngIf="!isLoading && !vendor.vendorName">
+    <i class="bi bi-exclamation-circle"></i>
+    <h3>Vendor Not Found</h3>
+    <p>The vendor you're looking for doesn't exist or couldn't be loaded.</p>
+    <button class="btn-primary" (click)="goBack()">
+      <i class="bi bi-arrow-left"></i>
+      Back to Vendors
+    </button>
+  </div>
+
   <!-- Header Section -->
-  <div class="profile-header">
+  <div class="profile-header" *ngIf="!isLoading && vendor.vendorName">
     <div class="header-left">
       <button class="back-btn" (click)="goBack()">
         <i class="bi bi-arrow-left"></i>
@@ -53,7 +78,7 @@
   </div>
 
   <!-- Quick Stats Cards -->
-  <div class="stats-row">
+  <div class="stats-row" *ngIf="!isLoading && vendor.vendorName">
     <div class="stat-card">
       <div class="stat-icon blue">
         <i class="bi bi-currency-dollar"></i>
@@ -95,7 +120,7 @@
   </div>
 
   <!-- Tabs Navigation -->
-  <div class="tabs-container">
+  <div class="tabs-container" *ngIf="!isLoading && vendor.vendorName">
     <div class="tabs-nav">
       <button
         class="tab-btn"
@@ -140,9 +165,24 @@
     </div>
 
     <!-- Tab Content -->
-    <div class="tab-content">
+    <div
+      class="tab-content"
+      style="background: #f0f0f0; min-height: 200px; border: 2px solid red"
+    >
+      <!-- Debug: Active Tab is {{ activeTab }} -->
+      <p style="color: red; font-weight: bold">
+        TAB CONTENT AREA - Active: {{ activeTab }}
+      </p>
+
       <!-- Overview Tab -->
-      <div class="tab-pane" *ngIf="activeTab === 'overview'">
+      <div
+        class="tab-pane"
+        *ngIf="activeTab === 'overview'"
+        style="background: #e0ffe0; padding: 20px"
+      >
+        <p style="color: green; font-weight: bold">
+          OVERVIEW TAB CONTENT IS SHOWING!
+        </p>
         <div class="content-grid">
           <!-- Contact Information -->
           <div class="info-card">

@@ -15,7 +15,10 @@
         <span class="logo-text" *ngIf="!sidebarCollapsed">VendorIQ</span>
       </div>
       <button class="collapse-btn" (click)="toggleSidebar()">
-        <i class="bi" [ngClass]="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"></i>
+        <i
+          class="bi"
+          [ngClass]="sidebarCollapsed ? 'bi-chevron-right' : 'bi-chevron-left'"
+        ></i>
       </button>
     </div>
 
@@ -27,8 +30,14 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a *ngFor="let item of menuItems" class="nav-item" [class.active]="item.active" [routerLink]="item.route"
-        routerLinkActive="active" (click)="selectMenuItem(item)">
+      <a
+        *ngFor="let item of menuItems"
+        class="nav-item"
+        [class.active]="item.active"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        (click)="selectMenuItem(item)"
+      >
         <i class="bi" [ngClass]="item.icon"></i>
         <span *ngIf="!sidebarCollapsed">{{ item.label }}</span>
       </a>
@@ -39,11 +48,14 @@
         <i class="bi bi-gear"></i>
         <span>Settings</span>
       </a>
-      <a class="nav-item logout-item" (click)="logout()" *ngIf="!sidebarCollapsed">
+      <a
+        class="nav-item logout-item"
+        (click)="logout()"
+        *ngIf="!sidebarCollapsed"
+      >
         <i class="bi bi-box-arrow-right"></i>
         <span>Logout</span>
       </a>
-
     </div>
   </aside>
 
@@ -51,11 +63,20 @@
   <main class="main-content" [class.sidebar-collapsed]="sidebarCollapsed">
     <!-- Top Navbar -->
     <header class="top-navbar">
-      <div class="search-bar">
-        <i class="bi bi-search"></i>
-        <input type="text" placeholder="Search for anything..." />
+      <div class="search-bar" >
+
       </div>
       <div class="navbar-actions">
+        <button
+          class="action-btn"
+          (click)="toggleTheme()"
+          [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        >
+          <i
+            class="bi"
+            [ngClass]="isDarkMode ? 'bi-sun-fill' : 'bi-moon-fill'"
+          ></i>
+        </button>
         <button class="action-btn">
           <i class="bi bi-chat-dots"></i>
         </button>
@@ -63,8 +84,14 @@
           <i class="bi bi-bell"></i>
         </button>
         <div class="user-profile" (click)="toggleUserMenu()">
-          <img [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=6366f1&color=fff'"
-            [alt]="userName" />
+          <img
+            [src]="
+              'https://ui-avatars.com/api/?name=' +
+              userName +
+              '&background=6366f1&color=fff'
+            "
+            [alt]="userName"
+          />
           <div class="user-dropdown" *ngIf="showUserMenu">
             <div class="dropdown-header">
               <span class="user-name">{{ userName }}</span>

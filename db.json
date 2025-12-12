@@ -170,6 +170,25 @@
       "rating": 0,
       "createdAt": "2025-12-12T09:40:01.177Z",
       "updatedAt": "2025-12-12T09:42:46.198Z"
+    },
+    {
+      "id": "fc25",
+      "vendorName": "Sagar",
+      "contactPerson": "Rakesh",
+      "email": "sagar44@gmail.com",
+      "phone": "1122334455",
+      "category": "IT Services",
+      "status": "active",
+      "address": "",
+      "city": "Solapur",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 0,
+      "rating": 0,
+      "createdAt": "2025-12-12T13:08:25.007Z",
+      "updatedAt": "2025-12-12T13:08:25.007Z"
     }
   ],
   "purchases": [
@@ -255,9 +274,7 @@
       "paymentDelayDays": 5,
       "leadTime": 18,
       "communicationRating": 3,
-      "complianceIssues": [
-        "Minor documentation delay"
-      ]
+      "complianceIssues": ["Minor documentation delay"]
     },
     {
       "id": "3",
@@ -455,9 +472,7 @@
       "paymentDelayDays": 10,
       "leadTime": 19,
       "communicationRating": 2,
-      "complianceIssues": [
-        "Late delivery notification"
-      ]
+      "complianceIssues": ["Late delivery notification"]
     },
     {
       "id": "8",
@@ -1246,6 +1261,394 @@
       ],
       "createdAt": "2025-12-12T09:40:01.208Z",
       "updatedAt": "2025-12-12T09:40:01.208Z"
+    },
+    {
+      "id": "1b17",
+      "vendorId": "fc25",
+      "vendorName": "Sagar",
+      "riskLevel": "low",
+      "overallScore": 20,
+      "financialRisk": 16,
+      "operationalRisk": 12,
+      "complianceRisk": 18,
+      "reputationRisk": 33,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 16,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 12,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 18,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 33,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T13:08:25.053Z",
+      "nextReviewDate": "2026-03-12T13:08:25.053Z",
+      "recommendations": [
+        "Continue regular monitoring",
+        "Consider for preferred vendor status"
+      ],
+      "createdAt": "2025-12-12T13:08:25.053Z",
+      "updatedAt": "2025-12-12T13:08:25.053Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "itemCode": "ITM-001",
+      "itemName": "Laptop Computer",
+      "description": "Business laptop with standard specifications",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 999,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "itemCode": "ITM-002",
+      "itemName": "Desktop Monitor",
+      "description": "27-inch LED monitor",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 350,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "itemCode": "ITM-003",
+      "itemName": "Wireless Keyboard",
+      "description": "Ergonomic wireless keyboard",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 79,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "itemCode": "ITM-004",
+      "itemName": "Printer Paper A4",
+      "description": "A4 size printer paper, 500 sheets per ream",
+      "category": "Office Supplies",
+      "unit": "ream",
+      "defaultPrice": 8,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "itemCode": "ITM-005",
+      "itemName": "Ballpoint Pens",
+      "description": "Blue ballpoint pens, pack of 12",
+      "category": "Office Supplies",
+      "unit": "pack",
+      "defaultPrice": 12,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "itemCode": "ITM-006",
+      "itemName": "Office Chair",
+      "description": "Ergonomic office chair with lumbar support",
+      "category": "Furniture",
+      "unit": "piece",
+      "defaultPrice": 299,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "itemCode": "ITM-007",
+      "itemName": "Standing Desk",
+      "description": "Height adjustable standing desk",
+      "category": "Furniture",
+      "unit": "piece",
+      "defaultPrice": 599,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "itemCode": "ITM-008",
+      "itemName": "Network Cable Cat6",
+      "description": "Cat6 Ethernet cable, 10 meters",
+      "category": "IT Services",
+      "unit": "piece",
+      "defaultPrice": 15,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "9",
+      "itemCode": "ITM-009",
+      "itemName": "USB-C Hub",
+      "description": "Multi-port USB-C hub with HDMI",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 65,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "10",
+      "itemCode": "ITM-010",
+      "itemName": "Webcam HD",
+      "description": "1080p HD webcam with microphone",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 89,
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "506e",
+      "itemCode": "ITM-011",
+      "itemName": "RK Part",
+      "description": "this product is best",
+      "category": "IT Services",
+      "unit": "pack",
+      "defaultPrice": 1,
+      "status": "active",
+      "createdAt": "2025-12-12T16:05:15.253Z",
+      "updatedAt": "2025-12-12T16:05:15.253Z"
+    },
+    {
+      "id": "5c23",
+      "itemCode": "ITM-012",
+      "itemName": "TV branch two",
+      "description": "this product is too quality ",
+      "category": "Electronics",
+      "unit": "piece",
+      "defaultPrice": 2,
+      "status": "active",
+      "createdAt": "2025-12-12T16:10:13.409Z",
+      "updatedAt": "2025-12-12T16:10:32.142Z"
+    }
+  ],
+  "vendorItems": [
+    {
+      "id": "1",
+      "vendorId": "1",
+      "itemId": "1",
+      "vendorName": "Acme Corporation",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-001",
+      "unitPrice": 950,
+      "minOrderQuantity": 5,
+      "leadTimeDays": 7,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "vendorId": "1",
+      "itemId": "2",
+      "vendorName": "Acme Corporation",
+      "itemName": "Desktop Monitor",
+      "itemCode": "ITM-002",
+      "unitPrice": 320,
+      "minOrderQuantity": 10,
+      "leadTimeDays": 5,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "vendorId": "1",
+      "itemId": "3",
+      "vendorName": "Acme Corporation",
+      "itemName": "Wireless Keyboard",
+      "itemCode": "ITM-003",
+      "unitPrice": 75,
+      "minOrderQuantity": 20,
+      "leadTimeDays": 3,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "vendorId": "1",
+      "itemId": "9",
+      "vendorName": "Acme Corporation",
+      "itemName": "USB-C Hub",
+      "itemCode": "ITM-009",
+      "unitPrice": 60,
+      "minOrderQuantity": 25,
+      "leadTimeDays": 3,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "vendorId": "2",
+      "itemId": "4",
+      "vendorName": "Global Supplies Ltd",
+      "itemName": "Printer Paper A4",
+      "itemCode": "ITM-004",
+      "unitPrice": 7.5,
+      "minOrderQuantity": 50,
+      "leadTimeDays": 2,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "vendorId": "2",
+      "itemId": "5",
+      "vendorName": "Global Supplies Ltd",
+      "itemName": "Ballpoint Pens",
+      "itemCode": "ITM-005",
+      "unitPrice": 10,
+      "minOrderQuantity": 100,
+      "leadTimeDays": 2,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "vendorId": "2",
+      "itemId": "6",
+      "vendorName": "Global Supplies Ltd",
+      "itemName": "Office Chair",
+      "itemCode": "ITM-006",
+      "unitPrice": 280,
+      "minOrderQuantity": 5,
+      "leadTimeDays": 10,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "vendorId": "3",
+      "itemId": "1",
+      "vendorName": "Tech Solutions Inc",
+      "itemName": "Laptop Computer",
+      "itemCode": "ITM-001",
+      "unitPrice": 980,
+      "minOrderQuantity": 3,
+      "leadTimeDays": 5,
+      "isPreferred": false,
+      "status": "active",
+      "createdAt": "2024-03-10T00:00:00.000Z",
+      "updatedAt": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "9",
+      "vendorId": "3",
+      "itemId": "8",
+      "vendorName": "Tech Solutions Inc",
+      "itemName": "Network Cable Cat6",
+      "itemCode": "ITM-008",
+      "unitPrice": 12,
+      "minOrderQuantity": 100,
+      "leadTimeDays": 1,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-03-10T00:00:00.000Z",
+      "updatedAt": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "10",
+      "vendorId": "3",
+      "itemId": "10",
+      "vendorName": "Tech Solutions Inc",
+      "itemName": "Webcam HD",
+      "itemCode": "ITM-010",
+      "unitPrice": 85,
+      "minOrderQuantity": 10,
+      "leadTimeDays": 3,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-03-10T00:00:00.000Z",
+      "updatedAt": "2024-03-10T00:00:00.000Z"
+    },
+    {
+      "id": "11",
+      "vendorId": "5",
+      "itemId": "6",
+      "vendorName": "Quick Logistics",
+      "itemName": "Office Chair",
+      "itemCode": "ITM-006",
+      "unitPrice": 275,
+      "minOrderQuantity": 10,
+      "leadTimeDays": 5,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-04-01T00:00:00.000Z",
+      "updatedAt": "2024-04-01T00:00:00.000Z"
+    },
+    {
+      "id": "12",
+      "vendorId": "5",
+      "itemId": "7",
+      "vendorName": "Quick Logistics",
+      "itemName": "Standing Desk",
+      "itemCode": "ITM-007",
+      "unitPrice": 550,
+      "minOrderQuantity": 5,
+      "leadTimeDays": 14,
+      "isPreferred": true,
+      "status": "active",
+      "createdAt": "2024-04-01T00:00:00.000Z",
+      "updatedAt": "2024-04-01T00:00:00.000Z"
+    },
+    {
+      "id": "7cfa",
+      "vendorId": "17d3",
+      "itemId": "8",
+      "unitPrice": 80,
+      "minOrderQuantity": 50,
+      "leadTimeDays": 8,
+      "isPreferred": false,
+      "status": "active",
+      "vendorName": "Rahul ",
+      "itemName": "Network Cable Cat6",
+      "itemCode": "ITM-008",
+      "createdAt": "2025-12-12T16:11:49.643Z",
+      "updatedAt": "2025-12-12T16:11:49.643Z"
     }
   ]
 }

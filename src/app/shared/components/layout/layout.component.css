@@ -241,29 +241,13 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: #f5f6fa;
   padding: 0.75rem 1.25rem;
   border-radius: 8px;
-  flex: 1;
-  max-width: 500px;
+  max-width: 0px;
 }
 
-.search-bar i {
-  color: #9ca3af;
-}
 
-.search-bar input {
-  border: none;
-  background: transparent;
-  outline: none;
-  width: 100%;
-  font-size: 0.875rem;
-  color: #374151;
-}
 
-.search-bar input::placeholder {
-  color: #9ca3af;
-}
 
 .navbar-actions {
   display: flex;
@@ -376,6 +360,91 @@
 .page-content {
   flex: 1;
   padding: 2rem;
+}
+
+/* ==================== DARK THEME STYLES ==================== */
+:host-context(.dark-theme) .app-layout {
+  background: var(--bg);
+}
+
+:host-context(.dark-theme) .loading-overlay {
+  background: rgba(15, 23, 42, 0.9);
+}
+
+:host-context(.dark-theme) .loader-spinner {
+  border-color: var(--border-color);
+  border-top-color: var(--brand-primary);
+}
+
+:host-context(.dark-theme) .loader-text {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .sidebar {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  border-right: 1px solid var(--border-color);
+}
+
+:host-context(.dark-theme) .top-navbar {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+
+
+:host-context(.dark-theme) .search-bar input {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .search-bar input::placeholder {
+  color: var(--text-muted);
+}
+
+:host-context(.dark-theme) .action-btn {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .action-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .theme-toggle-btn:hover i {
+  color: var(--brand-primary);
+}
+
+:host-context(.dark-theme) .user-dropdown {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+:host-context(.dark-theme) .dropdown-header {
+  background: var(--bg-secondary);
+}
+
+:host-context(.dark-theme) .user-name {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .user-email {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .dropdown-divider {
+  background: var(--border-color);
+}
+
+:host-context(.dark-theme) .dropdown-item {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .dropdown-item:hover {
+  background: var(--bg-secondary);
+}
+
+:host-context(.dark-theme) .dropdown-item.logout:hover {
+  background: rgba(239, 68, 68, 0.1);
 }
 
 /* Responsive Design */

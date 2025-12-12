@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, delay, map } from 'rxjs';
-import { 
-  Vendor, 
-  VendorRiskAssessment, 
-  RiskFactor, 
-  RiskLevel, 
+import {
+  Vendor,
+  VendorRiskAssessment,
+  RiskFactor,
+  RiskLevel,
   RiskCategory,
-  AIRiskInsight 
+  AIRiskInsight
 } from '../../models/vendor/vendor.model';
-import { 
-  AIAnalysisResult, 
-  AIInsight, 
+import {
+  AIAnalysisResult,
+  AIInsight,
   ChatMessage,
-  AIAnalysisType 
+  AIAnalysisType
 } from '../../models/insights/insights.model';
 
 export interface AIConfig {
@@ -48,7 +48,7 @@ export class AIRiskAnalysisService {
   private analysisHistory = new BehaviorSubject<AIAnalysisResult[]>([]);
   private chatHistory = new BehaviorSubject<ChatMessage[]>([]);
   private isAnalyzing = new BehaviorSubject<boolean>(false);
-  
+
   // Current AI provider
   private currentProvider: AIProvider = 'local';
 
@@ -75,23 +75,23 @@ export class AIRiskAnalysisService {
     if (!this.geminiConfig.apiKey) {
       return [];
     }
-    
+
     try {
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models?key=${this.geminiConfig.apiKey}`
       );
-      
+
       if (!response.ok) {
         return [];
       }
-      
+
       const data = await response.json();
       const models = data.models?.map((m: any) => m.name) || [];
-      
+
       // Filter for models that support generateContent
       const generateModels = data.models
         ?.filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
-        ?.map((m: any) => m.name.replace('models/', '')) || [];      
+        ?.map((m: any) => m.name.replace('models/', '')) || [];
       return generateModels;
     } catch (error) {
       return [];
@@ -151,16 +151,17 @@ export class AIRiskAnalysisService {
       switch (this.currentProvider) {
         case 'gemini':
           if (this.geminiConfig.apiKey) {
+            console.log("Gemini")
             return await this.performGeminiRiskAnalysis(vendor);
           }
           return this.calculateRiskLocally(vendor);
-          
+
         case 'openai':
           if (this.config.apiKey) {
             return await this.performAIRiskAnalysis(vendor);
           }
           return this.calculateRiskLocally(vendor);
-          
+
         case 'local':
         default:
           return this.calculateRiskLocally(vendor);
@@ -175,10 +176,10 @@ export class AIRiskAnalysisService {
    */
   private async performGeminiRiskAnalysis(vendor: Vendor): Promise<VendorRiskAssessment> {
     const prompt = this.buildRiskAnalysisPrompt(vendor);
-    
+
     try {
       const endpoint = `${this.geminiConfig.baseUrl}/${this.geminiConfig.model}:generateContent?key=${this.geminiConfig.apiKey}`;
-      
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -202,14 +203,14 @@ export class AIRiskAnalysisService {
       }
 
       const data = await response.json();
-      
+
       const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!aiResponse) {
         return this.calculateRiskLocally(vendor);
       }
-      
+
       return this.parseAIRiskResponse(aiResponse, vendor);
-      
+
     } catch (error) {
       return this.calculateRiskLocally(vendor);
     }
@@ -220,7 +221,7 @@ export class AIRiskAnalysisService {
    */
   private async performAIRiskAnalysis(vendor: Vendor): Promise<VendorRiskAssessment> {
     const prompt = this.buildRiskAnalysisPrompt(vendor);
-    
+
     try {
       const response = await fetch(this.config.endpoint, {
         method: 'POST',
@@ -233,7 +234,7 @@ export class AIRiskAnalysisService {
           messages: [
             {
               role: 'system',
-              content: `You are an expert vendor risk analyst. Analyze vendor data and provide detailed risk assessments in JSON format. 
+              content: `You are an expert vendor risk analyst. Analyze vendor data and provide detailed risk assessments in JSON format.
               Focus on financial stability, operational reliability, compliance status, and market position.
               Always respond with valid JSON matching the expected schema. Do not include markdown code blocks, just return raw JSON.`
             },
@@ -252,14 +253,14 @@ export class AIRiskAnalysisService {
       }
 
       const data = await response.json();
-      
+
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         return this.calculateRiskLocally(vendor);
       }
-      
+
       const aiResponse = data.choices[0].message.content;
       return this.parseAIRiskResponse(aiResponse, vendor);
-      
+
     } catch (error) {
       return this.calculateRiskLocally(vendor);
     }
@@ -271,7 +272,7 @@ export class AIRiskAnalysisService {
   private buildRiskAnalysisPrompt(vendor: Vendor): string {
     // Cast to any to access extended properties from API
     const v = vendor as any;
-    
+
     return `
 Analyze the following vendor for risk assessment:
 
@@ -348,27 +349,27 @@ Respond in valid JSON format matching this structure:
     try {
       // Extract JSON from response (handle various formats)
       let jsonStr = aiResponse.trim();
-      
+
       // Remove markdown code blocks if present (handles ```json, ```, with newlines or spaces)
       const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (jsonMatch) {
         jsonStr = jsonMatch[1].trim();
       }
-      
+
       // Try to find JSON object in the response
       const jsonStartIndex = jsonStr.indexOf('{');
       const jsonEndIndex = jsonStr.lastIndexOf('}');
       if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonStartIndex < jsonEndIndex) {
         jsonStr = jsonStr.substring(jsonStartIndex, jsonEndIndex + 1);
       }
-      
+
       const parsed = JSON.parse(jsonStr);
-      
+
       // Validate required fields exist
       if (!parsed.overallRiskScore && parsed.overallRiskScore !== 0) {
         return this.calculateRiskLocally(vendor);
       }
-      
+
       const riskFactors = (parsed.riskFactors || []).map((rf: any) => ({
         category: (rf.category || 'general').toLowerCase(),
         name: rf.name || 'Unknown Factor',
@@ -378,24 +379,24 @@ Respond in valid JSON format matching this structure:
         recommendation: rf.recommendation || '',
         id: this.generateId()
       }));
-      
+
       const aiInsights = (parsed.aiInsights || []).map((insight: any) => ({
         title: insight.title || 'Insight',
         description: insight.description || '',
         impact: (insight.impact || 'neutral').toLowerCase() as 'positive' | 'negative' | 'neutral',
         // Handle confidence as integer (0-100) or decimal (0-1)
-        confidence: insight.confidence 
-          ? (insight.confidence > 1 ? insight.confidence / 100 : insight.confidence) 
+        confidence: insight.confidence
+          ? (insight.confidence > 1 ? insight.confidence / 100 : insight.confidence)
           : 0.7,
         category: insight.category || 'general',
         actionRequired: insight.actionRequired || false,
-        suggestedActions: insight.suggestedActions || 
+        suggestedActions: insight.suggestedActions ||
           (insight.actionRequired ? ['Review and take appropriate action'] : []),
         id: this.generateId()
       }));
-      
+
       const recommendations = parsed.recommendations || ['Review vendor periodically'];
-      
+
       return {
         vendorId: vendor.id,
         vendorName: vendor.name,
@@ -467,8 +468,8 @@ Respond in valid JSON format matching this structure:
       description: `Vendor is using ${(utilizationRate * 100).toFixed(1)}% of credit limit`,
       severity: utilizationRate > 0.8 ? 'high' : utilizationRate > 0.5 ? 'medium' : 'low',
       score: Math.min(utilizationRate * 100, 100),
-      recommendation: utilizationRate > 0.8 
-        ? 'Consider reviewing credit terms or requiring prepayment' 
+      recommendation: utilizationRate > 0.8
+        ? 'Consider reviewing credit terms or requiring prepayment'
         : 'Credit utilization is within acceptable range'
     });
 
@@ -479,8 +480,8 @@ Respond in valid JSON format matching this structure:
       description: `Payment terms of ${paymentTerms} days`,
       severity: paymentTerms > 60 ? 'high' : paymentTerms > 30 ? 'medium' : 'low',
       score: Math.min((paymentTerms / 90) * 100, 100),
-      recommendation: paymentTerms > 60 
-        ? 'Extended payment terms increase financial exposure' 
+      recommendation: paymentTerms > 60
+        ? 'Extended payment terms increase financial exposure'
         : 'Payment terms are standard'
     });
 
@@ -492,8 +493,8 @@ Respond in valid JSON format matching this structure:
       description: `On-time delivery rate of ${onTimeDeliveryRate}%`,
       severity: deliveryRisk > 20 ? 'high' : deliveryRisk > 10 ? 'medium' : 'low',
       score: deliveryRisk,
-      recommendation: deliveryRisk > 20 
-        ? 'Implement delivery monitoring and backup supplier strategy' 
+      recommendation: deliveryRisk > 20
+        ? 'Implement delivery monitoring and backup supplier strategy'
         : 'Delivery performance is satisfactory'
     });
 
@@ -504,8 +505,8 @@ Respond in valid JSON format matching this structure:
       description: `Quality score of ${qualityScore}/100 with ${defectRate}% defect rate`,
       severity: qualityScore < 70 ? 'high' : qualityScore < 85 ? 'medium' : 'low',
       score: 100 - qualityScore,
-      recommendation: qualityScore < 70 
-        ? 'Quality improvement plan required' 
+      recommendation: qualityScore < 70
+        ? 'Quality improvement plan required'
         : 'Quality levels are acceptable'
     });
 
@@ -516,8 +517,8 @@ Respond in valid JSON format matching this structure:
       description: `Average response time of ${responseTime} hours`,
       severity: responseTime > 48 ? 'high' : responseTime > 24 ? 'medium' : 'low',
       score: Math.min((responseTime / 72) * 100, 100),
-      recommendation: responseTime > 48 
-        ? 'Communication SLAs should be established' 
+      recommendation: responseTime > 48
+        ? 'Communication SLAs should be established'
         : 'Response time is adequate'
     });
 
@@ -527,12 +528,12 @@ Respond in valid JSON format matching this structure:
       category: 'compliance',
       name: 'Compliance Status',
       description: `Current compliance status: ${complianceStatus}`,
-      severity: complianceStatus === 'non-compliant' ? 'critical' 
+      severity: complianceStatus === 'non-compliant' ? 'critical'
         : complianceStatus === 'pending-review' ? 'medium' : 'low',
-      score: complianceStatus === 'non-compliant' ? 100 
+      score: complianceStatus === 'non-compliant' ? 100
         : complianceStatus === 'pending-review' ? 50 : 10,
-      recommendation: complianceStatus === 'non-compliant' 
-        ? 'Immediate compliance review and remediation required' 
+      recommendation: complianceStatus === 'non-compliant'
+        ? 'Immediate compliance review and remediation required'
         : 'Continue regular compliance monitoring'
     });
 
@@ -544,8 +545,8 @@ Respond in valid JSON format matching this structure:
       description: `Vendor has ${certCount} certification(s)`,
       severity: certCount === 0 ? 'medium' : 'low',
       score: certCount === 0 ? 60 : Math.max(40 - certCount * 10, 10),
-      recommendation: certCount === 0 
-        ? 'Request relevant industry certifications' 
+      recommendation: certCount === 0
+        ? 'Request relevant industry certifications'
         : 'Certification status is adequate'
     });
 
@@ -557,8 +558,8 @@ Respond in valid JSON format matching this structure:
       description: `Total purchases of $${totalPurchases.toLocaleString()} may indicate dependency`,
       severity: concentrationRisk > 60 ? 'high' : concentrationRisk > 30 ? 'medium' : 'low',
       score: concentrationRisk,
-      recommendation: concentrationRisk > 60 
-        ? 'Develop alternative supplier strategy to reduce dependency' 
+      recommendation: concentrationRisk > 60
+        ? 'Develop alternative supplier strategy to reduce dependency'
         : 'Supplier concentration is manageable'
     });
 
@@ -610,18 +611,18 @@ Respond in valid JSON format matching this structure:
     // Financial Health Insight
     const financialFactors = factors.filter(f => f.category === 'financial');
     const avgFinancialScore = financialFactors.reduce((a, b) => a + b.score, 0) / financialFactors.length;
-    
+
     insights.push({
       id: this.generateId(),
       title: 'Financial Health Assessment',
-      description: avgFinancialScore > 50 
+      description: avgFinancialScore > 50
         ? `Financial indicators show elevated risk. Credit utilization and payment terms require attention.`
         : `Financial indicators are within acceptable range. Continue monitoring key metrics.`,
       impact: avgFinancialScore > 50 ? 'negative' : 'positive',
       confidence: 0.85,
       category: 'financial',
       actionRequired: avgFinancialScore > 50,
-      suggestedActions: avgFinancialScore > 50 
+      suggestedActions: avgFinancialScore > 50
         ? ['Review credit terms', 'Request updated financial statements', 'Consider reducing order volume']
         : ['Maintain current monitoring frequency']
     });
@@ -637,7 +638,7 @@ Respond in valid JSON format matching this structure:
       confidence: 0.90,
       category: 'operational',
       actionRequired: vendor.onTimeDeliveryRate < 90 || vendor.qualityScore < 80,
-      suggestedActions: vendor.onTimeDeliveryRate < 90 
+      suggestedActions: vendor.onTimeDeliveryRate < 90
         ? ['Establish delivery SLAs', 'Implement delivery tracking', 'Develop contingency plans']
         : ['Continue current monitoring']
     });
@@ -682,7 +683,7 @@ Respond in valid JSON format matching this structure:
    */
   private generateRecommendations(factors: RiskFactor[]): string[] {
     const recommendations: string[] = [];
-    
+
     const criticalFactors = factors.filter(f => f.severity === 'critical');
     const highFactors = factors.filter(f => f.severity === 'high');
 
@@ -699,7 +700,7 @@ Respond in valid JSON format matching this structure:
     categories.forEach(category => {
       const categoryFactors = factors.filter(f => f.category === category);
       const avgScore = categoryFactors.reduce((a, b) => a + b.score, 0) / categoryFactors.length;
-      
+
       if (avgScore > 50) {
         switch (category) {
           case 'financial':
@@ -728,7 +729,7 @@ Respond in valid JSON format matching this structure:
    * Chat with AI about vendor risks
    */
   async chatAboutRisk(
-    message: string, 
+    message: string,
     vendorContext?: Vendor,
     assessmentContext?: VendorRiskAssessment
   ): Promise<string> {
@@ -757,7 +758,7 @@ Respond in valid JSON format matching this structure:
 
     try {
       const contextPrompt = this.buildChatContext(vendorContext, assessmentContext);
-      
+
       const response = await fetch(this.config.endpoint, {
         method: 'POST',
         headers: {
@@ -812,12 +813,12 @@ Respond in valid JSON format matching this structure:
     if (!vendor && !assessment) return '';
 
     let context = '\n\nCurrent Context:';
-    
+
     if (vendor) {
       context += `\nVendor: ${vendor.name} (${vendor.category})`;
       context += `\nStatus: ${vendor.status}, Compliance: ${vendor.complianceStatus}`;
     }
-    
+
     if (assessment) {
       context += `\nRisk Score: ${assessment.overallRiskScore}/100 (${assessment.riskLevel})`;
       context += `\nKey Risk Factors: ${assessment.riskFactors.slice(0, 3).map(f => f.name).join(', ')}`;
@@ -827,14 +828,14 @@ Respond in valid JSON format matching this structure:
   }
 
   private generateLocalChatResponse(
-    message: string, 
-    vendor?: Vendor, 
+    message: string,
+    vendor?: Vendor,
     assessment?: VendorRiskAssessment
   ): string {
     const lowerMessage = message.toLowerCase();
 
     if (lowerMessage.includes('risk') && lowerMessage.includes('score')) {
-      return assessment 
+      return assessment
         ? `The current risk score for ${vendor?.name || 'this vendor'} is ${assessment.overallRiskScore}/100, classified as ${assessment.riskLevel} risk. The main contributing factors are: ${assessment.riskFactors.slice(0, 3).map(f => f.name).join(', ')}.`
         : 'Please run a risk assessment first to get the risk score.';
     }
@@ -865,7 +866,7 @@ Respond in valid JSON format matching this structure:
    */
   async analyzeMultipleVendors(vendors: Vendor[]): Promise<VendorRiskAssessment[]> {
     const assessments: VendorRiskAssessment[] = [];
-    
+
     for (const vendor of vendors) {
       const assessment = await this.analyzeVendorRisk(vendor);
       assessments.push(assessment);
@@ -908,7 +909,7 @@ Respond in valid JSON format matching this structure:
   private generateMockTrend(): { date: Date; riskScore: number; riskLevel: RiskLevel }[] {
     const trend = [];
     const now = new Date();
-    
+
     for (let i = 5; i >= 0; i--) {
       const date = new Date(now);
       date.setMonth(date.getMonth() - i);
@@ -919,7 +920,7 @@ Respond in valid JSON format matching this structure:
         riskLevel: this.determineRiskLevel(score)
       });
     }
-    
+
     return trend;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Router,
@@ -9,6 +9,7 @@ import {
   RouterModule,
 } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { ThemeService } from '../../../core/services/theme/theme.service';
 
 @Component({
   selector: 'app-layout',
@@ -17,6 +18,9 @@ import { filter } from 'rxjs/operators';
   styleUrl: './layout.component.css',
 })
 export class LayoutComponent implements OnInit {
+  // Theme service
+  private themeService = inject(ThemeService);
+
   // Loading state - start with true to show loader on page refresh
   isLoading = true;
 
@@ -35,16 +39,21 @@ export class LayoutComponent implements OnInit {
     // { icon: 'bi-upload', label: 'Upload', route: '/upload', active: false },
     { icon: 'bi-people', label: 'Vendors', route: '/vendors', active: false },
     { icon: 'bi-cart', label: 'Purchase', route: '/purchase', active: false },
-    
+
     {
       icon: 'bi-bar-chart',
       label: 'Analytics',
       route: '/aianalysis',
       active: false,
     },
+    {
+      icon: 'bi-database',
+      label: 'Master Data',
+      route: '/master-data',
+      active: false,
+    },
   ];
 
-  // Vendor section menu items (shown when in vendor pages)
   vendorMenuItems = [
     {
       icon: 'bi-house-door',
@@ -53,7 +62,13 @@ export class LayoutComponent implements OnInit {
       active: false,
     },
     { icon: 'bi-people', label: 'Vendor', route: '/vendors', active: true },
-
+    { icon: 'bi-cart', label: 'Purchase', route: '/purchase', active: false },
+    {
+      icon: 'bi-bar-chart',
+      label: 'Analytics',
+      route: '/aianalysis',
+      active: false,
+    },
   ];
 
   // Current menu items to display
@@ -94,10 +109,7 @@ export class LayoutComponent implements OnInit {
 
   updateMenuBasedOnRoute(url: string) {
     // Check if we're in vendor section (vendors, vendor/:id, or insights)
-    const isVendor =
-      url.includes('/vendors') ||
-      url.includes('/vendor/');
-
+    const isVendor = url.includes('/vendors') || url.includes('/vendor/');
 
     if (isVendor) {
       this.isVendorSection = true;
@@ -166,5 +178,13 @@ export class LayoutComponent implements OnInit {
 
   toggleUserMenu() {
     this.showUserMenu = !this.showUserMenu;
+  }
+
+  get isDarkMode(): boolean {
+    return this.themeService.isDarkMode();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 }

@@ -647,6 +647,115 @@ tbody tr:hover {
   border-top: 1px solid #e9ecef;
 }
 
+/* ==================== DARK THEME STYLES ==================== */
+:host-context(.dark-theme) .purchase-container {
+  background-color: var(--bg);
+}
+
+:host-context(.dark-theme) .header-card,
+:host-context(.dark-theme) .table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+:host-context(.dark-theme) .header-card .card-header {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .breadcrumb-nav {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .breadcrumb-nav .active {
+  color: var(--brand-primary);
+}
+
+:host-context(.dark-theme) .status-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+:host-context(.dark-theme) .status-count {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .status-label {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .btn-outline {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .btn-outline:hover {
+  background: var(--bg-secondary);
+  border-color: var(--brand-primary);
+}
+
+:host-context(.dark-theme) .search-wrapper {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+}
+
+:host-context(.dark-theme) .search-input {
+  background: transparent;
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .search-input::placeholder {
+  color: var(--text-muted);
+}
+
+:host-context(.dark-theme) .purchase-table {
+  background: var(--card-bg);
+}
+
+:host-context(.dark-theme) .t-head {
+  background: var(--table-header-bg);
+  color: var(--text-secondary);
+  border-color: var(--table-border);
+}
+
+:host-context(.dark-theme) .t-col {
+  color: var(--text);
+  border-color: var(--table-border);
+}
+
+:host-context(.dark-theme) .purchase-table tbody tr:hover {
+  background: var(--table-row-hover);
+}
+
+:host-context(.dark-theme) .filter-dropdown {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+:host-context(.dark-theme) .filter-label {
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .checkbox-items label {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .page-info {
+  color: var(--text-secondary);
+}
+
+:host-context(.dark-theme) .btn-page {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text);
+}
+
+:host-context(.dark-theme) .btn-page:hover:not(:disabled) {
+  background: var(--bg-secondary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .purchase-container {
