@@ -6,6 +6,8 @@ import {
   AIRiskAnalysisService,
   AIProvider,
   ItemAnalysisInput,
+  DetailedItemAnalysis,
+  VendorComparisonResult,
 } from '../../core/services/ai-risk-analysis/ai-risk-analysis.service';
 import { ApiService, Purchase, Item, VendorItem } from '../../core/services/api/api.service';
 import {
@@ -57,6 +59,8 @@ interface ItemAnalysis {
   demandTrend?: 'increasing' | 'stable' | 'decreasing';
   category?: string;
   lastUpdated?: Date;
+  // Detailed vendor comparison (when analyzing single item)
+  detailedAnalysis?: DetailedItemAnalysis;
 }
 
 @Component({
@@ -94,6 +98,11 @@ export class RiskAnalysisComponent implements OnInit, OnDestroy {
   isAnalyzingItems = false;
   itemAnalysisProgress = 0;
   selectedItemForDetail: ItemAnalysis | null = null;
+  
+  // Detailed vendor comparison modal
+  showVendorComparisonModal = false;
+  vendorComparisonResult: DetailedItemAnalysis | null = null;
+  isAnalyzingVendorComparison = false;
   
   // Track expanded items (by item name)
   expandedItems: Set<string> = new Set();
@@ -1011,6 +1020,113 @@ export class RiskAnalysisComponent implements OnInit, OnDestroy {
       this.isAnalyzingItems = false;
       this.cdr.detectChanges();
     }
+  }
+
+  // Run detailed vendor comparison for a single item
+  // This analyzes which vendor is the best choice when buying the same product from multiple vendors
+  async analyzeItemVendorComparison(item: ItemAnalysis): Promise<void> {
+    if (this.isAnalyzingVendorComparison) return;
+    
+    // Check if item has multiple vendors
+    if (item.vendorOptions.length < 2) {
+      this.errorMessage = `${item.itemName} has only ${item.vendorOptions.length} vendor(s). Vendor comparison requires at least 2 vendors.`;
+      return;
+    }
+    
+    this.isAnalyzingVendorComparison = true;
+    this.showVendorComparisonModal = true;
+    this.vendorComparisonResult = null;
+    this.errorMessage = '';
+    
+    try {
+      // Call the AI service for detailed vendor comparison
+      const comparison = await this.aiRiskService.analyzeItemVendorComparison(item);
+      this.vendorComparisonResult = comparison;
+      
+      // Also update the item with the detailed analysis
+      const index = this.itemAnalysisList.findIndex(it => {
+        if (it.masterItemId && item.masterItemId) {
+          return it.masterItemId === item.masterItemId;
+        }
+        return it.itemName === item.itemName;
+      });
+      if (index !== -1) {
+        this.itemAnalysisList[index] = {
+          ...this.itemAnalysisList[index],
+          detailedAnalysis: comparison
+        };
+      }
+      
+      // Update filtered list
+      const filteredIndex = this.filteredItemAnalysis.findIndex(it => {
+        if (it.masterItemId && item.masterItemId) {
+          return it.masterItemId === item.masterItemId;
+        }
+        return it.itemName === item.itemName;
+      });
+      if (filteredIndex !== -1) {
+        this.filteredItemAnalysis[filteredIndex] = {
+          ...this.filteredItemAnalysis[filteredIndex],
+          detailedAnalysis: comparison
+        };
+      }
+      
+      // Update selected item
+      if (this.selectedItemForDetail && 
+          (this.selectedItemForDetail.itemName === item.itemName || 
+           this.selectedItemForDetail.masterItemId === item.masterItemId)) {
+        this.selectedItemForDetail = {
+          ...this.selectedItemForDetail!,
+          detailedAnalysis: comparison
+        } as ItemAnalysis;
+      }
+      
+      this.cdr.detectChanges();
+      
+    } catch (error) {
+      this.errorMessage = `Failed to compare vendors for ${item.itemName}. Please try again.`;
+    } finally {
+      this.isAnalyzingVendorComparison = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Close vendor comparison modal
+  closeVendorComparisonModal(): void {
+    this.showVendorComparisonModal = false;
+    this.vendorComparisonResult = null;
+  }
+
+  // Get vendor comparison score class
+  getVendorScoreClass(score: number): string {
+    if (score >= 80) return 'score-excellent';
+    if (score >= 65) return 'score-good';
+    if (score >= 50) return 'score-average';
+    return 'score-poor';
+  }
+
+  // Get rank badge class
+  getRankBadgeClass(rank: number): string {
+    switch (rank) {
+      case 1: return 'rank-1';
+      case 2: return 'rank-2';
+      case 3: return 'rank-3';
+      default: return 'rank-other';
+    }
+  }
+
+  // Format cost savings
+  formatCostSavings(savings: number): string {
+    if (savings > 0) return `+${savings.toFixed(1)}% savings`;
+    if (savings < 0) return `${savings.toFixed(1)}% premium`;
+    return 'Average price';
+  }
+
+  // Get savings class
+  getSavingsClass(savings: number): string {
+    if (savings > 0) return 'savings-positive';
+    if (savings < 0) return 'savings-negative';
+    return 'savings-neutral';
   }
 
   // Get trend icon

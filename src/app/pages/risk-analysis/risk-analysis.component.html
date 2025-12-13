@@ -961,9 +961,23 @@
                   <span class="purchase-count">{{ item.totalPurchases }}</span>
                 </td>
                 <td class="col-actions">
-                  <button class="btn-icon" title="View Details">
-                    <i class="bi" [ngClass]="selectedItemForDetail?.itemName === item.itemName ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                  </button>
+                  <div class="action-buttons">
+                    <!-- Compare Vendors Button - shown for items with 2+ vendors -->
+                    <button 
+                      class="btn-compare-inline" 
+                      *ngIf="item.vendorOptions.length >= 2"
+                      (click)="analyzeItemVendorComparison(item); $event.stopPropagation()"
+                      [disabled]="isAnalyzingVendorComparison"
+                      title="Compare {{ item.vendorOptions.length }} vendors and get AI recommendation"
+                    >
+                      <i class="bi bi-diagram-3"></i>
+                      <span class="compare-text">Compare</span>
+                    </button>
+                    <!-- View Details Button -->
+                    <button class="btn-icon" title="View Details">
+                      <i class="bi" [ngClass]="selectedItemForDetail?.itemName === item.itemName ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
               
@@ -1104,6 +1118,27 @@
               <span *ngIf="!isAnalyzingItems"><i class="bi bi-stars"></i> Analyze This Item</span>
               <span *ngIf="isAnalyzingItems"><div class="spinner-sm"></div> Analyzing...</span>
             </button>
+          </div>
+
+          <!-- Vendor Comparison Button (for items with multiple vendors) -->
+          <div class="vendor-comparison-action" *ngIf="selectedItemForDetail.vendorOptions.length >= 2">
+            <button 
+              class="btn btn-vendor-compare"
+              (click)="analyzeItemVendorComparison(selectedItemForDetail)"
+              [disabled]="isAnalyzingVendorComparison"
+            >
+              <span *ngIf="!isAnalyzingVendorComparison">
+                <i class="bi bi-diagram-3"></i> 
+                Compare {{ selectedItemForDetail.vendorOptions.length }} Vendors - Which Should I Buy From?
+              </span>
+              <span *ngIf="isAnalyzingVendorComparison">
+                <div class="spinner-sm"></div> Analyzing Vendors...
+              </span>
+            </button>
+            <p class="comparison-hint">
+              <i class="bi bi-info-circle"></i>
+              AI will analyze all {{ selectedItemForDetail.vendorOptions.length }} vendors and recommend the best choice based on price, quality, delivery, and reliability.
+            </p>
           </div>
 
           <!-- Recommended Vendor -->
@@ -1295,6 +1330,204 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="showApiKeyModal = false">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor Comparison Modal -->
+  <div class="modal-overlay" *ngIf="showVendorComparisonModal" (click)="closeVendorComparisonModal()">
+    <div class="modal-content vendor-comparison-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <i class="bi bi-diagram-3"></i>
+          Vendor Comparison Analysis
+        </h2>
+        <button class="close-btn" (click)="closeVendorComparisonModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Loading State -->
+        <div class="comparison-loading" *ngIf="isAnalyzingVendorComparison && !vendorComparisonResult">
+          <div class="spinner"></div>
+          <p>Analyzing vendors and generating recommendations...</p>
+          <small>This may take a few seconds</small>
+        </div>
+        
+        <!-- Results -->
+        <div class="comparison-results" *ngIf="vendorComparisonResult">
+          <!-- Item Info Header -->
+          <div class="comparison-header">
+            <div class="item-info">
+              <h3>{{ vendorComparisonResult.itemName }}</h3>
+              <span class="category-badge">{{ vendorComparisonResult.category }}</span>
+              <span class="vendor-count">{{ vendorComparisonResult.totalVendors }} vendors compared</span>
+            </div>
+          </div>
+          
+          <!-- Best Choice Highlights -->
+          <div class="best-choices-grid">
+            <div class="best-choice-card best-overall" *ngIf="vendorComparisonResult.bestChoice">
+              <div class="choice-label">
+                <i class="bi bi-trophy"></i> Best Overall
+              </div>
+              <div class="choice-vendor">{{ vendorComparisonResult.bestChoice.vendorName }}</div>
+              <div class="choice-score">Score: {{ vendorComparisonResult.bestChoice.overallScore }}/100</div>
+            </div>
+            
+            <div class="best-choice-card best-value" *ngIf="vendorComparisonResult.bestValue">
+              <div class="choice-label">
+                <i class="bi bi-cash-stack"></i> Best Value
+              </div>
+              <div class="choice-vendor">{{ vendorComparisonResult.bestValue.vendorName }}</div>
+              <div class="choice-score">{{ formatCostSavings(vendorComparisonResult.bestValue.costSavingsVsAvg) }}</div>
+            </div>
+            
+            <div class="best-choice-card best-quality" *ngIf="vendorComparisonResult.bestQuality">
+              <div class="choice-label">
+                <i class="bi bi-award"></i> Best Quality
+              </div>
+              <div class="choice-vendor">{{ vendorComparisonResult.bestQuality.vendorName }}</div>
+              <div class="choice-score">Quality: {{ vendorComparisonResult.bestQuality.scores.quality }}%</div>
+            </div>
+            
+            <div class="best-choice-card most-reliable" *ngIf="vendorComparisonResult.mostReliable">
+              <div class="choice-label">
+                <i class="bi bi-clock-history"></i> Most Reliable
+              </div>
+              <div class="choice-vendor">{{ vendorComparisonResult.mostReliable.vendorName }}</div>
+              <div class="choice-score">Delivery: {{ vendorComparisonResult.mostReliable.scores.delivery }}%</div>
+            </div>
+          </div>
+          
+          <!-- Vendor Comparison Table -->
+          <div class="vendor-comparison-section">
+            <h4><i class="bi bi-list-columns-reverse"></i> Detailed Vendor Comparison</h4>
+            <div class="comparison-table-wrapper">
+              <table class="vendor-comparison-table-detailed">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Vendor</th>
+                    <th>Overall Score</th>
+                    <th>Price</th>
+                    <th>Quality</th>
+                    <th>Delivery</th>
+                    <th>Reliability</th>
+                    <th>Cost vs Avg</th>
+                    <th>Verdict</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let vendor of vendorComparisonResult.vendorComparisons" [class.recommended-row]="vendor.isRecommended">
+                    <td>
+                      <span class="rank-badge" [ngClass]="getRankBadgeClass(vendor.rank)">#{{ vendor.rank }}</span>
+                    </td>
+                    <td>
+                      <div class="vendor-cell">
+                        <span class="vendor-avatar" [style.background]="getVendorColor(vendor.vendorName)">
+                          {{ vendor.vendorName.charAt(0) }}
+                        </span>
+                        <span class="vendor-name">{{ vendor.vendorName }}</span>
+                        <span class="recommended-tag" *ngIf="vendor.isRecommended">✓ Recommended</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="score-bar">
+                        <div class="score-fill" [style.width.%]="vendor.overallScore" [ngClass]="getVendorScoreClass(vendor.overallScore)"></div>
+                        <span class="score-value">{{ vendor.overallScore }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="metric-score" [ngClass]="getVendorScoreClass(vendor.scores.price)">{{ vendor.scores.price }}</span>
+                    </td>
+                    <td>
+                      <span class="metric-score" [ngClass]="getVendorScoreClass(vendor.scores.quality)">{{ vendor.scores.quality }}</span>
+                    </td>
+                    <td>
+                      <span class="metric-score" [ngClass]="getVendorScoreClass(vendor.scores.delivery)">{{ vendor.scores.delivery }}</span>
+                    </td>
+                    <td>
+                      <span class="metric-score" [ngClass]="getVendorScoreClass(vendor.scores.reliability)">{{ vendor.scores.reliability }}</span>
+                    </td>
+                    <td>
+                      <span class="savings-badge" [ngClass]="getSavingsClass(vendor.costSavingsVsAvg)">
+                        {{ formatCostSavings(vendor.costSavingsVsAvg) }}
+                      </span>
+                    </td>
+                    <td class="verdict-cell">
+                      <span class="verdict-text">{{ vendor.aiVerdict }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Pros and Cons Section -->
+          <div class="pros-cons-section">
+            <h4><i class="bi bi-list-check"></i> Vendor Pros & Cons</h4>
+            <div class="pros-cons-grid">
+              <div class="vendor-pros-cons" *ngFor="let vendor of vendorComparisonResult.vendorComparisons">
+                <div class="vendor-header" [class.is-recommended]="vendor.isRecommended">
+                  <span class="vendor-avatar-sm" [style.background]="getVendorColor(vendor.vendorName)">
+                    {{ vendor.vendorName.charAt(0) }}
+                  </span>
+                  <span>{{ vendor.vendorName }}</span>
+                  <span class="rank-sm" [ngClass]="getRankBadgeClass(vendor.rank)">#{{ vendor.rank }}</span>
+                </div>
+                <div class="pros-list">
+                  <div class="list-label"><i class="bi bi-check-circle text-success"></i> Pros</div>
+                  <ul>
+                    <li *ngFor="let pro of vendor.pros">{{ pro }}</li>
+                  </ul>
+                </div>
+                <div class="cons-list">
+                  <div class="list-label"><i class="bi bi-x-circle text-danger"></i> Cons</div>
+                  <ul>
+                    <li *ngFor="let con of vendor.cons">{{ con }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recommendations Section -->
+          <div class="recommendations-section">
+            <div class="recommendation-card main-recommendation">
+              <h4><i class="bi bi-lightbulb"></i> Overall Recommendation</h4>
+              <p>{{ vendorComparisonResult.overallRecommendation }}</p>
+            </div>
+            
+            <div class="recommendation-card strategy">
+              <h4><i class="bi bi-diagram-2"></i> Procurement Strategy</h4>
+              <p>{{ vendorComparisonResult.procurementStrategy }}</p>
+            </div>
+            
+            <div class="recommendation-grid">
+              <div class="recommendation-card risk-mitigation">
+                <h4><i class="bi bi-shield-check"></i> Risk Mitigation</h4>
+                <ul>
+                  <li *ngFor="let item of vendorComparisonResult.riskMitigation">{{ item }}</li>
+                </ul>
+              </div>
+              
+              <div class="recommendation-card cost-optimization">
+                <h4><i class="bi bi-graph-down-arrow"></i> Cost Optimization</h4>
+                <ul>
+                  <li *ngFor="let item of vendorComparisonResult.costOptimization">{{ item }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeVendorComparisonModal()">
           Close
         </button>
       </div>
