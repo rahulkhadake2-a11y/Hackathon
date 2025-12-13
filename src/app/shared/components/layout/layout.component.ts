@@ -59,6 +59,12 @@ export class LayoutComponent implements OnInit {
       route: '/document-scanner',
       active: false,
     },
+    {
+      icon: 'bi-graph-up-arrow',
+      label: 'AI Forecasting',
+      route: '/ai-forecasting',
+      active: false,
+    },
   ];
 
   vendorMenuItems = [
@@ -86,6 +92,12 @@ export class LayoutComponent implements OnInit {
       icon: 'bi-file-earmark-text',
       label: 'Doc Scanner',
       route: '/document-scanner',
+      active: false,
+    },
+    {
+      icon: 'bi-graph-up-arrow',
+      label: 'AI Forecasting',
+      route: '/ai-forecasting',
       active: false,
     },
   ];
