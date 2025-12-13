@@ -275,6 +275,25 @@
       "riskScore": 11,
       "createdAt": "2024-02-20T08:00:00.000Z",
       "updatedAt": "2025-12-05T10:00:00.000Z"
+    },
+    {
+      "id": "aa0c",
+      "vendorName": "Test ",
+      "contactPerson": "POC",
+      "email": "poc@gmail.com",
+      "phone": "876543456",
+      "category": "Electronics",
+      "status": "active",
+      "address": "",
+      "city": "Hyd",
+      "country": "India",
+      "taxId": "",
+      "paymentTerms": "Net 30",
+      "creditLimit": 0,
+      "totalPurchases": 0,
+      "rating": 0,
+      "createdAt": "2025-12-12T23:56:49.272Z",
+      "updatedAt": "2025-12-12T23:56:49.272Z"
     }
   ],
   "items": [
@@ -2873,6 +2892,52 @@
       ],
       "createdAt": "2025-03-01T09:00:00.000Z",
       "updatedAt": "2025-12-02T13:00:00.000Z"
+    },
+    {
+      "id": "2ce6",
+      "vendorId": "aa0c",
+      "vendorName": "Test ",
+      "riskLevel": "medium",
+      "overallScore": 28,
+      "financialRisk": 22,
+      "operationalRisk": 47,
+      "complianceRisk": 31,
+      "reputationRisk": 12,
+      "riskFactors": [
+        {
+          "name": "Payment History",
+          "score": 22,
+          "weight": 0.3,
+          "description": "Based on past payment behavior"
+        },
+        {
+          "name": "Delivery Performance",
+          "score": 47,
+          "weight": 0.25,
+          "description": "On-time delivery rate"
+        },
+        {
+          "name": "Regulatory Compliance",
+          "score": 31,
+          "weight": 0.25,
+          "description": "Adherence to regulations"
+        },
+        {
+          "name": "Market Reputation",
+          "score": 12,
+          "weight": 0.2,
+          "description": "Industry standing"
+        }
+      ],
+      "lastAssessmentDate": "2025-12-12T23:56:49.315Z",
+      "nextReviewDate": "2026-03-12T23:56:49.315Z",
+      "recommendations": [
+        "Schedule quarterly reviews",
+        "Request updated financial statements",
+        "Monitor delivery metrics"
+      ],
+      "createdAt": "2025-12-12T23:56:49.315Z",
+      "updatedAt": "2025-12-12T23:56:49.315Z"
     }
   ]
 }
