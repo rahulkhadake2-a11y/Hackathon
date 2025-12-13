@@ -60,6 +60,42 @@ export interface ItemAnalysisResult {
   recommendation: string;
 }
 
+// Interface for detailed vendor comparison when analyzing a single item
+export interface VendorComparisonResult {
+  vendorId: string;
+  vendorName: string;
+  overallScore: number; // 0-100, higher is better
+  rank: number; // 1 = best choice
+  isRecommended: boolean;
+  scores: {
+    price: number; // 0-100
+    quality: number; // 0-100
+    delivery: number; // 0-100
+    reliability: number; // 0-100
+    riskScore: number; // 0-100, lower is better
+  };
+  pros: string[];
+  cons: string[];
+  costSavingsVsAvg: number; // Positive = savings, negative = premium
+  aiVerdict: string; // Short AI recommendation for this vendor
+}
+
+// Interface for detailed item vendor analysis
+export interface DetailedItemAnalysis {
+  itemName: string;
+  category: string;
+  totalVendors: number;
+  vendorComparisons: VendorComparisonResult[];
+  bestChoice: VendorComparisonResult | null;
+  bestValue: VendorComparisonResult | null; // Best price
+  bestQuality: VendorComparisonResult | null; // Highest quality
+  mostReliable: VendorComparisonResult | null; // Best delivery + reliability
+  overallRecommendation: string;
+  procurementStrategy: string;
+  riskMitigation: string[];
+  costOptimization: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -234,6 +270,450 @@ export class AIRiskAnalysisService {
       console.error('Item analysis failed:', error);
       return this.calculateItemRiskLocally(item);
     }
+  }
+
+  /**
+   * Analyze a single item with detailed vendor comparison
+   * This provides a comprehensive analysis of which vendor to choose for an item
+   * when the same product can be purchased from multiple vendors
+   */
+  async analyzeItemVendorComparison(item: ItemAnalysisInput): Promise<DetailedItemAnalysis> {
+    try {
+      switch (this.currentProvider) {
+        case 'gemini':
+          if (this.geminiConfig.apiKey) {
+            return await this.performGeminiVendorComparison(item);
+          }
+          return this.calculateVendorComparisonLocally(item);
+
+        case 'openai':
+          if (this.config.apiKey) {
+            return await this.performOpenAIVendorComparison(item);
+          }
+          return this.calculateVendorComparisonLocally(item);
+
+        case 'local':
+        default:
+          return this.calculateVendorComparisonLocally(item);
+      }
+    } catch (error) {
+      console.error('Vendor comparison analysis failed:', error);
+      return this.calculateVendorComparisonLocally(item);
+    }
+  }
+
+  /**
+   * Perform vendor comparison using Gemini AI
+   */
+  private async performGeminiVendorComparison(item: ItemAnalysisInput): Promise<DetailedItemAnalysis> {
+    const prompt = this.buildVendorComparisonPrompt(item);
+
+    try {
+      const endpoint = `${this.geminiConfig.baseUrl}/${this.geminiConfig.model}:generateContent?key=${this.geminiConfig.apiKey}`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are an expert procurement analyst. Your task is to compare vendors for an item and recommend the best choice. ${prompt}\n\nRespond ONLY with valid JSON, no markdown or explanation.`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 2500
+          }
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Gemini API error for vendor comparison:', response.status);
+        return this.calculateVendorComparisonLocally(item);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!aiResponse) {
+        return this.calculateVendorComparisonLocally(item);
+      }
+
+      return this.parseVendorComparisonResponse(aiResponse, item);
+
+    } catch (error) {
+      console.error('Gemini vendor comparison failed:', error);
+      return this.calculateVendorComparisonLocally(item);
+    }
+  }
+
+  /**
+   * Perform vendor comparison using OpenAI
+   */
+  private async performOpenAIVendorComparison(item: ItemAnalysisInput): Promise<DetailedItemAnalysis> {
+    const prompt = this.buildVendorComparisonPrompt(item);
+
+    try {
+      const response = await fetch(this.config.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`
+        },
+        body: JSON.stringify({
+          model: this.config.model,
+          messages: [
+            {
+              role: 'system',
+              content: `You are an expert procurement analyst specializing in vendor selection and comparison. Compare vendors for items and provide detailed recommendations. Always respond with valid JSON.`
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 2500,
+          temperature: 0.3
+        })
+      });
+
+      if (!response.ok) {
+        return this.calculateVendorComparisonLocally(item);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.choices?.[0]?.message?.content;
+      
+      if (!aiResponse) {
+        return this.calculateVendorComparisonLocally(item);
+      }
+
+      return this.parseVendorComparisonResponse(aiResponse, item);
+
+    } catch (error) {
+      console.error('OpenAI vendor comparison failed:', error);
+      return this.calculateVendorComparisonLocally(item);
+    }
+  }
+
+  /**
+   * Build prompt for detailed vendor comparison
+   */
+  private buildVendorComparisonPrompt(item: ItemAnalysisInput): string {
+    const vendorDetails = item.vendorOptions.map((v, index) => `
+  VENDOR ${index + 1}: ${v.vendorName} (ID: ${v.vendorId})
+    - Unit Price: $${v.avgPrice.toFixed(2)}
+    - Total Quantity Supplied: ${v.totalQuantity} units
+    - Number of Purchases: ${v.purchaseCount}
+    - Quality Score: ${v.qualityScore}/100
+    - On-Time Delivery Rate: ${v.onTimeDeliveryRate}%
+    - Current Risk Score: ${v.riskScore}/100 (lower is better)
+    - Price Variance: ${v.priceVariance?.toFixed(2) || 0}%
+    - Reliability Score: ${v.reliabilityScore || 'N/A'}/100
+    - Last Purchase: ${v.lastPurchaseDate ? new Date(v.lastPurchaseDate).toLocaleDateString() : 'N/A'}`).join('\n');
+
+    const avgPrice = item.avgPrice;
+
+    return `
+VENDOR COMPARISON ANALYSIS REQUEST
+
+I need to purchase "${item.itemName}" (Category: ${item.category || 'General'}) and have ${item.vendorOptions.length} vendors who can supply this item.
+
+ITEM DETAILS:
+- Item Name: ${item.itemName}
+- Category: ${item.category || 'General'}
+- Historical Purchases: ${item.totalPurchases}
+- Total Quantity Purchased: ${item.totalQuantity} units
+- Average Market Price: $${avgPrice.toFixed(2)}
+- Demand Trend: ${item.demandTrend || 'stable'}
+- Supply Chain Risk: ${item.supplyChainRisk || 50}/100
+
+AVAILABLE VENDORS:
+${vendorDetails}
+
+Please analyze each vendor and provide:
+1. A score (0-100) for each vendor across: price, quality, delivery, reliability
+2. Pros and cons for each vendor
+3. Cost savings/premium vs average price
+4. Which vendor is BEST OVERALL (balanced)
+5. Which vendor is BEST VALUE (price)
+6. Which vendor is BEST QUALITY
+7. Which vendor is MOST RELIABLE
+8. Overall procurement strategy recommendation
+9. Risk mitigation suggestions
+10. Cost optimization opportunities
+
+Respond in valid JSON format:
+{
+  "vendorComparisons": [
+    {
+      "vendorId": "string",
+      "vendorName": "string",
+      "overallScore": number,
+      "rank": number,
+      "isRecommended": boolean,
+      "scores": {
+        "price": number,
+        "quality": number,
+        "delivery": number,
+        "reliability": number,
+        "riskScore": number
+      },
+      "pros": ["string"],
+      "cons": ["string"],
+      "costSavingsVsAvg": number,
+      "aiVerdict": "string"
+    }
+  ],
+  "bestChoiceVendorId": "string",
+  "bestValueVendorId": "string",
+  "bestQualityVendorId": "string",
+  "mostReliableVendorId": "string",
+  "overallRecommendation": "string",
+  "procurementStrategy": "string",
+  "riskMitigation": ["string"],
+  "costOptimization": ["string"]
+}`;
+  }
+
+  /**
+   * Parse vendor comparison AI response
+   */
+  private parseVendorComparisonResponse(aiResponse: string, item: ItemAnalysisInput): DetailedItemAnalysis {
+    try {
+      let jsonStr = aiResponse.trim();
+
+      // Remove markdown code blocks if present
+      const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[1].trim();
+      }
+
+      // Find JSON object
+      const jsonStartIndex = jsonStr.indexOf('{');
+      const jsonEndIndex = jsonStr.lastIndexOf('}');
+      if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+        jsonStr = jsonStr.substring(jsonStartIndex, jsonEndIndex + 1);
+      }
+
+      const parsed = JSON.parse(jsonStr);
+
+      // Build vendor comparisons
+      const vendorComparisons: VendorComparisonResult[] = (parsed.vendorComparisons || []).map((vc: any, index: number) => {
+        const originalVendor = item.vendorOptions.find(v => v.vendorId === vc.vendorId || v.vendorName === vc.vendorName);
+        return {
+          vendorId: vc.vendorId || originalVendor?.vendorId || `V${index}`,
+          vendorName: vc.vendorName || originalVendor?.vendorName || `Vendor ${index + 1}`,
+          overallScore: Math.max(0, Math.min(100, vc.overallScore || 50)),
+          rank: vc.rank || index + 1,
+          isRecommended: vc.isRecommended || false,
+          scores: {
+            price: vc.scores?.price || 50,
+            quality: vc.scores?.quality || originalVendor?.qualityScore || 50,
+            delivery: vc.scores?.delivery || originalVendor?.onTimeDeliveryRate || 50,
+            reliability: vc.scores?.reliability || originalVendor?.reliabilityScore || 50,
+            riskScore: vc.scores?.riskScore || originalVendor?.riskScore || 50
+          },
+          pros: Array.isArray(vc.pros) ? vc.pros : [],
+          cons: Array.isArray(vc.cons) ? vc.cons : [],
+          costSavingsVsAvg: vc.costSavingsVsAvg || ((item.avgPrice - (originalVendor?.avgPrice || item.avgPrice)) / item.avgPrice * 100),
+          aiVerdict: vc.aiVerdict || 'No verdict provided'
+        };
+      });
+
+      // If AI didn't return comparisons, calculate locally
+      if (vendorComparisons.length === 0) {
+        return this.calculateVendorComparisonLocally(item);
+      }
+
+      // Sort by overall score
+      vendorComparisons.sort((a, b) => b.overallScore - a.overallScore);
+      vendorComparisons.forEach((vc, idx) => vc.rank = idx + 1);
+      if (vendorComparisons.length > 0) {
+        vendorComparisons[0].isRecommended = true;
+      }
+
+      // Find best in each category
+      const findVendor = (vendorId: string) => vendorComparisons.find(v => v.vendorId === vendorId) || null;
+      
+      const bestChoice = vendorComparisons[0] || null;
+      const bestValue = [...vendorComparisons].sort((a, b) => b.scores.price - a.scores.price)[0] || null;
+      const bestQuality = [...vendorComparisons].sort((a, b) => b.scores.quality - a.scores.quality)[0] || null;
+      const mostReliable = [...vendorComparisons].sort((a, b) => (b.scores.delivery + b.scores.reliability) - (a.scores.delivery + a.scores.reliability))[0] || null;
+
+      return {
+        itemName: item.itemName,
+        category: item.category || 'General',
+        totalVendors: item.vendorOptions.length,
+        vendorComparisons,
+        bestChoice,
+        bestValue: parsed.bestValueVendorId ? findVendor(parsed.bestValueVendorId) : bestValue,
+        bestQuality: parsed.bestQualityVendorId ? findVendor(parsed.bestQualityVendorId) : bestQuality,
+        mostReliable: parsed.mostReliableVendorId ? findVendor(parsed.mostReliableVendorId) : mostReliable,
+        overallRecommendation: parsed.overallRecommendation || `Recommend ${bestChoice?.vendorName} as the best overall choice.`,
+        procurementStrategy: parsed.procurementStrategy || 'Continue with current procurement approach.',
+        riskMitigation: Array.isArray(parsed.riskMitigation) ? parsed.riskMitigation : ['Monitor vendor performance regularly'],
+        costOptimization: Array.isArray(parsed.costOptimization) ? parsed.costOptimization : ['Negotiate volume discounts']
+      };
+
+    } catch (error) {
+      console.error('Failed to parse vendor comparison response:', error);
+      return this.calculateVendorComparisonLocally(item);
+    }
+  }
+
+  /**
+   * Calculate vendor comparison locally without AI
+   */
+  private calculateVendorComparisonLocally(item: ItemAnalysisInput): DetailedItemAnalysis {
+    const avgPrice = item.avgPrice;
+    
+    // Calculate scores for each vendor
+    const vendorComparisons: VendorComparisonResult[] = item.vendorOptions.map((v, index) => {
+      // Price score (lower price = higher score)
+      const priceDiff = ((avgPrice - v.avgPrice) / avgPrice) * 100;
+      const priceScore = Math.max(0, Math.min(100, 50 + priceDiff * 2));
+      
+      // Quality score
+      const qualityScore = v.qualityScore || 80;
+      
+      // Delivery score
+      const deliveryScore = v.onTimeDeliveryRate || 90;
+      
+      // Reliability score
+      const reliabilityScore = v.reliabilityScore || Math.min(100, 50 + v.purchaseCount * 5);
+      
+      // Risk score (lower is better)
+      const riskScore = v.riskScore || 30;
+      
+      // Overall score (weighted)
+      const overallScore = Math.round(
+        (priceScore * 0.25) +
+        (qualityScore * 0.30) +
+        (deliveryScore * 0.25) +
+        (reliabilityScore * 0.10) +
+        ((100 - riskScore) * 0.10)
+      );
+
+      // Generate pros
+      const pros: string[] = [];
+      if (priceScore >= 60) pros.push(`Competitive pricing ($${v.avgPrice.toFixed(2)})`);
+      if (qualityScore >= 90) pros.push(`Excellent quality score (${qualityScore}%)`);
+      if (deliveryScore >= 95) pros.push(`Outstanding delivery performance (${deliveryScore}%)`);
+      if (v.purchaseCount >= 10) pros.push(`Proven track record (${v.purchaseCount} orders)`);
+      if (riskScore <= 20) pros.push('Low risk vendor');
+      if (pros.length === 0) pros.push('Acceptable overall performance');
+
+      // Generate cons
+      const cons: string[] = [];
+      if (priceScore < 40) cons.push(`Higher than average price (+${Math.abs(priceDiff).toFixed(1)}%)`);
+      if (qualityScore < 80) cons.push(`Quality concerns (${qualityScore}%)`);
+      if (deliveryScore < 85) cons.push(`Delivery issues (${deliveryScore}% on-time)`);
+      if (v.purchaseCount < 3) cons.push('Limited purchase history');
+      if (riskScore >= 50) cons.push(`Higher risk profile (${riskScore})`);
+      if (cons.length === 0) cons.push('No significant concerns');
+
+      // Cost savings vs average
+      const costSavingsVsAvg = priceDiff;
+
+      // AI verdict
+      let aiVerdict = '';
+      if (overallScore >= 80) {
+        aiVerdict = 'Excellent choice - highly recommended for this item';
+      } else if (overallScore >= 65) {
+        aiVerdict = 'Good option - reliable vendor with solid performance';
+      } else if (overallScore >= 50) {
+        aiVerdict = 'Acceptable - consider for backup or price negotiation';
+      } else {
+        aiVerdict = 'Caution advised - significant improvement needed';
+      }
+
+      return {
+        vendorId: v.vendorId,
+        vendorName: v.vendorName,
+        overallScore,
+        rank: 0, // Will be set after sorting
+        isRecommended: false,
+        scores: {
+          price: Math.round(priceScore),
+          quality: qualityScore,
+          delivery: deliveryScore,
+          reliability: Math.round(reliabilityScore),
+          riskScore
+        },
+        pros,
+        cons,
+        costSavingsVsAvg,
+        aiVerdict
+      };
+    });
+
+    // Sort by overall score and assign ranks
+    vendorComparisons.sort((a, b) => b.overallScore - a.overallScore);
+    vendorComparisons.forEach((vc, idx) => {
+      vc.rank = idx + 1;
+      vc.isRecommended = idx === 0;
+    });
+
+    // Identify best in each category
+    const bestChoice = vendorComparisons[0] || null;
+    const bestValue = [...vendorComparisons].sort((a, b) => b.scores.price - a.scores.price)[0] || null;
+    const bestQuality = [...vendorComparisons].sort((a, b) => b.scores.quality - a.scores.quality)[0] || null;
+    const mostReliable = [...vendorComparisons].sort((a, b) => 
+      (b.scores.delivery + b.scores.reliability) - (a.scores.delivery + a.scores.reliability)
+    )[0] || null;
+
+    // Generate recommendations
+    const overallRecommendation = bestChoice 
+      ? `Based on comprehensive analysis, ${bestChoice.vendorName} is the recommended vendor for "${item.itemName}" with an overall score of ${bestChoice.overallScore}/100. They offer the best balance of price, quality, and reliability.`
+      : 'Unable to determine a recommended vendor. Consider expanding vendor options.';
+
+    const procurementStrategy = item.vendorOptions.length === 1
+      ? `SINGLE SOURCE RISK: Only one vendor available. Urgently qualify additional suppliers to reduce dependency on ${item.vendorOptions[0]?.vendorName}.`
+      : item.vendorOptions.length >= 3
+        ? `MULTI-SOURCE STRATEGY: With ${item.vendorOptions.length} qualified vendors, consider splitting orders to maintain relationships and leverage competitive pricing.`
+        : `DUAL SOURCE: Two vendors available. Maintain both relationships for supply security.`;
+
+    const riskMitigation: string[] = [];
+    if (item.vendorOptions.length === 1) {
+      riskMitigation.push('Qualify at least one backup vendor to reduce single-source risk');
+    }
+    if (item.supplyChainRisk && item.supplyChainRisk > 50) {
+      riskMitigation.push('Consider safety stock for this high-risk item');
+    }
+    if (bestChoice && bestChoice.scores.riskScore > 30) {
+      riskMitigation.push(`Monitor ${bestChoice.vendorName} closely for potential issues`);
+    }
+    riskMitigation.push('Conduct quarterly vendor performance reviews');
+
+    const costOptimization: string[] = [];
+    if (bestValue && bestChoice && bestValue.vendorId !== bestChoice.vendorId) {
+      costOptimization.push(`Consider ${bestValue.vendorName} for non-critical orders (${bestValue.costSavingsVsAvg.toFixed(1)}% savings)`);
+    }
+    if (item.totalQuantity > 100) {
+      costOptimization.push('Negotiate volume discounts for high-quantity purchases');
+    }
+    costOptimization.push('Consolidate orders to reduce shipping costs');
+    if (item.vendorOptions.length >= 2) {
+      costOptimization.push('Use competitive bidding to drive better pricing');
+    }
+
+    return {
+      itemName: item.itemName,
+      category: item.category || 'General',
+      totalVendors: item.vendorOptions.length,
+      vendorComparisons,
+      bestChoice,
+      bestValue,
+      bestQuality,
+      mostReliable,
+      overallRecommendation,
+      procurementStrategy,
+      riskMitigation,
+      costOptimization
+    };
   }
 
   /**
