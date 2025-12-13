@@ -14,6 +14,7 @@ import { AddPurchaseComponent } from './pages/add-purchase/add-purchase.componen
 import { AIRiskAnalysisService } from './core/services/ai-risk-analysis/ai-risk-analysis.service';
 import { MasterDataComponent } from './shared/components/master-data/master-data.component';
 import { DocumentScannerComponent } from './pages/document-scanner/document-scanner.component';
+import { AiForecastingComponent } from './pages/ai-forecasting/ai-forecasting.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -36,6 +37,7 @@ export const routes: Routes = [
       { path: 'aianalysis', component: RiskAnalysisComponent },
       { path: 'master-data', component: MasterDataComponent },
       { path: 'document-scanner', component: DocumentScannerComponent },
+      { path: 'ai-forecasting', component: AiForecastingComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

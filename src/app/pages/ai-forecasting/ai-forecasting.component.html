@@ -1,0 +1,656 @@
+<div class="forecasting-container">
+  <!-- Header -->
+  <div class="forecasting-header">
+    <div class="header-content">
+      <div class="header-title">
+        <i class="bi bi-graph-up-arrow"></i>
+        <div>
+          <h1>AI Forecasting</h1>
+          <p class="subtitle">Predictive analytics powered by your ERP data</p>
+        </div>
+      </div>
+      <button
+        class="btn-refresh"
+        (click)="refreshForecast()"
+        [disabled]="isLoading"
+      >
+        <i class="bi bi-arrow-clockwise" [class.spinning]="isLoading"></i>
+        Refresh Forecast
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Analyzing your data...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <div class="error-card">
+      <i class="bi bi-exclamation-triangle"></i>
+      <h3>Unable to Load Forecasts</h3>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="refreshForecast()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="forecasting-content" *ngIf="forecast && !isLoading">
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card critical">
+        <div class="summary-icon">
+          <i class="bi bi-exclamation-octagon"></i>
+        </div>
+        <div class="summary-info">
+          <span class="summary-value">{{
+            forecast.summary.criticalItems
+          }}</span>
+          <span class="summary-label">Critical Items</span>
+        </div>
+      </div>
+
+      <div class="summary-card warning">
+        <div class="summary-icon">
+          <i class="bi bi-box-seam"></i>
+        </div>
+        <div class="summary-info">
+          <span class="summary-value">{{
+            forecast.summary.stockOutAlerts
+          }}</span>
+          <span class="summary-label">Stock-out Alerts</span>
+        </div>
+      </div>
+
+      <div class="summary-card info">
+        <div class="summary-icon">
+          <i class="bi bi-graph-up"></i>
+        </div>
+        <div class="summary-info">
+          <span class="summary-value">{{
+            forecast.summary.risingDemandItems
+          }}</span>
+          <span class="summary-label">Rising Demand</span>
+        </div>
+      </div>
+
+      <div class="summary-card danger">
+        <div class="summary-icon">
+          <i class="bi bi-person-exclamation"></i>
+        </div>
+        <div class="summary-info">
+          <span class="summary-value">{{
+            forecast.summary.atRiskVendors
+          }}</span>
+          <span class="summary-label">At-Risk Vendors</span>
+        </div>
+      </div>
+
+      <div class="summary-card success">
+        <div class="summary-icon">
+          <i class="bi bi-piggy-bank"></i>
+        </div>
+        <div class="summary-info">
+          <span class="summary-value">{{
+            formatCurrency(forecast.summary.totalSavingsOpportunity)
+          }}</span>
+          <span class="summary-label">Savings Opportunity</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Navigation (Mobile) -->
+    <div class="tab-navigation">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'stockout'"
+        (click)="setActiveTab('stockout')"
+      >
+        <i class="bi bi-box-seam"></i>
+        Stock-out
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'demand'"
+        (click)="setActiveTab('demand')"
+      >
+        <i class="bi bi-graph-up"></i>
+        Demand
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'pricing'"
+        (click)="setActiveTab('pricing')"
+      >
+        <i class="bi bi-currency-dollar"></i>
+        Pricing
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'vendor'"
+        (click)="setActiveTab('vendor')"
+      >
+        <i class="bi bi-people"></i>
+        Vendors
+      </button>
+    </div>
+
+    <!-- Forecast Sections -->
+    <div class="forecast-grid">
+      <!-- Stock-out Predictions -->
+      <div
+        class="forecast-section"
+        [class.active]="activeTab === 'stockout'"
+        [class.collapsed]="!expandedSections['stockout']"
+      >
+        <div class="section-header" (click)="toggleSection('stockout')">
+          <div class="section-title">
+            <i class="bi bi-box-seam"></i>
+            <h2>Stock-out Predictions</h2>
+            <span
+              class="badge badge-critical"
+              *ngIf="getTopStockOutRisks().length"
+            >
+              {{ getTopStockOutRisks().length }} alerts
+            </span>
+          </div>
+          <i
+            class="bi"
+            [ngClass]="
+              expandedSections['stockout'] ? 'bi-chevron-up' : 'bi-chevron-down'
+            "
+          ></i>
+        </div>
+
+        <div class="section-content" *ngIf="expandedSections['stockout']">
+          <div
+            class="forecast-list"
+            *ngIf="forecast.stockOutForecasts.length > 0; else noStockOut"
+          >
+            <div
+              class="forecast-item"
+              *ngFor="let item of forecast.stockOutForecasts"
+              [ngClass]="getRiskLevelClass(item.riskLevel)"
+            >
+              <div class="item-header">
+                <div class="item-info">
+                  <span class="item-code">{{ item.itemCode }}</span>
+                  <span class="item-name">{{ item.itemName }}</span>
+                </div>
+                <span
+                  class="badge"
+                  [ngClass]="getRiskLevelClass(item.riskLevel)"
+                >
+                  {{ item.riskLevel | uppercase }}
+                </span>
+              </div>
+
+              <div class="item-details">
+                <div class="detail">
+                  <span class="label">Current Stock</span>
+                  <span class="value">{{ item.currentStock }} units</span>
+                </div>
+                <div class="detail">
+                  <span class="label">Days Until Stock-out</span>
+                  <span class="value highlight"
+                    >{{ item.daysUntilStockOut }} days</span
+                  >
+                </div>
+                <div class="detail">
+                  <span class="label">Daily Usage</span>
+                  <span class="value"
+                    >{{ item.avgDailyUsage | number : "1.1-1" }} units/day</span
+                  >
+                </div>
+                <div class="detail">
+                  <span class="label">Predicted Date</span>
+                  <span class="value">{{ item.predictedStockOutDate }}</span>
+                </div>
+              </div>
+
+              <div class="item-progress">
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    [style.width]="getStockOutProgress(item) + '%'"
+                    [ngClass]="getRiskLevelClass(item.riskLevel)"
+                  ></div>
+                </div>
+                <span class="progress-label"
+                  >{{ getStockOutProgress(item) | number : "1.0-0" }}% until
+                  stock-out</span
+                >
+              </div>
+
+              <div class="item-action">
+                <div class="recommendation">
+                  <i class="bi bi-lightbulb"></i>
+                  <span
+                    >Recommended order:
+                    <strong>{{ item.suggestedOrderQty }}</strong> units</span
+                  >
+                </div>
+                <div class="trend" [ngClass]="getTrendClass(item.trend)">
+                  <i class="bi" [ngClass]="getTrendIcon(item.trend)"></i>
+                  <span>Usage {{ item.trend }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noStockOut>
+            <div class="empty-state">
+              <i class="bi bi-check-circle"></i>
+              <p>No stock-out risks detected</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Demand Forecasts -->
+      <div
+        class="forecast-section"
+        [class.active]="activeTab === 'demand'"
+        [class.collapsed]="!expandedSections['demand']"
+      >
+        <div class="section-header" (click)="toggleSection('demand')">
+          <div class="section-title">
+            <i class="bi bi-graph-up"></i>
+            <h2>Demand Forecasts</h2>
+            <span
+              class="badge badge-info"
+              *ngIf="getDemandGrowthItems().length"
+            >
+              {{ getDemandGrowthItems().length }} rising
+            </span>
+          </div>
+          <i
+            class="bi"
+            [ngClass]="
+              expandedSections['demand'] ? 'bi-chevron-up' : 'bi-chevron-down'
+            "
+          ></i>
+        </div>
+
+        <div class="section-content" *ngIf="expandedSections['demand']">
+          <div
+            class="forecast-list"
+            *ngIf="forecast.demandForecasts.length > 0; else noDemand"
+          >
+            <div
+              class="forecast-item demand-item"
+              *ngFor="let item of forecast.demandForecasts"
+            >
+              <div class="item-header">
+                <div class="item-info">
+                  <span class="item-code">{{ item.itemCode }}</span>
+                  <span class="item-name">{{ item.itemName }}</span>
+                </div>
+                <div
+                  class="trend-badge"
+                  [ngClass]="getTrendClass(item.demandTrend)"
+                >
+                  <i class="bi" [ngClass]="getTrendIcon(item.demandTrend)"></i>
+                  {{ item.demandTrend }}
+                </div>
+              </div>
+
+              <div class="demand-chart">
+                <div class="chart-bars">
+                  <div class="bar-group">
+                    <div
+                      class="bar last-month"
+                      [style.height]="
+                        (item.lastMonthDemand / item.predictedNextMonthDemand) *
+                          100 +
+                        '%'
+                      "
+                    ></div>
+                    <span class="bar-label">Last</span>
+                  </div>
+                  <div class="bar-group">
+                    <div
+                      class="bar current-month"
+                      [style.height]="
+                        (item.currentMonthDemand /
+                          item.predictedNextMonthDemand) *
+                          100 +
+                        '%'
+                      "
+                    ></div>
+                    <span class="bar-label">Current</span>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar predicted" [style.height]="100 + '%'"></div>
+                    <span class="bar-label">Predicted</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="item-details">
+                <div class="detail">
+                  <span class="label">Current Month</span>
+                  <span class="value">{{ item.currentMonthDemand }} units</span>
+                </div>
+                <div class="detail">
+                  <span class="label">Predicted Next</span>
+                  <span class="value highlight"
+                    >{{ item.predictedNextMonthDemand }} units</span
+                  >
+                </div>
+                <div class="detail">
+                  <span class="label">Growth Rate</span>
+                  <span
+                    class="value"
+                    [ngClass]="item.growthRate >= 0 ? 'positive' : 'negative'"
+                  >
+                    {{ formatPercent(item.growthRate) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="confidence-meter">
+                <span class="confidence-label"
+                  >Confidence: {{ item.confidence }}%</span
+                >
+                <div class="confidence-bar">
+                  <div
+                    class="confidence-fill"
+                    [style.width]="getConfidenceWidth(item.confidence)"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noDemand>
+            <div class="empty-state">
+              <i class="bi bi-bar-chart"></i>
+              <p>No demand data available</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Pricing Trends -->
+      <div
+        class="forecast-section"
+        [class.active]="activeTab === 'pricing'"
+        [class.collapsed]="!expandedSections['pricing']"
+      >
+        <div class="section-header" (click)="toggleSection('pricing')">
+          <div class="section-title">
+            <i class="bi bi-currency-dollar"></i>
+            <h2>Pricing Trends</h2>
+            <span class="badge badge-warning" *ngIf="getPriceAlerts().length">
+              {{ getPriceAlerts().length }} alerts
+            </span>
+          </div>
+          <i
+            class="bi"
+            [ngClass]="
+              expandedSections['pricing'] ? 'bi-chevron-up' : 'bi-chevron-down'
+            "
+          ></i>
+        </div>
+
+        <div class="section-content" *ngIf="expandedSections['pricing']">
+          <div
+            class="forecast-list"
+            *ngIf="forecast.pricingForecasts.length > 0; else noPricing"
+          >
+            <div
+              class="forecast-item pricing-item"
+              *ngFor="let item of forecast.pricingForecasts"
+            >
+              <div class="item-header">
+                <div class="item-info">
+                  <span class="item-code">{{ item.itemCode }}</span>
+                  <span class="item-name">{{ item.itemName }}</span>
+                </div>
+                <span
+                  class="volatility-badge"
+                  [ngClass]="'volatility-' + item.volatility"
+                >
+                  {{ item.volatility }} volatility
+                </span>
+              </div>
+
+              <div class="price-comparison">
+                <div class="price-box">
+                  <span class="price-label">Current Avg</span>
+                  <span class="price-value">{{
+                    formatCurrency(item.currentAvgPrice)
+                  }}</span>
+                </div>
+                <div
+                  class="price-arrow"
+                  [ngClass]="getTrendClass(item.priceTrend)"
+                >
+                  <i class="bi" [ngClass]="getTrendIcon(item.priceTrend)"></i>
+                  <span
+                    class="change"
+                    [ngClass]="item.priceChangePercent >= 0 ? 'up' : 'down'"
+                  >
+                    {{ formatPercent(item.priceChangePercent) }}
+                  </span>
+                </div>
+                <div class="price-box predicted">
+                  <span class="price-label">Predicted</span>
+                  <span class="price-value">{{
+                    formatCurrency(item.predictedNextPrice)
+                  }}</span>
+                </div>
+              </div>
+
+              <div class="item-details">
+                <div class="detail">
+                  <span class="label">Last Month Avg</span>
+                  <span class="value">{{
+                    formatCurrency(item.lastMonthAvgPrice)
+                  }}</span>
+                </div>
+                <div class="detail">
+                  <span class="label">Best Vendor Price</span>
+                  <span class="value highlight">{{
+                    formatCurrency(item.bestVendorPrice)
+                  }}</span>
+                </div>
+                <div class="detail">
+                  <span class="label">Best Vendor</span>
+                  <span class="value">{{ item.bestVendor }}</span>
+                </div>
+              </div>
+
+              <div
+                class="item-action savings"
+                *ngIf="item.savingsOpportunity > 0"
+              >
+                <i class="bi bi-piggy-bank"></i>
+                <span
+                  >Potential savings:
+                  <strong>{{
+                    formatCurrency(item.savingsOpportunity)
+                  }}</strong></span
+                >
+              </div>
+            </div>
+          </div>
+          <ng-template #noPricing>
+            <div class="empty-state">
+              <i class="bi bi-currency-dollar"></i>
+              <p>No pricing data available</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Vendor Risk Predictions -->
+      <div
+        class="forecast-section"
+        [class.active]="activeTab === 'vendor'"
+        [class.collapsed]="!expandedSections['vendor']"
+      >
+        <div class="section-header" (click)="toggleSection('vendor')">
+          <div class="section-title">
+            <i class="bi bi-people"></i>
+            <h2>Vendor Risk Analysis</h2>
+            <span
+              class="badge badge-danger"
+              *ngIf="getHighRiskVendors().length"
+            >
+              {{ getHighRiskVendors().length }} at risk
+            </span>
+          </div>
+          <i
+            class="bi"
+            [ngClass]="
+              expandedSections['vendor'] ? 'bi-chevron-up' : 'bi-chevron-down'
+            "
+          ></i>
+        </div>
+
+        <div class="section-content" *ngIf="expandedSections['vendor']">
+          <div
+            class="forecast-list"
+            *ngIf="forecast.vendorRiskForecasts.length > 0; else noVendor"
+          >
+            <div
+              class="forecast-item vendor-item"
+              *ngFor="let vendor of forecast.vendorRiskForecasts"
+              [ngClass]="getAlertLevelClass(vendor.alertLevel)"
+            >
+              <div class="item-header">
+                <div class="item-info">
+                  <span class="vendor-name">{{ vendor.vendorName }}</span>
+                  <span class="vendor-category">{{ vendor.category }}</span>
+                </div>
+                <span
+                  class="alert-badge"
+                  [ngClass]="getAlertLevelClass(vendor.alertLevel)"
+                >
+                  <i class="bi bi-bell"></i>
+                  {{ vendor.alertLevel }}
+                </span>
+              </div>
+
+              <div class="risk-scores">
+                <div class="risk-score-item">
+                  <span class="score-label">Current Risk</span>
+                  <div class="score-bar">
+                    <div
+                      class="score-fill"
+                      [style.width]="vendor.currentRiskScore + '%'"
+                      [ngClass]="
+                        getRiskLevelClass(
+                          vendor.currentRiskScore > 70
+                            ? 'critical'
+                            : vendor.currentRiskScore > 40
+                            ? 'high'
+                            : 'low'
+                        )
+                      "
+                    ></div>
+                  </div>
+                  <span class="score-value"
+                    >{{ vendor.currentRiskScore }}%</span
+                  >
+                </div>
+                <div class="risk-score-item">
+                  <span class="score-label">Predicted Risk</span>
+                  <div class="score-bar">
+                    <div
+                      class="score-fill"
+                      [style.width]="vendor.predictedRiskScore + '%'"
+                      [ngClass]="
+                        getRiskLevelClass(
+                          vendor.predictedRiskScore > 70
+                            ? 'critical'
+                            : vendor.predictedRiskScore > 40
+                            ? 'high'
+                            : 'low'
+                        )
+                      "
+                    ></div>
+                  </div>
+                  <span class="score-value"
+                    >{{ vendor.predictedRiskScore }}%</span
+                  >
+                </div>
+              </div>
+
+              <div class="item-details vendor-metrics">
+                <div class="metric">
+                  <span class="metric-label">On-Time Delivery</span>
+                  <div class="metric-value">
+                    <span>{{ vendor.onTimeDeliveryRate }}%</span>
+                    <span
+                      class="trend-indicator"
+                      [ngClass]="getTrendClass(vendor.deliveryTrend)"
+                    >
+                      <i
+                        class="bi"
+                        [ngClass]="getTrendIcon(vendor.deliveryTrend)"
+                      ></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Quality Score</span>
+                  <div class="metric-value">
+                    <span>{{ vendor.qualityScore }}%</span>
+                    <span
+                      class="trend-indicator"
+                      [ngClass]="getTrendClass(vendor.qualityTrend)"
+                    >
+                      <i
+                        class="bi"
+                        [ngClass]="getTrendIcon(vendor.qualityTrend)"
+                      ></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">Payment Health</span>
+                  <span
+                    class="health-badge"
+                    [ngClass]="'health-' + vendor.paymentHealth"
+                  >
+                    {{ vendor.paymentHealth }}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                class="recommendations"
+                *ngIf="vendor.recommendations.length > 0"
+              >
+                <h4><i class="bi bi-lightbulb"></i> Recommendations</h4>
+                <ul>
+                  <li *ngFor="let rec of vendor.recommendations">{{ rec }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <ng-template #noVendor>
+            <div class="empty-state">
+              <i class="bi bi-people"></i>
+              <p>No vendor risk data available</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Last Updated -->
+    <div class="last-updated">
+      <i class="bi bi-clock-history"></i>
+      <span
+        >Last updated:
+        {{ forecast.summary.lastUpdated | date : "medium" }}</span
+      >
+    </div>
+  </div>
+</div>
